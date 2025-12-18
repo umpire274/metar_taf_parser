@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-alpha2] – 2025-XX-XX
+
+### Added
+
+#### CLI output
+
+- New `--json` flag to output parsed METAR and TAF data in JSON format
+- New `--raw` flag to output raw METAR or TAF strings only
+- `--json` and `--raw` are mutually exclusive (validated by clap)
+
+#### CLI behavior
+
+- Cleaner and more predictable output modes:
+    - default: parsed debug output
+    - `--json`: machine-readable JSON only
+    - `--raw`: raw report only
+- Improved scriptability and pipeline integration
+
+### Notes
+
+- This is an **alpha release**.
+- Output formats are stabilizing but may still change in future alpha versions.
+
+---
+
 ## [0.2.0-alpha1] – 2025-XX-XX
 
 ### Added
@@ -102,3 +127,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.0]: https://github.com/<your-org-or-user>/metar_taf_parser/releases/tag/v0.1.0
 
 [0.2.0-alpha1]: https://github.com/<your-org-or-user>/metar_taf_parser/releases/tag/v0.2.0-alpha1
+
+[0.2.0-alpha2]: https://github.com/<your-org-or-user>/metar_taf_parser/releases/tag/v0.2.0-alpha2
