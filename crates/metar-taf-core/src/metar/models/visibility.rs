@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq, Eq, Clone)]
+use serde::Serialize;
+
+#[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 pub enum Visibility {
     CAVOK,
     Single {
@@ -11,7 +13,7 @@ pub enum Visibility {
     },
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 pub enum VisibilityDirection {
     N,
     NE,

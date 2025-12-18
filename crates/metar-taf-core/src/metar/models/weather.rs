@@ -1,11 +1,13 @@
-#[derive(Debug, PartialEq, Eq, Clone)]
+use serde::Serialize;
+
+#[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 pub enum WeatherIntensity {
     Light,
     Moderate,
     Heavy,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 pub enum WeatherDescriptor {
     Shallow,      // MI
     Partial,      // PR
@@ -18,7 +20,7 @@ pub enum WeatherDescriptor {
     Vicinity,     // VC
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 pub enum WeatherPhenomenon {
     Rain,       // RA
     Snow,       // SN
@@ -33,7 +35,7 @@ pub enum WeatherPhenomenon {
     Unknown(String),
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 pub struct Weather {
     pub intensity: Option<WeatherIntensity>,
     pub descriptors: Vec<WeatherDescriptor>,

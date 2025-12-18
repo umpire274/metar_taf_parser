@@ -4,8 +4,9 @@ use crate::metar::models::temperature::Temperature;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::models::weather::Weather;
 use crate::metar::models::wind::Wind;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Metar {
     pub station: String,
     pub time: Option<super::time::MetarTime>,

@@ -36,5 +36,13 @@ pub enum Commands {
         /// Fetch both METAR and TAF
         #[arg(long)]
         all: bool,
+
+        /// Output parsed data as JSON
+        #[arg(long, conflicts_with = "raw")]
+        json: bool,
+
+        /// Output raw METAR / TAF only
+        #[arg(long, conflicts_with = "json")]
+        raw: bool,
     },
 }

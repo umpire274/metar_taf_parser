@@ -9,6 +9,7 @@ license = "MIT"
 metar-taf-core = { path = "../metar-taf-core" }
 clap = { version = "4.5.53", features = ["derive"] }
 reqwest = { version = "0.12.26", features = ["blocking", "rustls-tls"] }
+serde_json = "1.0.145"
 
 [[bin]]
 name = "metar-taf"
