@@ -1,2 +1,170 @@
 # metar_taf_parser
-metar_taf_parser: a Rust library for parsing and explaining METAR or TAF strings in natural language
+
+A modern, strongly-typed **METAR and TAF parser** written in Rust.
+
+`metar_taf_parser` provides a reusable parsing library and a command-line interface
+to parse aviation weather reports (METAR and TAF) into structured data,
+with full support for advanced weather phenomena.
+
+---
+
+## ✈️ Features
+
+### METAR parsing
+
+- Station identifier
+- Observation time (`ddhhmmZ`)
+- Wind:
+    - direction, speed, gusts
+    - variable wind
+- Visibility:
+    - prevailing visibility
+    - minimum visibility with direction (e.g. `2000SW`)
+- Cloud layers:
+    - FEW, SCT, BKN, OVC
+    - cloud height
+    - cloud types (CB, TCU)
+- Temperature and dew point
+- Pressure (QNH)
+- **Advanced weather phenomena**:
+    - intensity (`-`, `+`)
+    - descriptors (`TS`, `SH`, `FZ`, `VC`, …)
+    - phenomena (`RA`, `SN`, `BR`, `FG`, …)
+    - multiple simultaneous weather groups
+
+### TAF parsing
+
+- Full TAF header parsing (station, issue time, validity)
+- Forecast groups:
+    - Base forecast
+    - `FM`
+    - `BECMG`
+    - `TEMPO`
+    - `PROB30` / `PROB40` (with or without `TEMPO`)
+- Reuse of METAR parsing logic for:
+    - wind
+    - visibility
+    - clouds
+    - weather
+- Explicit forecast period modeling
+
+---
+
+## 🧱 Architecture
+
+The project is structured as a Rust workspace:
+
+```text
+metar_taf_parser/
+├── crates/
+│ ├── metar-taf-core/ # Parsing library
+│ └── metar-taf-cli/ # Command-line interface
+├── Cargo.toml
+├── README.md
+└── CHANGELOG.md
+```
+
+### Core library (`metar-taf-core`)
+
+- Token-based parsing
+- Strongly typed domain models
+- Designed to be embedded in other applications
+- No I/O, no CLI assumptions
+
+### CLI (`metar-taf-cli`)
+
+- Simple interface for parsing METAR / TAF strings
+- Intended mainly for inspection and testing
+- Will evolve in future releases
+
+---
+
+## 🚀 Installation
+
+### From source
+
+```bash
+git clone https://github.com/<your-org-or-user>/metar_taf_parser.git
+cd metar_taf_parser
+cargo build --release
+```
+
+---
+
+## 🖥️ CLI usage
+
+To run the CLI parser, use:
+
+```bash
+cargo run -p metar-taf-cli
+```
+
+Then provide a METAR or TAF string via standard input.
+
+> The CLI is intentionally minimal in v0.1.0. Output formatting and JSON export are planned for future versions.
+
+---
+
+## 📚 Library usage
+
+Add the core crate to your Cargo.toml:
+
+```toml
+[dependencies]
+metar-taf-core = "0.1.0"
+```
+
+Example:
+
+```rust
+use metar_taf_core::parse_metar;
+
+let metar = parse_metar(
+"LIRF 121250Z 18012KT 9999 FEW030 SCT080 18/12 Q1015"
+) ?;
+
+println!("{:#?}", metar);
+```
+
+---
+
+## 🧪 Testing & quality
+
+- Unit tests for individual parsers 
+- Golden tests using real-world METAR and TAF reports 
+- `cargo clippy` clean with `-D warnings`
+
+---
+
+## 📦 Versioning
+
+This project follows **Semantic Versioning**.
+
+- `0.1.0` is the **initial stable release** 
+- Public API is considered **experimental** and may evolve in future minor versions
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
+
+---
+
+## 🛣️ Roadmap
+
+Planned for future releases:
+
+- JSON output for CLI 
+- Pretty-print / human-readable CLI output 
+- Additional TAF groups (INTER, CNL, AMD)
+- Improved error reporting 
+- crates.io publication
+
+---
+
+### 📄 License
+
+[MIT](LICENSE) License.
+
+---
+
+### ✍️ Author
+
+Developed and maintained by **Alessandro Maestri**.

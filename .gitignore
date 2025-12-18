@@ -1,4 +1,4 @@
-/.idea
+.idea/
 /target
 *.db
 *.png
@@ -7,3 +7,6 @@
 .github/copilot-instructions.md
 /examples
 *.zip
+**/target
+Cargo.lock
+.vscode/
