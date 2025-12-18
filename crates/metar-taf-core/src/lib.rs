@@ -1,3 +1,4 @@
+pub mod airports;
 pub mod common;
 pub mod metar;
 pub mod taf;

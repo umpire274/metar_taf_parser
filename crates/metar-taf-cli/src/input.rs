@@ -1,15 +1,24 @@
+use crate::ui::typewriter_print;
+use atty::Stream;
 use std::io::{self, Write};
 
 /// Prompt interattivo per codice ICAO
 pub fn prompt_icao() -> String {
     loop {
-        print!("Enter ICAO airport code: ");
+        println!();
+        if atty::is(Stream::Stdout) {
+            typewriter_print("Enter ICAO airport code: ", 80);
+        } else {
+            print!("Enter ICAO airport code: ");
+        }
         io::stdout().flush().ok();
 
         let mut input = String::new();
         if io::stdin().read_line(&mut input).is_ok() {
             let code = input.trim().to_uppercase();
             if is_valid_icao(&code) {
+                println!();
+
                 return code;
             }
         }

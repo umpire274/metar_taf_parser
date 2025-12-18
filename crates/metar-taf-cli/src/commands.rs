@@ -2,12 +2,23 @@ use crate::cli::Commands;
 use crate::fetch::{fetch_metar, fetch_taf};
 use crate::input::{normalize_icao, prompt_icao};
 
+use metar_taf_core::airports::AirportDb;
 use metar_taf_core::{parse_metar, parse_taf};
 
 pub fn execute(command: Commands, icao: Option<String>) {
+    let airport_db = AirportDb::load();
+
     let icao = match icao {
         Some(code) => normalize_icao(code),
         None => prompt_icao(),
+    };
+
+    let _airport = match airport_db.lookup(&icao) {
+        Some(airport) => airport,
+        None => {
+            eprintln!("Unknown ICAO airport code: {}", icao);
+            std::process::exit(1);
+        }
     };
 
     match command {
