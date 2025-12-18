@@ -1,5 +1,10 @@
 # metar_taf_parser
 
+> ⚠️ **Status:** Active development – current version `0.2.0-alpha1`
+>
+> This alpha release introduces a functional CLI with real-time METAR/TAF fetching
+> and automatic parsing. Output format and public API may change.
+
 A modern, strongly-typed **METAR and TAF parser** written in Rust.
 
 `metar_taf_parser` provides a reusable parsing library and a command-line interface
@@ -93,15 +98,23 @@ cargo build --release
 
 ## 🖥️ CLI usage
 
-To run the CLI parser, use:
+### Fetch METAR / TAF reports
 
 ```bash
-cargo run -p metar-taf-cli
+metar-taf <ICAO> get --metar
+metar-taf <ICAO> get --taf
+metar-taf <ICAO> get --all
 ```
 
-Then provide a METAR or TAF string via standard input.
+If the ICAO code is not provided, the CLI will prompt interactively:
 
-> The CLI is intentionally minimal in v0.1.0. Output formatting and JSON export are planned for future versions.
+```bash
+metar-taf get --metar
+Enter ICAO airport code:
+```
+
+The CLI fetches the latest available data from the NOAA Aviation Weather service and automatically parses the returned
+METAR or TAF.
 
 ---
 
@@ -130,8 +143,8 @@ println!("{:#?}", metar);
 
 ## 🧪 Testing & quality
 
-- Unit tests for individual parsers 
-- Golden tests using real-world METAR and TAF reports 
+- Unit tests for individual parsers
+- Golden tests using real-world METAR and TAF reports
 - `cargo clippy` clean with `-D warnings`
 
 ---
@@ -140,7 +153,7 @@ println!("{:#?}", metar);
 
 This project follows **Semantic Versioning**.
 
-- `0.1.0` is the **initial stable release** 
+- `0.1.0` is the **initial stable release**
 - Public API is considered **experimental** and may evolve in future minor versions
 
 See [CHANGELOG.md](CHANGELOG.md) for details.
@@ -149,13 +162,13 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## 🛣️ Roadmap
 
-Planned for future releases:
+Planned for upcoming `0.2.x` releases:
 
-- JSON output for CLI 
-- Pretty-print / human-readable CLI output 
-- Additional TAF groups (INTER, CNL, AMD)
-- Improved error reporting 
-- crates.io publication
+- JSON output (`--json`)
+- Pretty-print human-readable output
+- ICAO validation and airport metadata lookup
+- Additional TAF edge cases (INTER, CNL, AMD)
+- Improved error reporting
 
 ---
 
