@@ -1,9 +1,9 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.0-alpha1`
+> ⚠️ **Status:** Active development – current version `0.2.0-alpha2`
 >
-> This alpha release introduces a functional CLI with real-time METAR/TAF fetching
-> and automatic parsing. Output format and public API may change.
+> The CLI supports real-time METAR/TAF fetching, parsing, and multiple output modes (debug, raw, JSON). Output formats
+> are stabilizing but still subject to change.
 
 A modern, strongly-typed **METAR and TAF parser** written in Rust.
 
@@ -116,6 +116,27 @@ Enter ICAO airport code:
 The CLI fetches the latest available data from the NOAA Aviation Weather service and automatically parses the returned
 METAR or TAF.
 
+### Output modes
+
+By default, the CLI outputs the parsed data in debug format:
+
+```bash
+# Parsed output (default)
+metar-taf LIRF get --metar
+
+# Raw METAR / TAF only
+metar-taf LIRF get --metar --raw
+
+# JSON output
+metar-taf LIRF get --metar --json
+```
+
+**Notes**:
+
+- `--raw` outputs only the raw report string
+- `--json` outputs only JSON
+- `--raw` and `--json` cannot be used together
+
 ---
 
 ## 📚 Library usage
@@ -164,11 +185,10 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 Planned for upcoming `0.2.x` releases:
 
-- JSON output (`--json`)
-- Pretty-print human-readable output
 - ICAO validation and airport metadata lookup
-- Additional TAF edge cases (INTER, CNL, AMD)
-- Improved error reporting
+- Golden JSON snapshot tests
+- Human-readable pretty output
+- Extended TAF support (INTER, CNL, AMD)
 
 ---
 
