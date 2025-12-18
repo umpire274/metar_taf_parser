@@ -1,9 +1,8 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.0-alpha2`
+> ⚠️ **Status:** Active development – current version `0.2.0-alpha3`
 >
-> The CLI supports real-time METAR/TAF fetching, parsing, and multiple output modes (debug, raw, JSON). Output formats
-> are stabilizing but still subject to change.
+> ICAO codes are now validated against a real airport database.
 
 A modern, strongly-typed **METAR and TAF parser** written in Rust.
 
