@@ -1,0 +1,13 @@
+[package]
+name = "metar-taf-cli"
+version = "0.1.0"
+edition = "2024"
+description = "CLI tool for parsing METAR and TAF strings"
+license = "MIT"
+
+[dependencies]
+metar-taf-core = { path = "../metar-taf-core" }
+
+[[bin]]
+name = "metar-taf"
+path = "src/main.rs"

@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "crates/metar-taf-core",
+    "crates/metar-taf-cli",
+]
+resolver = "2"
