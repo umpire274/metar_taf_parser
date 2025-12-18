@@ -1,4 +1,4 @@
-use metar_taf_core::parse_metar;
+/*use metar_taf_core::parse_metar;
 
 fn main() {
     //let metar = "LIRF 121250Z 18010KT 5000 2000SW FEW030 18/12 Q1015";
@@ -17,4 +17,17 @@ fn main() {
         Ok(parsed) => println!("{:#?}", parsed),
         Err(e) => eprintln!("Error: {}", e),
     }
+}*/
+
+mod cli;
+mod commands;
+mod fetch;
+mod input;
+
+use clap::Parser;
+use cli::Cli;
+
+fn main() {
+    let cli = Cli::parse();
+    commands::execute(cli.command, cli.icao);
 }
