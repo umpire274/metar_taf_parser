@@ -3,17 +3,26 @@ use crate::taf::errors::TafError;
 use crate::taf::models::taf::Taf;
 
 pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
-    let mut tokenizer = Tokenizer::new(input);
+    let normalized = input
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ");
 
-    // Optional TAF / TAF AMD / TAF COR
+    let mut tokenizer = Tokenizer::new(&normalized);
+
+    // Mandatory "TAF"
     let first = tokenizer.next().ok_or(TafError::InvalidFormat)?;
-    let token = if first == "TAF" {
-        tokenizer.next().ok_or(TafError::InvalidFormat)?
-    } else {
-        first
-    };
+    if first != "TAF" {
+        return Err(TafError::InvalidFormat);
+    }
 
-    let station = token;
+    // Optional AMD / COR
+    let mut station = tokenizer.next().ok_or(TafError::InvalidFormat)?;
+    if station == "AMD" || station == "COR" {
+        station = tokenizer.next().ok_or(TafError::InvalidFormat)?;
+    }
 
     // Issue time: DDHHMMZ
     let time_token = tokenizer.next().ok_or(TafError::InvalidFormat)?;
@@ -23,9 +32,8 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
     let validity_token = tokenizer.next().ok_or(TafError::InvalidFormat)?;
     let validity = parse_validity(&validity_token)?;
 
-    // raccogli tutti i token rimanenti
+    // Remaining tokens → forecasts
     let remaining: Vec<String> = tokenizer.collect();
-
     let forecasts = crate::taf::parser::forecast::parse_forecasts(&remaining);
 
     Ok(Taf {
@@ -35,6 +43,7 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
         forecasts,
     })
 }
+
 fn parse_taf_time(
     token: &str,
 ) -> Result<crate::taf::models::time::TafTime, crate::taf::errors::TafError> {

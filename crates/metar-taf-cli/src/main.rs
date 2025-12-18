@@ -23,6 +23,7 @@ mod cli;
 mod commands;
 mod fetch;
 mod input;
+mod output;
 mod ui;
 
 use clap::Parser;
