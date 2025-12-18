@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-alpha4] – 2025-12-18
+
+### Added
+
+- TAF parser now supports multiline inputs
+- Support for `TAF AMD` and `TAF COR`
+- Correct handling of `PROBxx` as forecast modifiers
+- Tolerant parsing for unsupported TAF weather groups
+
+### Improved
+
+- CLI JSON output enriched with airport metadata
+
+### Known limitations
+
+- METAR advanced groups not yet supported:
+    - `CAVOK`
+    - wind speed in `MPS`
+    - RVR groups (`Rxx/...`)
+    - `RMK` / remarks
+
+---
+
 ## [0.2.0-alpha3] – 2025-12-18
 
 ### Added

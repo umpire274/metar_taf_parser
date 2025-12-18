@@ -1,8 +1,9 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.0-alpha3`
+> ⚠️ **Status:** Active development – current version `0.2.0-alpha4`
 >
-> ICAO codes are now validated against a real airport database.
+> Note: METAR parsing is intentionally partial in this alpha release. Advanced groups (CAVOK, RVR, MPS, RMK) will be
+> added in a future alpha.
 
 A modern, strongly-typed **METAR and TAF parser** written in Rust.
 
