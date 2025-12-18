@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-alpha5] - 2025-12-18
+
+### Added
+
+- Support for negative temperatures (Mxx/Mxx) in METAR
+- Wind parsing with unit preservation (KT / MPS)
+- Runway Visual Range (RVR) parsing (ICAO-compliant)
+- Conservative handling of RMK (remarks) section
+- Improved handling of CAVOK and cloud clearing
+- Gust support for variable and fixed wind directions
+
+### Fixed
+
+- Correct handling of METAR/SPECI headers
+- Fixed wind parsing regression with gusts
+- Avoided misclassification of runway state groups as RVR
+
+### Notes
+
+- Runway state groups (e.g. R01/39//37) are currently ignored
+- RMK is preserved as raw text without semantic parsing
+
+---
+
 ## [0.2.0-alpha4] – 2025-12-18
 
 ### Added

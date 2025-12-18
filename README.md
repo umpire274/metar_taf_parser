@@ -1,9 +1,8 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.0-alpha4`
+> ⚠️ **Status:** Active development – current version `0.2.0-alpha5`
 >
-> Note: METAR parsing is intentionally partial in this alpha release. Advanced groups (CAVOK, RVR, MPS, RMK) will be
-> added in a future alpha.
+> Note: METAR parsing advanced groups (CAVOK, RVR, MPS, Temperature +/-). RMK will be added in a future alpha.
 
 A modern, strongly-typed **METAR and TAF parser** written in Rust.
 
@@ -81,6 +80,19 @@ metar_taf_parser/
 - Simple interface for parsing METAR / TAF strings
 - Intended mainly for inspection and testing
 - Will evolve in future releases
+
+### METAR support (alpha)
+
+- ✔ Wind (KT / MPS, gusts)
+- ✔ Visibility (including CAVOK)
+- ✔ RVR (basic ICAO format)
+- ✔ Clouds
+- ✔ Weather phenomena
+- ✔ Temperature / Dew point (including negative values)
+- ✔ Pressure (QNH)
+- ✔ RMK (raw, unparsed)
+
+⚠ Runway state groups are not parsed yet.
 
 ---
 
@@ -192,12 +204,12 @@ Planned for upcoming `0.2.x` releases:
 
 ---
 
-### 📄 License
+## 📄 License
 
 [MIT](LICENSE) License.
 
 ---
 
-### ✍️ Author
+## ✍️ Author
 
 Developed and maintained by **Alessandro Maestri**.

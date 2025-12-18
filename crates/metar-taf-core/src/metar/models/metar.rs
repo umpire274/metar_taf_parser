@@ -1,5 +1,6 @@
 use crate::metar::models::cloud::CloudLayer;
 use crate::metar::models::pressure::Pressure;
+use crate::metar::models::rvr::Rvr;
 use crate::metar::models::temperature::Temperature;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::models::weather::Weather;
@@ -16,6 +17,8 @@ pub struct Metar {
     pub temperature: Option<Temperature>,
     pub pressure: Option<Pressure>,
     pub weather: Vec<Weather>,
+    pub rvr: Vec<Rvr>,
+    pub rmk: Option<String>,
     pub raw: String,
 }
 
@@ -30,6 +33,8 @@ impl Metar {
             temperature: None,
             pressure: None,
             weather: Vec::new(),
+            rvr: Vec::new(),
+            rmk: None,
             raw: raw.to_string(),
         }
     }

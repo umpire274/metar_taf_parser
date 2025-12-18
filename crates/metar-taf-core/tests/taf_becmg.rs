@@ -22,5 +22,5 @@ BECMG 1220/1222 20012KT SCT040";
 
     let wind = becmg.wind.as_ref().unwrap();
     assert_eq!(wind.direction, Some(200));
-    assert_eq!(wind.speed_kt, 12);
+    assert_eq!(wind.speed, 12);
 }

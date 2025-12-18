@@ -14,7 +14,7 @@ fn taf_base_forecast_parsing() {
 
     let wind = fc.wind.as_ref().expect("wind missing");
     assert_eq!(wind.direction, Some(180));
-    assert_eq!(wind.speed_kt, 10);
+    assert_eq!(wind.speed, 10);
 
     let vis = fc.visibility.as_ref().expect("visibility missing");
     assert!(matches!(vis, Visibility::Single { prevailing: 9999 }));

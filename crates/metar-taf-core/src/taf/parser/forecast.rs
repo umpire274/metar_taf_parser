@@ -181,6 +181,8 @@ fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
         temperature: None,
         pressure: None,
         weather: Vec::new(),
+        rvr: Vec::new(),
+        rmk: None,
         raw: String::new(),
     }
 }

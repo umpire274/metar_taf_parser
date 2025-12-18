@@ -17,14 +17,14 @@ pub enum TafForecastKind {
 pub struct TafForecast {
     pub kind: TafForecastKind,
 
-    // temporali
+    // Temporal information
     pub from: Option<(u8, u8, u8)>, // FM
     pub period: Option<TafPeriod>,  // BECMG / TEMPO / PROB
 
-    // PROB
-    pub probability: Option<u8>, // 30 o 40
+    // Probability (PROB30 / PROB40)
+    pub probability: Option<u8>,
 
-    // meteo
+    // Weather
     pub wind: Option<Wind>,
     pub visibility: Option<Visibility>,
     pub clouds: Vec<CloudLayer>,

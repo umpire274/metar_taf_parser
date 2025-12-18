@@ -15,11 +15,11 @@ fn metar_basic_parsing() {
 
     let wind = metar.wind.expect("wind missing");
     assert_eq!(wind.direction, Some(180));
-    assert_eq!(wind.speed_kt, 10);
-    assert_eq!(wind.gust_kt, None);
+    assert_eq!(wind.speed, 10);
+    assert_eq!(wind.gust, None);
 
     let temp = metar.temperature.expect("temperature missing");
-    assert_eq!(temp.air, 18);
+    assert_eq!(temp.temperature, 18);
     assert_eq!(temp.dew_point, 12);
 
     let pressure = metar.pressure.expect("pressure missing");

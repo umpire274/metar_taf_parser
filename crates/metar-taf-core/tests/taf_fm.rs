@@ -18,10 +18,10 @@ FM130600 15008KT 9999 BKN020";
     // First FM
     let fm1 = &taf.forecasts[1];
     assert_eq!(fm1.from, Some((12, 18, 0)));
-    assert_eq!(fm1.wind.as_ref().unwrap().speed_kt, 12);
+    assert_eq!(fm1.wind.as_ref().unwrap().speed, 12);
 
     // Second FM
     let fm2 = &taf.forecasts[2];
     assert_eq!(fm2.from, Some((13, 6, 0)));
-    assert_eq!(fm2.wind.as_ref().unwrap().speed_kt, 8);
+    assert_eq!(fm2.wind.as_ref().unwrap().speed, 8);
 }

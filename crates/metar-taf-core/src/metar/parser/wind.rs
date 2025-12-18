@@ -1,33 +1,40 @@
-use crate::metar::models::wind::Wind;
+use crate::metar::models::wind::{Wind, WindUnit};
+
+fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
+    if let Some(rest) = token.strip_suffix("KT") {
+        Some((rest, WindUnit::KT))
+    } else if let Some(rest) = token.strip_suffix("MPS") {
+        Some((rest, WindUnit::MPS))
+    } else {
+        None
+    }
+}
 
 pub fn parse_wind(token: &str) -> Option<Wind> {
-    if !token.ends_with("KT") {
-        return None;
-    }
+    // 1. Strip unit first
+    let (body, unit) = strip_unit(token)?;
 
-    let body = &token[..token.len() - 2];
-
+    // 2. Direction
     let (direction, rest) = if let Some(rest) = body.strip_prefix("VRB") {
         (None, rest)
     } else if body.len() >= 3 {
-        let dir: u16 = body[0..3].parse().ok()?;
+        let dir: u16 = body.get(0..3)?.parse().ok()?;
         (Some(dir), &body[3..])
     } else {
         return None;
     };
 
-    let (speed, gust) = if let Some(idx) = rest.find('G') {
-        (
-            rest[..idx].parse().ok()?,
-            Some(rest[idx + 1..].parse().ok()?),
-        )
+    // 3. Speed / Gust
+    let (speed, gust) = if let Some((s, g)) = rest.split_once('G') {
+        (s.parse().ok()?, Some(g.parse().ok()?))
     } else {
         (rest.parse().ok()?, None)
     };
 
     Some(Wind {
         direction,
-        speed_kt: speed,
-        gust_kt: gust,
+        speed,
+        gust,
+        unit,
     })
 }

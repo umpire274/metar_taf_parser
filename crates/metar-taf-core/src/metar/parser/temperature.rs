@@ -1,22 +1,23 @@
 use crate::metar::models::temperature::Temperature;
 
-fn parse_signed_temp(s: &str) -> Option<i8> {
+fn parse_single_temp(s: &str) -> Option<i8> {
     if let Some(rest) = s.strip_prefix('M') {
         let v: i8 = rest.parse().ok()?;
         Some(-v)
     } else {
-        s.parse().ok()
+        let v: i8 = s.parse().ok()?;
+        Some(v)
     }
 }
 
 pub fn parse_temperature(token: &str) -> Option<Temperature> {
-    let (air, dew) = token.split_once('/')?;
+    let (temp_str, dew_str) = token.split_once('/')?;
 
-    let air = parse_signed_temp(air)?;
-    let dew = parse_signed_temp(dew)?;
+    let temperature = parse_single_temp(temp_str)?;
+    let dew_point = parse_single_temp(dew_str)?;
 
     Some(Temperature {
-        air,
-        dew_point: dew,
+        temperature,
+        dew_point,
     })
 }

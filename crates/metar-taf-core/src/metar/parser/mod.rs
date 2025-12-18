@@ -1,6 +1,8 @@
 pub mod cloud;
 pub mod metar;
 pub mod pressure;
+mod rmk;
+mod rvr;
 pub mod temperature;
 pub mod time;
 pub mod visibility;

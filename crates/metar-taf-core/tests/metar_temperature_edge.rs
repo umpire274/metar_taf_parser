@@ -1,13 +1,19 @@
 use metar_taf_core::parse_metar;
 
 #[test]
-fn metar_temperature_negative_and_zero() {
-    let input = "LIMC 121250Z 02005KT 9999 SCT020 M01/00 Q1020";
+fn parse_positive_temperature() {
+    let metar = "METAR LIRF 181200Z 18005KT 9999 SCT020 15/10 Q1015";
+    let p = parse_metar(metar).unwrap();
+    let t = p.temperature.expect("temperature missing");
+    assert_eq!(t.temperature, 15);
+    assert_eq!(t.dew_point, 10);
+}
 
-    let metar = parse_metar(input).expect("METAR should parse");
-
-    let temp = metar.temperature.expect("temperature missing");
-
-    assert_eq!(temp.air, -1);
-    assert_eq!(temp.dew_point, 0);
+#[test]
+fn parse_negative_temperature() {
+    let metar = "METAR UOOO 181400Z 08002MPS CAVOK M25/M28 Q1014";
+    let p = parse_metar(metar).unwrap();
+    let t = p.temperature.expect("temperature missing");
+    assert_eq!(t.temperature, -25);
+    assert_eq!(t.dew_point, -28);
 }
