@@ -7,7 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.2.0-alpha2] – 2025-XX-XX
+## [0.2.0-alpha3] – 2025-12-18
+
+### Added
+
+#### ICAO validation
+
+- Real ICAO airport code validation using an embedded airport database
+- Airports database loaded from `airports.dat` in the core library
+- Early error reporting for unknown ICAO codes
+
+#### CLI behavior
+
+- ICAO positional argument is required when using `--json`
+- Interactive prompt disabled automatically in non-interactive / JSON mode
+
+### Notes
+
+- This is an **alpha release**.
+- Airport metadata is currently used for validation only.
+
+---
+
+## [0.2.0-alpha2] – 2025-12-18
 
 ### Added
 
@@ -32,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.2.0-alpha1] – 2025-XX-XX
+## [0.2.0-alpha1] – 2025-12-18
 
 ### Added
 
