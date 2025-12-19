@@ -7,11 +7,12 @@ pub fn parse_runway_state(token: &str) -> Option<RunwayState> {
 
     let (rwy_str, data) = token[1..].split_once('/')?;
 
-    // Runway designator: exactly 2 digits
+    // Runway designator: exactly 2 characters
     if rwy_str.len() != 2 {
         return None;
     }
-    let runway_designator: u8 = rwy_str.parse().ok()?;
+
+    let runway_designator = rwy_str.to_string();
 
     // Data must be exactly 6 characters
     if data.len() != 6 {

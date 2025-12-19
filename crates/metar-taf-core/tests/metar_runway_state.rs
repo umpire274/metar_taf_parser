@@ -8,7 +8,7 @@ fn parse_runway_state_full_icao() {
     assert_eq!(parsed.runway_state.len(), 1);
     let rs = &parsed.runway_state[0];
 
-    assert_eq!(rs.runway_designator, 19);
+    assert_eq!(rs.runway_designator, "19");
     assert_eq!(rs.deposit_type, Some(4)); // Dry snow
     assert_eq!(rs.contamination_extent, Some(5)); // 26–50%
     assert_eq!(rs.deposit_depth.as_deref(), Some("02")); // 2 mm
@@ -21,7 +21,7 @@ fn parse_runway_state_with_missing_fields() {
     let parsed = parse_metar(metar).unwrap();
 
     let rs = &parsed.runway_state[0];
-    assert_eq!(rs.runway_designator, 1);
+    assert_eq!(rs.runway_designator, "01");
     assert_eq!(rs.deposit_type, Some(3));
     assert_eq!(rs.contamination_extent, Some(9));
     assert_eq!(rs.deposit_depth.as_deref(), None);
@@ -35,7 +35,7 @@ fn parse_runway_state_preserve_codes() {
 
     let rs = &parsed.runway_state[0];
 
-    assert_eq!(rs.runway_designator, 19);
+    assert_eq!(rs.runway_designator, "19");
     assert_eq!(rs.deposit_type, Some(4));
     assert_eq!(rs.contamination_extent, Some(5));
 

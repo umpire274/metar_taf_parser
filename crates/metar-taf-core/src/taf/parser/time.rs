@@ -1,4 +1,7 @@
-fn parse_taf_time(token: &str) -> Result<TafTime, TafError> {
+use crate::taf::errors::TafError;
+use crate::taf::models::time::{TafTime, TafValidity};
+
+pub fn parse_taf_time(token: &str) -> Result<TafTime, TafError> {
     if token.len() != 7 || !token.ends_with('Z') {
         return Err(TafError::InvalidFormat);
     }
@@ -10,7 +13,7 @@ fn parse_taf_time(token: &str) -> Result<TafTime, TafError> {
     })
 }
 
-fn parse_validity(token: &str) -> Result<TafValidity, TafError> {
+pub fn parse_validity(token: &str) -> Result<TafValidity, TafError> {
     let (from, to) = token.split_once('/').ok_or(TafError::InvalidFormat)?;
 
     Ok(TafValidity {

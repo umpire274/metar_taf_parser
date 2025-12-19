@@ -3,7 +3,7 @@ use serde::Serialize;
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct RunwayState {
     /// Runway designator (two digits)
-    pub runway_designator: u8,
+    pub runway_designator: String,
 
     /// Deposit type (ICAO code: "0"–"9" or "/")
     pub deposit_type: Option<u8>,

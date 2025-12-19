@@ -1,3 +1,4 @@
+use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
 use crate::metar::parser::visibility::parse_visibility;
@@ -175,7 +176,7 @@ fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
     Metar {
         station: String::new(),
         time: None,
-        automated: false,
+        modifier: ReportModifier::Normal,
         wind: None,
         visibility,
         clouds: Vec::new(),

@@ -1,3 +1,4 @@
+use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::cloud::CloudLayer;
 use crate::metar::models::pressure::Pressure;
 use crate::metar::models::runway_state::RunwayState;
@@ -12,7 +13,7 @@ use serde::Serialize;
 pub struct Metar {
     pub station: String,
     pub time: Option<super::time::MetarTime>,
-    pub automated: bool,
+    pub modifier: ReportModifier,
     pub wind: Option<Wind>,
     pub visibility: Option<Visibility>,
     pub clouds: Vec<CloudLayer>,
@@ -31,7 +32,7 @@ impl Metar {
         Self {
             station: station.to_string(),
             time: None,
-            automated: false,
+            modifier: ReportModifier::Normal,
             wind: None,
             visibility: None,
             clouds: Vec::new(),

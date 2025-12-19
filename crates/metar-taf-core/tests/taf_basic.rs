@@ -7,7 +7,8 @@ fn taf_basic_header_and_times() {
     let taf = parse_taf(input).expect("TAF should parse");
 
     assert_eq!(taf.station, "LIRF");
-    assert_eq!(taf.issued_at.day, 12);
-    assert_eq!(taf.validity.from_day, 12);
-    assert_eq!(taf.validity.to_day, 13);
+    assert_eq!(taf.issued_at.unwrap().day, 12);
+    let validity = taf.validity.unwrap();
+    assert_eq!(validity.from_day, 12);
+    assert_eq!(validity.to_day, 13);
 }
