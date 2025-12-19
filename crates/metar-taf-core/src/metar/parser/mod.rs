@@ -1,10 +1,11 @@
 pub mod cloud;
 pub mod metar;
 pub mod pressure;
-mod rmk;
-mod rvr;
+pub mod rmk;
+pub mod runway_state;
 pub mod temperature;
 pub mod time;
+pub mod trend;
 pub mod visibility;
 pub mod weather;
 pub mod wind;

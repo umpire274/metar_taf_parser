@@ -4,9 +4,10 @@ use crate::metar::models::Metar;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
 use crate::metar::parser::pressure::parse_pressure;
-use crate::metar::parser::rvr::parse_rvr;
+use crate::metar::parser::runway_state::parse_runway_state;
 use crate::metar::parser::temperature::parse_temperature;
 use crate::metar::parser::time::parse_time;
+use crate::metar::parser::trend::parse_trend;
 use crate::metar::parser::visibility::parse_visibility;
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
@@ -27,6 +28,11 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
     let mut rmk_started = false;
 
     for token in tokenizer {
+        if token == "AUTO" {
+            metar.automated = true;
+            continue;
+        }
+
         if token == "RMK" {
             rmk_started = true;
             continue;
@@ -56,8 +62,8 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
             continue;
         }
 
-        if let Some(rvr) = parse_rvr(&token) {
-            metar.rvr.push(rvr);
+        if let Some(rs) = parse_runway_state(&token) {
+            metar.runway_state.push(rs);
             continue;
         }
 
@@ -76,8 +82,18 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
             continue;
         }
 
+        if let Some(t) = parse_trend(&token) {
+            metar.trend = Some(t);
+            continue;
+        }
+
         if let Some(v) = parse_weather(&token) {
             metar.weather.push(v);
+            continue;
+        }
+
+        if token.starts_with('R') {
+            metar.unparsed_groups.push(token);
             continue;
         }
     }

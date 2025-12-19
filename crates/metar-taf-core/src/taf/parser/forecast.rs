@@ -175,14 +175,17 @@ fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
     Metar {
         station: String::new(),
         time: None,
+        automated: false,
         wind: None,
         visibility,
         clouds: Vec::new(),
         temperature: None,
         pressure: None,
         weather: Vec::new(),
-        rvr: Vec::new(),
         rmk: None,
+        runway_state: Vec::new(),
+        trend: None,
+        unparsed_groups: Vec::new(),
         raw: String::new(),
     }
 }
