@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Workspace now targets the `metar-taf-core` library crate only (CLI excluded from workspace members).
+- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-core`.
 - README updated to document the library-first direction and Python fork porting objective.
 
 ---
