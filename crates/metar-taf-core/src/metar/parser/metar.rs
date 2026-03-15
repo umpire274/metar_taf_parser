@@ -9,7 +9,7 @@ use crate::metar::parser::runway_state::parse_runway_state;
 use crate::metar::parser::temperature::parse_temperature;
 use crate::metar::parser::time::parse_time;
 use crate::metar::parser::trend::parse_trend;
-use crate::metar::parser::visibility::parse_visibility;
+use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
 
@@ -46,7 +46,7 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
     let mut rmk_started = false;
     let mut remaining_tokens: Vec<String> = Vec::new();
 
-    for token in tokenizer {
+    while let Some(token) = tokenizer.next() {
         if token == "RMK" {
             rmk_started = true;
             continue;
@@ -77,6 +77,16 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
         if let Some(v) = parse_wind(&token) {
             metar.wind = Some(v);
             continue;
+        }
+
+        if token.chars().all(|c| c.is_ascii_digit()) {
+            if let Some(next) = tokenizer.peek() {
+                if let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next) {
+                    metar.visibility = Some(Visibility::Single { prevailing });
+                    let _ = tokenizer.next();
+                    continue;
+                }
+            }
         }
 
         if let Some(v) = parse_visibility(&token, &metar) {

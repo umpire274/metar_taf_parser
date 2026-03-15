@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- METAR visibility parsing now supports statute miles (`10SM`, `1/2SM`, and split form `1 1/2SM`) with conversion to meters.
+- Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
+
+### Changed
+
+- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-core`.
+- README updated to document the library-first direction and Python fork porting objective.
+
+---
+
 ## [0.2.0-alpha5] - 2025-12-18
 
 ### Added
