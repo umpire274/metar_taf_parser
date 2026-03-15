@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
+
+### Changed
+
+- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-core`.
+- README updated to document the library-first direction and Python fork porting objective.
+
+---
+
+## [0.2.1] - 2026-03-15
+
+### Added
+
+- METAR wind parsing now supports explicit calm wind group `00000KT` with deterministic structured output.
+- Added regression tests for calm wind and malformed wind groups (`36110KT`, `180ABKT`).
+
+### Improved
+
+- Hardened METAR wind parser validation for direction range and numeric speed/gust groups.
+
+---
+
 ## [0.2.0-alpha5] - 2025-12-18
 
 ### Added
