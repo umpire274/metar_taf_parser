@@ -15,6 +15,8 @@ https://github.com/umpire274/python-metar-taf-parser.
 - Provide a robust Rust-native API for METAR/TAF parsing.
 - Reach feature parity with the referenced Python fork.
 - Keep the public API ergonomic and strongly typed for embedding in other apps.
+- During porting, parser groups are being migrated using the same regex-first approach used in the Python fork to preserve behavior.
+- Porting process follows a regex-alignment policy documented in [`docs/PORTING_REGEX_POLICY.md`](docs/PORTING_REGEX_POLICY.md).
 
 ---
 
