@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.6] - 2026-03-15
+
+### Added
+
+- Added TAF regression tests for invalid `TEMPO`/`BECMG` periods to ensure following tokens remain parseable.
+
+### Improved
+
+- Hardened `TEMPO` and `BECMG` parsing to consume period tokens only after successful period validation.
+- Reused non-consuming lookahead strategy across change-group parsing helpers to avoid token swallowing on invalid groups.
+
+---
+
 ## [0.2.5] - 2026-03-15
 
 ### Added

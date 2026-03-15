@@ -29,8 +29,7 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
 
         // -------- BECMG --------
         if token == "BECMG"
-            && let Some(period_token) = iter.next()
-            && let Some(period) = parse_becmg_period(period_token)
+            && let Some(period) = try_consume_period(&mut iter)
         {
             forecasts.push(current);
             current = new_period_forecast(TafForecastKind::BECMG, period, None);
@@ -40,8 +39,7 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
 
         // -------- TEMPO --------
         if token == "TEMPO"
-            && let Some(period_token) = iter.next()
-            && let Some(period) = parse_becmg_period(period_token)
+            && let Some(period) = try_consume_period(&mut iter)
         {
             forecasts.push(current);
             current = new_period_forecast(TafForecastKind::TEMPO, period, None);
@@ -184,6 +182,14 @@ fn try_consume_prob_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafP
     }
 
     None
+}
+
+fn try_consume_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafPeriod> {
+    let mut lookahead = iter.clone();
+    let period_token = lookahead.next()?;
+    let period = parse_becmg_period(period_token)?;
+    iter.next(); // period
+    Some(period)
 }
 
 fn parse_day_hour(value: &str) -> Option<(u8, u8)> {
