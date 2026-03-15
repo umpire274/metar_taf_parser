@@ -6,7 +6,12 @@ pub struct Tokenizer {
 
 impl Tokenizer {
     pub fn new(input: &str) -> Self {
-        let tokens = input.split_whitespace().map(|s| s.to_string()).collect();
+        let tokens = input
+            .split_whitespace()
+            .map(|s| s.trim_end_matches('='))
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string())
+            .collect();
 
         Self { tokens, index: 0 }
     }

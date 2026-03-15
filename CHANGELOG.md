@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.8] - 2026-03-15
+
+### Added
+
+- Added regression tests for trailing `=` terminator handling in both METAR and TAF inputs.
+
+### Improved
+
+- Tokenizer now strips trailing `=` from tokens, allowing last-group parsing to remain deterministic (e.g. `NOSIG=`, `FEW030=`).
+
+---
+
 ## [0.2.7] - 2026-03-15
 
 ### Added
