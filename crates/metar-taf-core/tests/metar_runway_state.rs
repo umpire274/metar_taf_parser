@@ -43,3 +43,19 @@ fn parse_runway_state_preserve_codes() {
     assert_eq!(rs.deposit_depth.as_deref(), Some("02"));
     assert_eq!(rs.braking_action.as_deref(), Some("35"));
 }
+
+#[test]
+fn reject_non_numeric_runway_designator() {
+    let metar = "METAR XXXX 181200Z 18005KT 9999 RAB/390037";
+    let parsed = parse_metar(metar).unwrap();
+
+    assert!(parsed.runway_state.is_empty());
+}
+
+#[test]
+fn reject_invalid_runway_state_data_characters() {
+    let metar = "METAR XXXX 181200Z 18005KT 9999 R01/39A/37";
+    let parsed = parse_metar(metar).unwrap();
+
+    assert!(parsed.runway_state.is_empty());
+}

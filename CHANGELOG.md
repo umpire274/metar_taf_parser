@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.9] - 2026-03-15
+
+### Added
+
+- Added METAR runway-state regression tests for invalid runway designators and invalid data characters.
+
+### Improved
+
+- Hardened runway-state parsing to require numeric runway designators and digit-or-slash-only state payloads.
+
+---
+
 ## [0.2.8] - 2026-03-15
 
 ### Added
