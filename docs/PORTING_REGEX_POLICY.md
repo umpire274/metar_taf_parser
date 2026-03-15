@@ -1,7 +1,7 @@
 # Python fork regex-alignment policy
 
 To reduce behavioral drift during the Rust port, each METAR/TAF group parser should be migrated
-using the same regex definitions used by the Python fork (`umpire274/python-metar-taf-parser`).
+using the same regex definitions used by the Mivek's Python original project (`mivek/python-metar-taf-parser`).
 
 ## Rules
 
