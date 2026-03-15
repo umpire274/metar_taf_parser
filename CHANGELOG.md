@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.10] - 2026-03-15
+
+### Added
+
+- Added METAR time regression tests for valid groups plus invalid range/non-numeric cases.
+
+### Improved
+
+- Hardened METAR time parsing to validate `DDHHMMZ` numeric content and range limits (day/hour/minute).
+
+---
+
 ## [0.2.9] - 2026-03-15
 
 ### Added
