@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-core`.
+- README updated to document the library-first direction and Python fork porting objective.
+
+---
+
 ## [0.2.0-alpha5] - 2025-12-18
 
 ### Added
