@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.5] - 2026-03-15
+
+### Added
+
+- Added METAR weather regression tests for `FZFG`, `VCBR`, `+SHGR`, unknown phenomena pairs, and malformed odd-length groups.
+
+### Improved
+
+- Hardened METAR weather parsing for descriptor/phenomena chaining and malformed trailing fragments.
+- Unknown phenomena are now consumed in 2-character groups to preserve token progression deterministically.
+
+---
+
 ## [0.2.4] - 2026-03-15
 
 ### Added
