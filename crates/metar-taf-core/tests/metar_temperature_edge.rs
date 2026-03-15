@@ -17,3 +17,19 @@ fn parse_negative_temperature() {
     assert_eq!(t.temperature, -25);
     assert_eq!(t.dew_point, -28);
 }
+
+#[test]
+fn reject_malformed_temperature_token() {
+    let metar = "METAR LIRF 181200Z 18005KT 9999 SCT020 5/10 Q1015";
+    let p = parse_metar(metar).unwrap();
+
+    assert!(p.temperature.is_none());
+}
+
+#[test]
+fn reject_out_of_range_temperature_token() {
+    let metar = "METAR LIRF 181200Z 18005KT 9999 SCT020 99/10 Q1015";
+    let p = parse_metar(metar).unwrap();
+
+    assert!(p.temperature.is_none());
+}
