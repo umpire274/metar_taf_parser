@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2026-03-15
+
+### Added
+
+- METAR cloud parsing now supports `VV///` (vertical visibility with unknown height).
+- Added cloud regression tests for `VV///` and invalid suffix handling (e.g. `SCT050ABC`).
+
+### Improved
+
+- Hardened cloud-layer parsing to reject unknown cloud suffixes and malformed layer lengths.
+
+---
+
 ## [0.2.1] - 2026-03-15
 
 ### Added
