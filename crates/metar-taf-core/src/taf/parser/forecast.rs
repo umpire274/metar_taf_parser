@@ -1,7 +1,10 @@
+use std::iter::Peekable;
+use std::slice::Iter;
+
 use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
-use crate::metar::parser::visibility::parse_visibility;
+use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::wind::parse_wind;
 use crate::taf::models::forecast::{TafForecast, TafForecastKind};
 use crate::taf::models::time::TafPeriod;
@@ -47,26 +50,13 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
         }
 
         // -------- PROB30 / PROB40 --------
-        if let Some(prob) = parse_prob(token) {
-            let mut period: Option<TafPeriod> = None;
-
-            if let Some(next) = iter.peek() {
-                if *next == "TEMPO" {
-                    iter.next(); // consuma TEMPO
-                    if let Some(p) = iter.next() {
-                        period = parse_becmg_period(p);
-                    }
-                } else if let Some(p) = iter.next() {
-                    period = parse_becmg_period(p);
-                }
-            }
-
-            if let Some(period) = period {
-                forecasts.push(current);
-                current = new_period_forecast(TafForecastKind::PROB, period, Some(prob));
-                visibility_context = None;
-                continue;
-            }
+        if let Some(prob) = parse_prob(token)
+            && let Some(period) = try_consume_prob_period(&mut iter)
+        {
+            forecasts.push(current);
+            current = new_period_forecast(TafForecastKind::PROB, period, Some(prob));
+            visibility_context = None;
+            continue;
         }
 
         // -------- Wind --------
@@ -76,6 +66,17 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
         }
 
         // -------- Visibility --------
+        if token.chars().all(|c| c.is_ascii_digit())
+            && let Some(next) = iter.peek()
+            && let Some(prevailing) = parse_split_statute_miles_to_meters(token, next)
+        {
+            let vis = Visibility::Single { prevailing };
+            visibility_context = Some(vis.clone());
+            current.visibility = Some(vis);
+            iter.next();
+            continue;
+        }
+
         if let Some(vis) = parse_visibility(token, &fake_metar(visibility_context.clone())) {
             visibility_context = Some(vis.clone());
             current.visibility = Some(vis);
@@ -142,23 +143,18 @@ fn parse_fm_time(token: &str) -> Option<(u8, u8, u8)> {
         return None;
     }
 
-    Some((
-        token[2..4].parse().ok()?,
-        token[4..6].parse().ok()?,
-        token[6..8].parse().ok()?,
-    ))
+    parse_day_hour_min(&token[2..])
 }
 
 fn parse_becmg_period(token: &str) -> Option<TafPeriod> {
     let (from, to) = token.split_once('/')?;
 
+    let from = parse_day_hour(from)?;
+    let to = parse_day_hour(to)?;
+
     Some(TafPeriod {
-        from: (
-            from.get(0..2)?.parse().ok()?,
-            from.get(2..4)?.parse().ok()?,
-            0,
-        ),
-        to: (to.get(0..2)?.parse().ok()?, to.get(2..4)?.parse().ok()?, 0),
+        from: (from.0, from.1, 0),
+        to: (to.0, to.1, 0),
     })
 }
 
@@ -168,6 +164,57 @@ fn parse_prob(token: &str) -> Option<u8> {
         "PROB40" => Some(40),
         _ => None,
     }
+}
+
+fn try_consume_prob_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafPeriod> {
+    let mut lookahead = iter.clone();
+
+    if let Some(token) = lookahead.next() {
+        if token == "TEMPO" {
+            let period_token = lookahead.next()?;
+            let period = parse_becmg_period(period_token)?;
+            iter.next(); // TEMPO
+            iter.next(); // period
+            return Some(period);
+        }
+
+        let period = parse_becmg_period(token)?;
+        iter.next(); // period
+        return Some(period);
+    }
+
+    None
+}
+
+fn parse_day_hour(value: &str) -> Option<(u8, u8)> {
+    if value.len() != 4 || !value.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let day: u8 = value[0..2].parse().ok()?;
+    let hour: u8 = value[2..4].parse().ok()?;
+
+    if !(1..=31).contains(&day) || hour > 24 {
+        return None;
+    }
+
+    Some((day, hour))
+}
+
+fn parse_day_hour_min(value: &str) -> Option<(u8, u8, u8)> {
+    if value.len() != 6 || !value.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let day: u8 = value[0..2].parse().ok()?;
+    let hour: u8 = value[2..4].parse().ok()?;
+    let min: u8 = value[4..6].parse().ok()?;
+
+    if !(1..=31).contains(&day) || hour > 23 || min > 59 {
+        return None;
+    }
+
+    Some((day, hour, min))
 }
 
 fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
