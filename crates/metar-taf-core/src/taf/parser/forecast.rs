@@ -1,7 +1,7 @@
 use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
-use crate::metar::parser::visibility::parse_visibility;
+use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::wind::parse_wind;
 use crate::taf::models::forecast::{TafForecast, TafForecastKind};
 use crate::taf::models::time::TafPeriod;
@@ -76,6 +76,17 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
         }
 
         // -------- Visibility --------
+        if token.chars().all(|c| c.is_ascii_digit())
+            && let Some(next) = iter.peek()
+            && let Some(prevailing) = parse_split_statute_miles_to_meters(token, next)
+        {
+            let vis = Visibility::Single { prevailing };
+            visibility_context = Some(vis.clone());
+            current.visibility = Some(vis);
+            iter.next();
+            continue;
+        }
+
         if let Some(vis) = parse_visibility(token, &fake_metar(visibility_context.clone())) {
             visibility_context = Some(vis.clone());
             current.visibility = Some(vis);

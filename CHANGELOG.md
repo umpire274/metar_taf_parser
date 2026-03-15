@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.3] - 2026-03-15
+
+### Added
+
+- TAF forecast parsing now supports statute-mile visibility in split-token form (e.g. `1 1/2SM`).
+- Added dedicated TAF visibility statute-mile tests for both single-token and split-token forms.
+
+### Improved
+
+- Reused METAR split-token visibility parsing logic inside TAF forecast parsing to reduce behavioral drift.
+
+---
+
 ## [0.2.2] - 2026-03-15
 
 ### Added
