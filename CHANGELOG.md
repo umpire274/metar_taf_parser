@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- METAR visibility parsing now supports statute miles (`10SM`, `1/2SM`, and split form `1 1/2SM`) with conversion to meters.
 - Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
 
 ### Changed
@@ -21,29 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.2.0-alpha7] – 2025-12-19
+## [0.2.1] - 2026-03-15
 
 ### Added
 
-- Support for report modifiers `COR`, `AMD`, and `NIL` for both METAR and TAF
-- Unified report lifecycle handling via a shared `ReportModifier` model
-- Support for `AUTO` METAR reports as part of the report modifier system
-- ICAO-compliant runway state group parsing (`Rxx/……`)
+- METAR wind parsing now supports explicit calm wind group `00000KT` with deterministic structured output.
+- Added regression tests for calm wind and malformed wind groups (`36110KT`, `180ABKT`).
 
-### Changed
+### Improved
 
-- Refactored METAR and TAF models to include explicit report modifiers
-- Improved robustness of METAR parsing against real-world inputs
-- Runway state groups are now preserved in raw form for UI-level interpretation
-
-### Removed
-
-- Removed experimental RVR parsing and models (to be reconsidered in a future release)
-
-### Notes
-
-- Alpha7 focuses on semantic correctness and real-world compliance rather than UI rendering
-- Runway designator normalization (e.g. 77 → 27R) is intentionally deferred to the presentation layer
+- Hardened METAR wind parser validation for direction range and numeric speed/gust groups.
 
 ---
 

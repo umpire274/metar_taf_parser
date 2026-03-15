@@ -1,11 +1,14 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.0-alpha5`
+> ⚠️ **Status:** Active development – current version `0.2.1`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
-This project is now focused on the reusable library crate (`metar-taf-core`) and the
-ongoing port of functionality from the Python fork:
+This project is now focused on the reusable library crate (`metar-taf-core`) and is a
+Rust port of the original Python project:
+https://github.com/mivek/python-metar-taf-parser
+
+Porting and parity work also tracks the maintained fork:
 https://github.com/umpire274/python-metar-taf-parser.
 
 ---
