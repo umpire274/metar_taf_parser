@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.7] - 2026-03-15
+
+### Added
+
+- Added METAR pressure parser regression tests for valid QNH/altimeter groups and malformed tokens.
+
+### Improved
+
+- Hardened METAR pressure parsing to accept only strict ICAO token formats (`Qdddd`, `Adddd`).
+- Malformed pressure tokens are now ignored deterministically instead of being partially parsed.
+
+---
+
 ## [0.2.6] - 2026-03-15
 
 ### Added
