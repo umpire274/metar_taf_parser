@@ -18,3 +18,23 @@ fn metar_multiple_cloud_layers() {
     assert!(matches!(metar.clouds[3].amount, CloudAmount::OVC));
     assert_eq!(metar.clouds[3].altitude_ft, None);
 }
+
+#[test]
+fn metar_vertical_visibility_unknown_height() {
+    let input = "LIRF 121250Z 18010KT 9999 VV/// 18/12 Q1015";
+
+    let metar = parse_metar(input).expect("METAR should parse");
+
+    assert_eq!(metar.clouds.len(), 1);
+    assert!(matches!(metar.clouds[0].amount, CloudAmount::VV));
+    assert_eq!(metar.clouds[0].altitude_ft, None);
+}
+
+#[test]
+fn reject_invalid_cloud_suffix() {
+    let input = "LIRF 121250Z 18010KT 9999 SCT050ABC 18/12 Q1015";
+
+    let metar = parse_metar(input).expect("METAR should parse");
+
+    assert!(metar.clouds.is_empty());
+}
