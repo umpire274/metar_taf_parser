@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.4] - 2026-03-15
+
+### Added
+
+- Added TAF regression tests for `PROB40` without `TEMPO`, invalid `PROB` periods, and invalid `FM` times.
+
+### Improved
+
+- Hardened TAF change-group parsing to avoid consuming tokens when `PROBxx` period parsing fails.
+- Added validation for `FMDDHHMM` and `DDHH/DDHH` period fragments before creating forecast groups.
+
+---
+
 ## [0.2.3] - 2026-03-15
 
 ### Added
