@@ -19,3 +19,12 @@ fn parse_thunderstorm_rain() {
         "expected RA phenomenon"
     );
 }
+
+#[test]
+fn parse_heavy_showers_hail() {
+    let wx = parse_weather("+SHGR").unwrap();
+
+    assert!(matches!(wx.intensity, Some(WeatherIntensity::Heavy)));
+    assert!(wx.descriptors.contains(&WeatherDescriptor::Showers));
+    assert!(wx.phenomena.contains(&WeatherPhenomenon::Hail));
+}
