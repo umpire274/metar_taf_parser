@@ -79,14 +79,13 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
             continue;
         }
 
-        if token.chars().all(|c| c.is_ascii_digit()) {
-            if let Some(next) = tokenizer.peek() {
-                if let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next) {
-                    metar.visibility = Some(Visibility::Single { prevailing });
-                    let _ = tokenizer.next();
-                    continue;
-                }
-            }
+        if token.chars().all(|c| c.is_ascii_digit())
+            && let Some(next) = tokenizer.peek()
+            && let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next)
+        {
+            metar.visibility = Some(Visibility::Single { prevailing });
+            let _ = tokenizer.next();
+            continue;
         }
 
         if let Some(v) = parse_visibility(&token, &metar) {

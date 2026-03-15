@@ -21,6 +21,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-alpha7] – 2025-12-19
+
+### Added
+
+- Support for report modifiers `COR`, `AMD`, and `NIL` for both METAR and TAF
+- Unified report lifecycle handling via a shared `ReportModifier` model
+- Support for `AUTO` METAR reports as part of the report modifier system
+- ICAO-compliant runway state group parsing (`Rxx/……`)
+
+### Changed
+
+- Refactored METAR and TAF models to include explicit report modifiers
+- Improved robustness of METAR parsing against real-world inputs
+- Runway state groups are now preserved in raw form for UI-level interpretation
+
+### Removed
+
+- Removed experimental RVR parsing and models (to be reconsidered in a future release)
+
+### Notes
+
+- Alpha7 focuses on semantic correctness and real-world compliance rather than UI rendering
+- Runway designator normalization (e.g. 77 → 27R) is intentionally deferred to the presentation layer
+
+---
+
 ## [0.2.0-alpha5] - 2025-12-18
 
 ### Added
