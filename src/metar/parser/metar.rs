@@ -12,7 +12,7 @@ use crate::metar::parser::runway_state::parse_runway_state;
 use crate::metar::parser::rvr::parse_rvr;
 use crate::metar::parser::temperature::parse_temperature;
 use crate::metar::parser::time::parse_time;
-use crate::metar::parser::trend::parse_trend;
+use crate::metar::parser::trend::{parse_trend, parse_trend_detail};
 use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
@@ -128,7 +128,10 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
         }
 
         if let Some(t) = parse_trend(&token) {
-            metar.trend = Some(t);
+            metar.trend = Some(t.clone());
+            if !matches!(t, crate::metar::models::trend::MetarTrend::Nosig) {
+                metar.trend_detail = Some(parse_trend_detail(t, &mut tokenizer));
+            }
             continue;
         }
 

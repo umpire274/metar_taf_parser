@@ -13,12 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
 - Added `docs/CODEBASE_REFERENCE.md` with an English inventory of modules, structs, enums, and functions across the codebase.
+- Added advanced METAR trend payload parsing for `BECMG`/`TEMPO` details (`FM`/`TL`/`AT` times, trend wind/visibility/weather/clouds, and trend-level unknown group capture).
 
 ### Changed
 
 - Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-parser`.
 - README updated to document the library-first direction and Python fork porting objective.
 - README usage section now includes explicit METAR/TAF examples and strict-vs-tolerant TAF parsing use cases.
+- Updated porting policy immediate-next list after completing METAR advanced trend payload support.
 
 ---
 
