@@ -24,3 +24,31 @@ fn parse_wind_in_mps() {
     assert_eq!(wind.speed, 2);
     assert_eq!(wind.unit, WindUnit::MPS);
 }
+
+#[test]
+fn parse_calm_wind() {
+    let metar = "METAR XXXX 181200Z 00000KT CAVOK 10/05 Q1015";
+    let parsed = parse_metar(metar).unwrap();
+    let wind = parsed.wind.unwrap();
+
+    assert_eq!(wind.direction, Some(0));
+    assert_eq!(wind.speed, 0);
+    assert_eq!(wind.gust, None);
+    assert_eq!(wind.unit, WindUnit::KT);
+}
+
+#[test]
+fn reject_invalid_direction_above_360() {
+    let metar = "METAR XXXX 181200Z 36110KT CAVOK 10/05 Q1015";
+    let parsed = parse_metar(metar).unwrap();
+
+    assert!(parsed.wind.is_none());
+}
+
+#[test]
+fn reject_invalid_non_numeric_wind_speed() {
+    let metar = "METAR XXXX 181200Z 180ABKT CAVOK 10/05 Q1015";
+    let parsed = parse_metar(metar).unwrap();
+
+    assert!(parsed.wind.is_none());
+}
