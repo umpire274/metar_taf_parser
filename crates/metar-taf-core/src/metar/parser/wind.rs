@@ -11,23 +11,55 @@ fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
 }
 
 pub fn parse_wind(token: &str) -> Option<Wind> {
-    // 1. Strip unit first
     let (body, unit) = strip_unit(token)?;
 
-    // 2. Direction
+    // Calm wind
+    if body == "00000" {
+        return Some(Wind {
+            direction: Some(0),
+            speed: 0,
+            gust: None,
+            unit,
+        });
+    }
+
     let (direction, rest) = if let Some(rest) = body.strip_prefix("VRB") {
         (None, rest)
-    } else if body.len() >= 3 {
-        let dir: u16 = body.get(0..3)?.parse().ok()?;
-        (Some(dir), &body[3..])
     } else {
-        return None;
+        let dir_str = body.get(0..3)?;
+        if !dir_str.chars().all(|c| c.is_ascii_digit()) {
+            return None;
+        }
+
+        let dir: u16 = dir_str.parse().ok()?;
+        if dir > 360 {
+            return None;
+        }
+
+        (Some(dir), body.get(3..)?)
     };
 
-    // 3. Speed / Gust
-    let (speed, gust) = if let Some((s, g)) = rest.split_once('G') {
-        (s.parse().ok()?, Some(g.parse().ok()?))
+    if rest.is_empty() {
+        return None;
+    }
+
+    let (speed, gust) = if let Some((speed_str, gust_str)) = rest.split_once('G') {
+        if speed_str.is_empty() || gust_str.is_empty() {
+            return None;
+        }
+
+        if !speed_str.chars().all(|c| c.is_ascii_digit())
+            || !gust_str.chars().all(|c| c.is_ascii_digit())
+        {
+            return None;
+        }
+
+        (speed_str.parse().ok()?, Some(gust_str.parse().ok()?))
     } else {
+        if !rest.chars().all(|c| c.is_ascii_digit()) {
+            return None;
+        }
+
         (rest.parse().ok()?, None)
     };
 
