@@ -1,5 +1,9 @@
+//! Module `wind`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::wind::{Wind, WindUnit};
 
+/// Normalizes token/text input for `strip_unit` processing.
 fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
     if let Some(rest) = token.strip_suffix("KT") {
         Some((rest, WindUnit::KT))
@@ -10,6 +14,7 @@ fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
     }
 }
 
+/// Parses input tokens into typed data for `parse_wind`.
 pub fn parse_wind(token: &str) -> Option<Wind> {
     let (body, unit) = strip_unit(token)?;
 

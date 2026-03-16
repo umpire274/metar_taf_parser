@@ -1,3 +1,6 @@
+//! Module `forecast`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use std::iter::Peekable;
 use std::slice::Iter;
 
@@ -122,6 +125,7 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
 
 // ===== Forecast builders =====
 
+/// Creates a new `new_base_forecast` value with normalized defaults.
 fn new_base_forecast() -> TafForecast {
     TafForecast {
         kind: TafForecastKind::Base,
@@ -138,6 +142,7 @@ fn new_base_forecast() -> TafForecast {
     }
 }
 
+/// Creates a new `new_fm_forecast` value with normalized defaults.
 fn new_fm_forecast(from: (u8, u8, u8)) -> TafForecast {
     TafForecast {
         kind: TafForecastKind::FM,
@@ -154,6 +159,7 @@ fn new_fm_forecast(from: (u8, u8, u8)) -> TafForecast {
     }
 }
 
+/// Creates a new `new_period_forecast` value with normalized defaults.
 fn new_period_forecast(
     kind: TafForecastKind,
     period: TafPeriod,
@@ -176,6 +182,7 @@ fn new_period_forecast(
 
 // ===== Helpers =====
 
+/// Parses input tokens into typed data for `parse_fm_time`.
 fn parse_fm_time(token: &str) -> Option<(u8, u8, u8)> {
     if !token.starts_with("FM") || token.len() != 8 {
         return None;
@@ -184,6 +191,7 @@ fn parse_fm_time(token: &str) -> Option<(u8, u8, u8)> {
     parse_day_hour_min(&token[2..])
 }
 
+/// Parses input tokens into typed data for `parse_becmg_period`.
 fn parse_becmg_period(token: &str) -> Option<TafPeriod> {
     let (from, to) = token.split_once('/')?;
 
@@ -196,6 +204,7 @@ fn parse_becmg_period(token: &str) -> Option<TafPeriod> {
     })
 }
 
+/// Parses input tokens into typed data for `parse_prob`.
 fn parse_prob(token: &str) -> Option<u8> {
     match token {
         "PROB30" => Some(30),
@@ -204,6 +213,7 @@ fn parse_prob(token: &str) -> Option<u8> {
     }
 }
 
+/// Helper function used by `try_consume_prob_period` parsing logic.
 fn try_consume_prob_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafPeriod> {
     let mut lookahead = iter.clone();
 
@@ -224,6 +234,7 @@ fn try_consume_prob_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafP
     None
 }
 
+/// Helper function used by `try_consume_period` parsing logic.
 fn try_consume_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafPeriod> {
     let mut lookahead = iter.clone();
     let period_token = lookahead.next()?;
@@ -232,6 +243,7 @@ fn try_consume_period(iter: &mut Peekable<Iter<'_, String>>) -> Option<TafPeriod
     Some(period)
 }
 
+/// Parses input tokens into typed data for `parse_day_hour`.
 fn parse_day_hour(value: &str) -> Option<(u8, u8)> {
     if value.len() != 4 || !value.chars().all(|c| c.is_ascii_digit()) {
         return None;
@@ -247,6 +259,7 @@ fn parse_day_hour(value: &str) -> Option<(u8, u8)> {
     Some((day, hour))
 }
 
+/// Parses input tokens into typed data for `parse_day_hour_min`.
 fn parse_day_hour_min(value: &str) -> Option<(u8, u8, u8)> {
     if value.len() != 6 || !value.chars().all(|c| c.is_ascii_digit()) {
         return None;
@@ -263,6 +276,7 @@ fn parse_day_hour_min(value: &str) -> Option<(u8, u8, u8)> {
     Some((day, hour, min))
 }
 
+/// Parses input tokens into typed data for `parse_taf_wind_shear`.
 fn parse_taf_wind_shear(token: &str) -> Option<TafWindShear> {
     let body = token.strip_prefix("WS")?;
     let (height_part, wind_part) = body.split_once('/')?;
@@ -291,6 +305,7 @@ fn parse_taf_wind_shear(token: &str) -> Option<TafWindShear> {
     })
 }
 
+/// Parses input tokens into typed data for `parse_taf_temperature`.
 fn parse_taf_temperature(token: &str) -> Option<(bool, TafTemperature)> {
     let (is_max, body) = if let Some(v) = token.strip_prefix("TX") {
         (true, v)
@@ -323,6 +338,7 @@ fn parse_taf_temperature(token: &str) -> Option<(bool, TafTemperature)> {
     Some((is_max, TafTemperature { value, day, hour }))
 }
 
+/// Parses input tokens into typed data for `parse_signed_temp`.
 fn parse_signed_temp(token: &str) -> Option<i8> {
     if token.len() != 2 && token.len() != 3 {
         return None;
@@ -342,6 +358,7 @@ fn parse_signed_temp(token: &str) -> Option<i8> {
     Some(if negative { -parsed } else { parsed })
 }
 
+/// Helper function used by `fake_metar` parsing logic.
 fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
     use crate::metar::models::Metar;
 

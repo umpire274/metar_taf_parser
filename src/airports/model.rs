@@ -1,6 +1,10 @@
+//! Module `model`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]
+/// Defines the Airport domain model used by the parser.
 pub struct Airport {
     pub icao: String,
     pub name: String,

@@ -1,5 +1,9 @@
+//! Module `pressure`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::pressure::Pressure;
 
+/// Parses input tokens into typed data for `parse_pressure`.
 pub fn parse_pressure(token: &str) -> Option<Pressure> {
     // Q1015 → hPa (exactly 4 digits)
     if let Some(rest) = token.strip_prefix('Q') {

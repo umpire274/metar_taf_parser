@@ -1,5 +1,9 @@
+//! Module `runway_state`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::runway_state::RunwayState;
 
+/// Parses input tokens into typed data for `parse_runway_state`.
 pub fn parse_runway_state(token: &str) -> Option<RunwayState> {
     if !token.starts_with('R') {
         return None;

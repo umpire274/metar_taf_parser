@@ -1,3 +1,6 @@
+//! Module `metar`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::common::report_modifier::ReportModifier;
 use crate::common::tokenizer::Tokenizer;
 use crate::metar::errors::MetarError;
@@ -14,6 +17,7 @@ use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, pars
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
 
+/// Parses input tokens into typed data for `parse_metar`.
 pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
     let mut tokenizer = Tokenizer::new(input);
 

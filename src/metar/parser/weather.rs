@@ -1,5 +1,9 @@
+//! Module `weather`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::weather::*;
 
+/// Parses input tokens into typed data for `parse_weather`.
 pub fn parse_weather(token: &str) -> Option<Weather> {
     if token.is_empty() {
         return None;

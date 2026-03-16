@@ -1,6 +1,10 @@
+//! Module `runway_state`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use serde::Serialize;
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
+/// Defines the RunwayState domain model used by the parser.
 pub struct RunwayState {
     /// Runway designator (two digits)
     pub runway_designator: String,

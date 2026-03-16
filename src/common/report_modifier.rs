@@ -1,6 +1,10 @@
+//! Module `report_modifier`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use serde::Serialize;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+/// Enumerates the allowed values for ReportModifier.
 pub enum ReportModifier {
     /// Standard manual report
     #[default]

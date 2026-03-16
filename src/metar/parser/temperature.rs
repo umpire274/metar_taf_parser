@@ -1,5 +1,9 @@
+//! Module `temperature`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::temperature::Temperature;
 
+/// Parses input tokens into typed data for `parse_single_temp`.
 fn parse_single_temp(s: &str) -> Option<i8> {
     if s.is_empty() {
         return None;
@@ -29,6 +33,7 @@ fn parse_single_temp(s: &str) -> Option<i8> {
     Some(value)
 }
 
+/// Parses input tokens into typed data for `parse_temperature`.
 pub fn parse_temperature(token: &str) -> Option<Temperature> {
     let (temp_str, dew_str) = token.split_once('/')?;
 

@@ -1,5 +1,9 @@
+//! Module `rvr`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::rvr::{RunwayVisualRange, RvrQualifier, RvrTendency, RvrUnit, RvrValue};
 
+/// Parses input tokens into typed data for `parse_rvr`.
 pub fn parse_rvr(token: &str) -> Option<RunwayVisualRange> {
     if !token.starts_with('R') {
         return None;
@@ -36,6 +40,7 @@ pub fn parse_rvr(token: &str) -> Option<RunwayVisualRange> {
     })
 }
 
+/// Helper function used by `is_valid_runway_designator` parsing logic.
 fn is_valid_runway_designator(runway: &str) -> bool {
     if runway.len() != 2 && runway.len() != 3 {
         return false;
@@ -53,6 +58,7 @@ fn is_valid_runway_designator(runway: &str) -> bool {
     }
 }
 
+/// Parses input tokens into typed data for `parse_tendency`.
 fn parse_tendency(rest: &str) -> (&str, Option<RvrTendency>) {
     if let Some(last) = rest.chars().last() {
         let tendency = match last {
@@ -71,6 +77,7 @@ fn parse_tendency(rest: &str) -> (&str, Option<RvrTendency>) {
     (rest, None)
 }
 
+/// Parses input tokens into typed data for `parse_unit`.
 fn parse_unit(rest: &str) -> (&str, RvrUnit) {
     if let Some(v) = rest.strip_suffix("FT") {
         (v, RvrUnit::Feet)
@@ -79,6 +86,7 @@ fn parse_unit(rest: &str) -> (&str, RvrUnit) {
     }
 }
 
+/// Parses input tokens into typed data for `parse_rvr_value`.
 fn parse_rvr_value(value: &str) -> Option<RvrValue> {
     if value.len() != 4 && value.len() != 5 {
         return None;

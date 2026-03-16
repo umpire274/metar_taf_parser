@@ -1,5 +1,9 @@
+//! Module `cloud`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::cloud::{CloudAmount, CloudLayer, CloudType};
 
+/// Parses input tokens into typed data for `parse_cloud`.
 pub fn parse_cloud(token: &str) -> Option<CloudLayer> {
     if token.len() < 3 {
         return None;
@@ -74,6 +78,7 @@ pub fn parse_cloud(token: &str) -> Option<CloudLayer> {
     })
 }
 
+/// Parses input tokens into typed data for `parse_cloud_amount`.
 fn parse_cloud_amount(value: &str) -> Option<CloudAmount> {
     match value {
         "FEW" => Some(CloudAmount::FEW),

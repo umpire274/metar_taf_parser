@@ -1,6 +1,10 @@
+//! Module `weather`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use serde::Serialize;
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize)]
+/// Enumerates the allowed values for WeatherIntensity.
 pub enum WeatherIntensity {
     Light,
     Moderate,
@@ -8,6 +12,7 @@ pub enum WeatherIntensity {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize)]
+/// Enumerates the allowed values for WeatherDescriptor.
 pub enum WeatherDescriptor {
     Shallow,      // MI
     Partial,      // PR
@@ -21,6 +26,7 @@ pub enum WeatherDescriptor {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize)]
+/// Enumerates the allowed values for WeatherPhenomenon.
 pub enum WeatherPhenomenon {
     Rain,       // RA
     Snow,       // SN
@@ -36,6 +42,7 @@ pub enum WeatherPhenomenon {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize)]
+/// Defines the Weather domain model used by the parser.
 pub struct Weather {
     pub intensity: Option<WeatherIntensity>,
     pub descriptors: Vec<WeatherDescriptor>,

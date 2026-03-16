@@ -1,17 +1,23 @@
+//! Module `taf`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::common::report_modifier::ReportModifier;
 use crate::common::tokenizer::Tokenizer;
 use crate::taf::errors::TafError;
 use crate::taf::models::taf::Taf;
 use crate::taf::parser::time::{parse_taf_time, parse_validity};
 
+/// Parses input tokens into typed data for `parse_taf`.
 pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
     parse_taf_with_mode(input, false)
 }
 
+/// Parses input tokens into typed data for `parse_taf_strict`.
 pub fn parse_taf_strict(input: &str) -> Result<Taf, TafError> {
     parse_taf_with_mode(input, true)
 }
 
+/// Parses input tokens into typed data for `parse_taf_with_mode`.
 fn parse_taf_with_mode(input: &str, strict: bool) -> Result<Taf, TafError> {
     let normalized = input
         .lines()

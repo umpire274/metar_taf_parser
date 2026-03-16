@@ -1,3 +1,6 @@
+//! Module `metar`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::cloud::CloudLayer;
 use crate::metar::models::pressure::Pressure;
@@ -11,6 +14,7 @@ use crate::metar::models::wind::Wind;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
+/// Represents a parsed Metar report with typed fields.
 pub struct Metar {
     pub station: String,
     pub time: Option<super::time::MetarTime>,
@@ -30,6 +34,7 @@ pub struct Metar {
 }
 
 impl Metar {
+    /// Creates a new `new` value with normalized defaults.
     pub fn new(station: &str, raw: &str) -> Self {
         Self {
             station: station.to_string(),

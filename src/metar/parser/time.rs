@@ -1,5 +1,9 @@
+//! Module `time`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::time::MetarTime;
 
+/// Parses input tokens into typed data for `parse_time`.
 pub fn parse_time(token: &str) -> Option<MetarTime> {
     // format: DDHHMMZ
     if token.len() != 7 || !token.ends_with('Z') {

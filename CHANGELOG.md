@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-parser`.
 - README updated to document the library-first direction and Python fork porting objective.
+- README usage section now includes explicit METAR/TAF examples and strict-vs-tolerant TAF parsing use cases.
 
 ---
 

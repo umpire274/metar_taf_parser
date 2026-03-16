@@ -1,8 +1,13 @@
+//! Module `visibility`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::metar::models::Metar;
 use crate::metar::models::visibility::{Visibility, VisibilityDirection};
 
+/// Constant used by parsing and conversion logic.
 const METERS_PER_STATUTE_MILE: f64 = 1609.344;
 
+/// Parses input tokens into typed data for `parse_visibility`.
 pub fn parse_visibility(token: &str, metar: &Metar) -> Option<Visibility> {
     // CAVOK
     if token == "CAVOK" {
@@ -39,6 +44,7 @@ pub fn parse_visibility(token: &str, metar: &Metar) -> Option<Visibility> {
     None
 }
 
+/// Parses input tokens into typed data for `parse_split_statute_miles_to_meters`.
 pub fn parse_split_statute_miles_to_meters(
     whole_miles: &str,
     fraction_with_sm: &str,
@@ -58,6 +64,7 @@ pub fn parse_split_statute_miles_to_meters(
     miles_to_meters(whole + fraction)
 }
 
+/// Parses input tokens into typed data for `parse_statute_miles_to_meters`.
 fn parse_statute_miles_to_meters(token: &str) -> Option<u16> {
     let cleaned = token.strip_suffix("SM")?;
     let numeric = cleaned
@@ -73,6 +80,7 @@ fn parse_statute_miles_to_meters(token: &str) -> Option<u16> {
     miles_to_meters(fraction)
 }
 
+/// Parses input tokens into typed data for `parse_fraction`.
 fn parse_fraction(value: &str) -> Option<f64> {
     let (num, den) = value.split_once('/')?;
     let numerator: f64 = num.parse().ok()?;
@@ -85,6 +93,7 @@ fn parse_fraction(value: &str) -> Option<f64> {
     Some(numerator / denominator)
 }
 
+/// Helper function used by `miles_to_meters` parsing logic.
 fn miles_to_meters(miles: f64) -> Option<u16> {
     if miles.is_sign_negative() {
         return None;
@@ -99,6 +108,7 @@ fn miles_to_meters(miles: f64) -> Option<u16> {
     Some(meters as u16)
 }
 
+/// Parses input tokens into typed data for `parse_visibility_direction`.
 fn parse_visibility_direction(s: &str) -> Option<VisibilityDirection> {
     match s {
         "N" => Some(VisibilityDirection::N),

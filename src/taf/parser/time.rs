@@ -1,6 +1,10 @@
+//! Module `time`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use crate::taf::errors::TafError;
 use crate::taf::models::time::{TafTime, TafValidity};
 
+/// Parses input tokens into typed data for `parse_taf_time`.
 pub fn parse_taf_time(token: &str) -> Result<TafTime, TafError> {
     if token.len() != 7 || !token.ends_with('Z') || !token[..6].chars().all(|c| c.is_ascii_digit())
     {
@@ -18,6 +22,7 @@ pub fn parse_taf_time(token: &str) -> Result<TafTime, TafError> {
     Ok(TafTime { day, hour, minute })
 }
 
+/// Parses input tokens into typed data for `parse_validity`.
 pub fn parse_validity(token: &str) -> Result<TafValidity, TafError> {
     let (from, to) = token.split_once('/').ok_or(TafError::InvalidFormat)?;
 

@@ -1,12 +1,17 @@
+//! Module `db`.
+//!
+//! Contains types and parsing logic implemented for this crate.
 use std::collections::HashMap;
 
 use super::model::Airport;
 
+/// Provides in-memory access to airport reference data.
 pub struct AirportDb {
     by_icao: HashMap<String, Airport>,
 }
 
 impl AirportDb {
+    /// Helper function used by `load` parsing logic.
     pub fn load() -> Self {
         let data = include_str!("../../resources/airports.dat");
 
@@ -21,6 +26,7 @@ impl AirportDb {
         Self { by_icao }
     }
 
+    /// Looks up data for `lookup` using known identifiers.
     pub fn lookup(&self, icao: &str) -> Option<&Airport> {
         self.by_icao.get(&icao.to_uppercase())
     }
@@ -87,6 +93,7 @@ mod tests {
     use super::*;
 
     #[test]
+    /// Looks up data for `lookup_known_airport` using known identifiers.
     fn lookup_known_airport() {
         let db = AirportDb::load();
 

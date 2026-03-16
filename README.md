@@ -55,7 +55,7 @@ Add the core crate to your `Cargo.toml`:
 metar-taf-parser = "0.2.23"
 ```
 
-Example:
+### METAR example
 
 ```rust
 use metar_taf_parser::parse_metar;
@@ -64,10 +64,43 @@ let metar = parse_metar(
     "LIRF 121250Z 18012KT 9999 FEW030 SCT080 18/12 Q1015"
 )?;
 
-println!("{:#?}", metar);
+assert_eq!(metar.station, "LIRF");
+assert!(metar.wind.is_some());
+assert!(metar.temperature.is_some());
 ```
 
-For strict parsing (error on unsupported groups), use `parse_taf_strict`.
+### TAF example (tolerant mode)
+
+```rust
+use metar_taf_parser::parse_taf;
+
+let taf = parse_taf(
+    "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TX18/1214Z TN08/1304Z TEMPO 1218/1222 4000 -RA"
+)?;
+
+assert_eq!(taf.station, "LIRF");
+assert!(!taf.forecasts.is_empty());
+// In tolerant mode, unsupported tokens are preserved in `unparsed_groups`.
+```
+
+### TAF strict mode example
+
+```rust
+use metar_taf_parser::parse_taf_strict;
+
+let strict_result = parse_taf_strict(
+    "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 UNKNOWN_TOKEN"
+);
+
+assert!(strict_result.is_err());
+```
+
+### Typical parser use cases
+
+- Parse a single METAR and inspect typed fields (`wind`, `visibility`, `clouds`, `temperature`, `pressure`).
+- Parse a TAF and iterate forecast sections (`BASE`, `FM`, `BECMG`, `TEMPO`, `PROB`).
+- Enable strict TAF mode in validation pipelines where unknown groups must fail fast.
+- Use tolerant mode when you want best-effort parsing plus visibility on unsupported tokens.
 
 ---
 
