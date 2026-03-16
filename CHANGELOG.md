@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.12] - 2026-03-16
+
+### Added
+
+- Added TAF time/validity regression tests for malformed widths, non-numeric values, and out-of-range components.
+
+### Improved
+
+- Hardened TAF issue-time parsing to require strict `DDHHMMZ` numeric tokens and valid day/hour/minute ranges.
+- Hardened TAF validity parsing to require strict `DDHH/DDHH` numeric tokens and valid day/hour ranges.
+
+---
+
 ## [0.2.11] - 2026-03-15
 
 ### Added
