@@ -10,4 +10,5 @@ pub struct Taf {
     pub validity: Option<TafValidity>,
     pub modifier: ReportModifier,
     pub forecasts: Vec<TafForecast>,
+    pub unparsed_groups: Vec<String>,
 }
