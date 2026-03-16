@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.16] - 2026-03-16
+
+### Added
+
+- Added diagnostics regression tests for unknown/unparsed groups in both METAR and TAF parsing flows.
+
+### Improved
+
+- METAR parser now stores unknown tokens in `unparsed_groups` instead of silently dropping them.
+- TAF parser now exposes `unparsed_groups` and collects tokens that are not consumed by forecast group parsers.
+
+---
+
 ## [0.2.15] - 2026-03-16
 
 ### Added

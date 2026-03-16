@@ -11,8 +11,9 @@ use crate::taf::models::forecast::{TafForecast, TafForecastKind};
 use crate::taf::models::time::TafPeriod;
 
 /// Entry point: parse tutti i forecast TAF
-pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
+pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
     let mut forecasts = Vec::new();
+    let mut unparsed_groups = Vec::new();
 
     let mut current = new_base_forecast();
     let mut visibility_context: Option<Visibility> = None;
@@ -93,10 +94,12 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
             current.weather.push(weather);
             continue;
         }
+
+        unparsed_groups.push(token.to_string());
     }
 
     forecasts.push(current);
-    forecasts
+    (forecasts, unparsed_groups)
 }
 
 // ===== Forecast builders =====

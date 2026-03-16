@@ -126,6 +126,8 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
             metar.weather.push(v);
             continue;
         }
+
+        metar.unparsed_groups.push(token.to_string());
     }
 
     if rmk_started && !remaining_tokens.is_empty() {

@@ -30,6 +30,7 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
             validity: Default::default(),
             modifier: ReportModifier::Nil,
             forecasts: Vec::new(),
+            unparsed_groups: Vec::new(),
         });
     }
 
@@ -55,7 +56,7 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
     let validity = parse_validity(&validity_token)?;
 
     let remaining: Vec<String> = tokenizer.map(|s| s.to_string()).collect();
-    let forecasts = crate::taf::parser::forecast::parse_forecasts(&remaining);
+    let (forecasts, unparsed_groups) = crate::taf::parser::forecast::parse_forecasts(&remaining);
 
     Ok(Taf {
         station: station.to_string(),
@@ -63,5 +64,6 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
         validity: Some(validity),
         modifier,
         forecasts,
+        unparsed_groups,
     })
 }
