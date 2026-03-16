@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.18] - 2026-03-16
+
+### Added
+
+- Added `parse_taf_strict`, which rejects TAF messages containing unsupported/unparsed groups.
+- Added regression tests for tolerant vs strict TAF parsing behavior.
+
+### Changed
+
+- Updated README examples to reference `metar-taf-core = "0.2.18"` and document strict TAF parsing mode.
+
+---
+
 ## [0.2.17] - 2026-03-16
 
 ### Changed

@@ -5,6 +5,14 @@ use crate::taf::models::taf::Taf;
 use crate::taf::parser::time::{parse_taf_time, parse_validity};
 
 pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
+    parse_taf_with_mode(input, false)
+}
+
+pub fn parse_taf_strict(input: &str) -> Result<Taf, TafError> {
+    parse_taf_with_mode(input, true)
+}
+
+fn parse_taf_with_mode(input: &str, strict: bool) -> Result<Taf, TafError> {
     let normalized = input
         .lines()
         .map(str::trim)
@@ -57,6 +65,10 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
 
     let remaining: Vec<String> = tokenizer.map(|s| s.to_string()).collect();
     let (forecasts, unparsed_groups) = crate::taf::parser::forecast::parse_forecasts(&remaining);
+
+    if strict && !unparsed_groups.is_empty() {
+        return Err(TafError::UnsupportedGroup(unparsed_groups.join(" ")));
+    }
 
     Ok(Taf {
         station: station.to_string(),
