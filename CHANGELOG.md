@@ -20,6 +20,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.19] - 2026-03-16
+
+### Changed
+
+- Promoted the core library crate to repository root and renamed package to `metar-taf-parser` for crates.io publication.
+- Removed workspace-style root manifest and replaced it with the single-package crate manifest.
+- Updated README usage examples and test commands to the new root crate name/layout.
+
+### Notes
+
+- Existing Rust import path is now `metar_taf_parser` (instead of `metar_taf_core`).
+
+---
+
 ## [0.2.18] - 2026-03-16
 
 ### Added
@@ -29,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated README examples to reference `metar-taf-core = "0.2.18"` and document strict TAF parsing mode.
+- Updated README examples to reference `metar-taf-parser = "0.2.19"` and document strict TAF parsing mode.
 
 ---
 
