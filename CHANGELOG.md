@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.13] - 2026-03-16
+
+### Added
+
+- Added TAF modifier regression tests for `COR` parsing (with and without the `TAF` prefix).
+
+### Improved
+
+- Extended TAF header parsing to recognize `COR` as `ReportModifier::Correction` in addition to existing `AMD`/`NIL` handling.
+
+---
+
 ## [0.2.12] - 2026-03-16
 
 ### Added

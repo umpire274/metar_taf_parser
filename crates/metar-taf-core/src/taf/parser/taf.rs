@@ -33,12 +33,17 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
         });
     }
 
-    // Optional AMD
-    let (modifier, station) = if token == "AMD" {
-        let s = tokenizer.next().ok_or(TafError::InvalidFormat)?;
-        (ReportModifier::Amendment, s)
-    } else {
-        (ReportModifier::Normal, token)
+    // Optional AMD/COR
+    let (modifier, station) = match token.as_str() {
+        "AMD" => (
+            ReportModifier::Amendment,
+            tokenizer.next().ok_or(TafError::InvalidFormat)?,
+        ),
+        "COR" => (
+            ReportModifier::Correction,
+            tokenizer.next().ok_or(TafError::InvalidFormat)?,
+        ),
+        _ => (ReportModifier::Normal, token),
     };
 
     // Issue time: DDHHMMZ
