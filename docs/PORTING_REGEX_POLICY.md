@@ -12,6 +12,6 @@ using the same regex definitions used by the Mivek's Python original project (`m
 
 ## Immediate next modules
 
-- METAR wind groups
-- METAR cloud groups
-- TAF change groups (`FM`, `BECMG`, `TEMPO`, `PROBxx`)
+- METAR runway visual range (RVR) groups
+- METAR advanced trend payloads beyond marker tokens (`BECMG`/`TEMPO` details)
+- TAF temperature groups (`TX`/`TN`) and optional wind-shear sections

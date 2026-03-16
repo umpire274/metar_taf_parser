@@ -20,6 +20,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.17] - 2026-03-16
+
+### Changed
+
+- Updated `thiserror` dependency to `2.0.18`.
+- README dependency snippet now matches current crate line (`metar-taf-core = "0.2.17"`).
+
+### Improved
+
+- Extended METAR trend parsing to recognize `BECMG` and `TEMPO` marker tokens in addition to `NOSIG`.
+- Updated porting policy "Immediate next modules" to reflect remaining parity targets (RVR, advanced METAR trend payloads, TAF `TX`/`TN` + wind-shear sections).
+
+### Added
+
+- Added regression tests for `NOSIG`, `BECMG`, and `TEMPO` METAR trend markers.
+
+---
+
 ## [0.2.16] - 2026-03-16
 
 ### Added
