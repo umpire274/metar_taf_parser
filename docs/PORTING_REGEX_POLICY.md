@@ -12,5 +12,4 @@ using the same regex definitions used by the Mivek's Python original project (`m
 
 ## Immediate next modules
 
-- TAF additional weather payload coverage across change groups
 - Strict/tolerant parsing review for remaining unsupported METAR/TAF groups

@@ -1,3 +1,4 @@
+use metar_taf_parser::metar::models::weather::WeatherPhenomenon;
 use metar_taf_parser::parse_taf;
 use metar_taf_parser::taf::models::forecast::TafForecastKind;
 
@@ -42,4 +43,21 @@ BECMG 12A0/1222 20012KT SCT040";
     assert_eq!(wind.direction, Some(200));
     assert_eq!(wind.speed, 12);
     assert!(!base.clouds.is_empty());
+}
+
+#[test]
+fn taf_becmg_parses_nsw_weather_payload() {
+    let input = "TAF LIRF 121100Z 1212/1318 18010KT 9999 FEW030 BECMG 1220/1222 NSW SCT030";
+
+    let taf = parse_taf(input).expect("TAF should parse");
+    assert_eq!(taf.forecasts.len(), 2);
+
+    let becmg = &taf.forecasts[1];
+    assert!(
+        becmg
+            .weather
+            .iter()
+            .flat_map(|w| w.phenomena.iter())
+            .any(|p| matches!(p, WeatherPhenomenon::NoSignificantWeather))
+    );
 }

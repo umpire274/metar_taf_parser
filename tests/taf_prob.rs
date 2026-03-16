@@ -96,3 +96,18 @@ PROB30 99AA/1223 20012KT SCT040";
     assert_eq!(wind.speed, 12);
     assert!(!base.clouds.is_empty());
 }
+
+#[test]
+fn taf_prob_parses_nsw_weather_payload() {
+    let input = "TAF LIRF 121100Z 1212/1318 18010KT 9999 FEW030 PROB40 1220/1223 NSW";
+
+    let taf = parse_taf(input).expect("TAF should parse");
+    let prob = &taf.forecasts[1];
+
+    assert!(
+        prob.weather
+            .iter()
+            .flat_map(|w| w.phenomena.iter())
+            .any(|p| matches!(p, WeatherPhenomenon::NoSignificantWeather))
+    );
+}

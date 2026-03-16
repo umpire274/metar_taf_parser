@@ -57,3 +57,19 @@ TEMPO 99AA/1222 21015KT SCT030";
     assert_eq!(wind.speed, 15);
     assert!(!base.clouds.is_empty());
 }
+
+#[test]
+fn taf_tempo_parses_nsw_weather_payload() {
+    let input = "TAF LIRF 121100Z 1212/1318 18010KT 9999 FEW030 TEMPO 1220/1222 NSW";
+
+    let taf = parse_taf(input).expect("TAF should parse");
+    let tempo = &taf.forecasts[1];
+
+    assert!(
+        tempo
+            .weather
+            .iter()
+            .flat_map(|w| w.phenomena.iter())
+            .any(|p| matches!(p, WeatherPhenomenon::NoSignificantWeather))
+    );
+}

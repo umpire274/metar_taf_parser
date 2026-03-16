@@ -24,6 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.24] - 2026-03-16
+
+### Added
+
+- Added TAF weather payload coverage for `NSW` tokens across change groups (`BECMG`, `TEMPO`, `PROBxx`) with regression tests.
+
+### Changed
+
+- Bumped crate version and README dependency markers to `0.2.24`.
+
+---
+
 ## [0.2.23] - 2026-03-16
 
 ### Changed

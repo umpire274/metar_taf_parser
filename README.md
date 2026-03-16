@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.23`
+> ⚠️ **Status:** Active development – current version `0.2.24`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,7 +52,7 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.2.23"
+metar-taf-parser = "0.2.24"
 ```
 
 ### METAR example

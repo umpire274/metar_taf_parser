@@ -9,6 +9,14 @@ pub fn parse_weather(token: &str) -> Option<Weather> {
         return None;
     }
 
+    if token == "NSW" {
+        return Some(Weather {
+            intensity: None,
+            descriptors: Vec::new(),
+            phenomena: vec![WeatherPhenomenon::NoSignificantWeather],
+        });
+    }
+
     let mut s = token;
 
     // ---- intensity ----

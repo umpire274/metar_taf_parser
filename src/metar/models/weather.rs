@@ -28,16 +28,17 @@ pub enum WeatherDescriptor {
 #[derive(Debug, PartialEq, Eq, Clone, Serialize)]
 /// Enumerates the allowed values for WeatherPhenomenon.
 pub enum WeatherPhenomenon {
-    Rain,       // RA
-    Snow,       // SN
-    Drizzle,    // DZ
-    Thunder,    // TS (standalone)
-    Fog,        // FG
-    Mist,       // BR
-    Hail,       // GR
-    SmallHail,  // GS
-    IcePellets, // PL
-    SnowGrains, // SG
+    Rain,                 // RA
+    Snow,                 // SN
+    Drizzle,              // DZ
+    Thunder,              // TS (standalone)
+    Fog,                  // FG
+    Mist,                 // BR
+    Hail,                 // GR
+    SmallHail,            // GS
+    IcePellets,           // PL
+    SnowGrains,           // SG
+    NoSignificantWeather, // NSW
     Unknown(String),
 }
 
