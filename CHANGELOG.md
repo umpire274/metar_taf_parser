@@ -15,8 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-core`.
+- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-parser`.
 - README updated to document the library-first direction and Python fork porting objective.
+
+---
+
+## [0.2.23] - 2026-03-16
+
+### Changed
+
+- Synced porting policy immediate-next modules with the current parser status after completing RVR, `TX`/`TN`, and `WS` work.
+- Corrected historical changelog references for crate naming and README dependency snippets after the root-crate migration.
+- Updated README and manifest version markers to `0.2.23`.
 
 ---
 
@@ -69,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- Existing Rust import path is now `metar_taf_parser` (instead of `metar_taf_core`).
+- Existing Rust import path is now `metar_taf_parser` (legacy import path was `metar_taf_core`).
 
 ---
 
@@ -82,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated README examples to reference `metar-taf-parser = "0.2.19"` and document strict TAF parsing mode.
+- Updated README examples to reference `metar-taf-parser = "0.2.18"` and document strict TAF parsing mode.
 
 ---
 
@@ -91,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated `thiserror` dependency to `2.0.18`.
-- README dependency snippet now matches current crate line (`metar-taf-core = "0.2.17"`).
+- README dependency snippet now matches current crate line (`metar-taf-parser = "0.2.17"`).
 
 ### Improved
 
