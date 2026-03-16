@@ -8,6 +8,7 @@ use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, pars
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
 use crate::taf::models::forecast::{TafForecast, TafForecastKind};
+use crate::taf::models::temperature::TafTemperature;
 use crate::taf::models::time::TafPeriod;
 
 /// Entry point: parse tutti i forecast TAF
@@ -83,6 +84,16 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
             continue;
         }
 
+        // -------- TAF temperatures (TX/TN) --------
+        if let Some((is_max, temp)) = parse_taf_temperature(token) {
+            if is_max {
+                current.max_temperature = Some(temp);
+            } else {
+                current.min_temperature = Some(temp);
+            }
+            continue;
+        }
+
         // -------- Clouds --------
         if let Some(cloud) = parse_cloud(token) {
             current.clouds.push(cloud);
@@ -114,6 +125,8 @@ fn new_base_forecast() -> TafForecast {
         visibility: None,
         weather: Vec::new(),
         clouds: Vec::new(),
+        max_temperature: None,
+        min_temperature: None,
     }
 }
 
@@ -127,6 +140,8 @@ fn new_fm_forecast(from: (u8, u8, u8)) -> TafForecast {
         visibility: None,
         weather: Vec::new(),
         clouds: Vec::new(),
+        max_temperature: None,
+        min_temperature: None,
     }
 }
 
@@ -144,6 +159,8 @@ fn new_period_forecast(
         visibility: None,
         weather: Vec::new(),
         clouds: Vec::new(),
+        max_temperature: None,
+        min_temperature: None,
     }
 }
 
@@ -234,6 +251,57 @@ fn parse_day_hour_min(value: &str) -> Option<(u8, u8, u8)> {
     }
 
     Some((day, hour, min))
+}
+
+fn parse_taf_temperature(token: &str) -> Option<(bool, TafTemperature)> {
+    let (is_max, body) = if let Some(v) = token.strip_prefix("TX") {
+        (true, v)
+    } else if let Some(v) = token.strip_prefix("TN") {
+        (false, v)
+    } else {
+        return None;
+    };
+
+    if !body.ends_with('Z') {
+        return None;
+    }
+
+    let core = &body[..body.len() - 1];
+    let (temp_part, when_part) = core.split_once('/')?;
+
+    let value = parse_signed_temp(temp_part)?;
+
+    if when_part.len() != 4 || !when_part.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let day: u8 = when_part[0..2].parse().ok()?;
+    let hour: u8 = when_part[2..4].parse().ok()?;
+
+    if !(1..=31).contains(&day) || hour > 24 {
+        return None;
+    }
+
+    Some((is_max, TafTemperature { value, day, hour }))
+}
+
+fn parse_signed_temp(token: &str) -> Option<i8> {
+    if token.len() != 2 && token.len() != 3 {
+        return None;
+    }
+
+    let (negative, digits) = if let Some(v) = token.strip_prefix('M') {
+        (true, v)
+    } else {
+        (false, token)
+    };
+
+    if digits.len() != 2 || !digits.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let parsed: i8 = digits.parse().ok()?;
+    Some(if negative { -parsed } else { parsed })
 }
 
 fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {

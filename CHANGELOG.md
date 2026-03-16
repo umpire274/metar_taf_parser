@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.21] - 2026-03-16
+
+### Added
+
+- Added TAF forecast temperature support for `TX`/`TN` groups with structured model fields (`value`, `day`, `hour`).
+- Added regression tests for valid positive/negative TAF temperature groups and malformed temperature tokens.
+
+### Improved
+
+- TAF forecast parsing now captures `TX`/`TN` tokens without affecting existing change-group and visibility/weather parsing flow.
+
+---
+
 ## [0.2.20] - 2026-03-16
 
 ### Added
