@@ -4,6 +4,7 @@ use crate::metar::models::weather::Weather;
 use crate::metar::models::wind::Wind;
 use crate::taf::models::temperature::TafTemperature;
 use crate::taf::models::time::TafPeriod;
+use crate::taf::models::wind_shear::TafWindShear;
 use serde::Serialize;
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -33,4 +34,5 @@ pub struct TafForecast {
     pub clouds: Vec<CloudLayer>,
     pub max_temperature: Option<TafTemperature>,
     pub min_temperature: Option<TafTemperature>,
+    pub wind_shear: Option<TafWindShear>,
 }

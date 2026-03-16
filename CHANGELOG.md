@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.22] - 2026-03-16
+
+### Added
+
+- Added TAF forecast wind-shear (`WS`) support with structured fields for shear height, direction, and speed.
+- Added regression tests for valid/malformed wind-shear groups and strict-mode rejection behavior.
+
+### Improved
+
+- TAF forecast parsing now captures `WSddd/dddffKT` tokens without interfering with existing group parsing flow.
+
+---
+
 ## [0.2.21] - 2026-03-16
 
 ### Added

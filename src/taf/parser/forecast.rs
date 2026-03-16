@@ -10,6 +10,7 @@ use crate::metar::parser::wind::parse_wind;
 use crate::taf::models::forecast::{TafForecast, TafForecastKind};
 use crate::taf::models::temperature::TafTemperature;
 use crate::taf::models::time::TafPeriod;
+use crate::taf::models::wind_shear::TafWindShear;
 
 /// Entry point: parse tutti i forecast TAF
 pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
@@ -84,6 +85,12 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
             continue;
         }
 
+        // -------- Wind shear (WS) --------
+        if let Some(ws) = parse_taf_wind_shear(token) {
+            current.wind_shear = Some(ws);
+            continue;
+        }
+
         // -------- TAF temperatures (TX/TN) --------
         if let Some((is_max, temp)) = parse_taf_temperature(token) {
             if is_max {
@@ -127,6 +134,7 @@ fn new_base_forecast() -> TafForecast {
         clouds: Vec::new(),
         max_temperature: None,
         min_temperature: None,
+        wind_shear: None,
     }
 }
 
@@ -142,6 +150,7 @@ fn new_fm_forecast(from: (u8, u8, u8)) -> TafForecast {
         clouds: Vec::new(),
         max_temperature: None,
         min_temperature: None,
+        wind_shear: None,
     }
 }
 
@@ -161,6 +170,7 @@ fn new_period_forecast(
         clouds: Vec::new(),
         max_temperature: None,
         min_temperature: None,
+        wind_shear: None,
     }
 }
 
@@ -251,6 +261,34 @@ fn parse_day_hour_min(value: &str) -> Option<(u8, u8, u8)> {
     }
 
     Some((day, hour, min))
+}
+
+fn parse_taf_wind_shear(token: &str) -> Option<TafWindShear> {
+    let body = token.strip_prefix("WS")?;
+    let (height_part, wind_part) = body.split_once('/')?;
+
+    if height_part.len() != 3 || !height_part.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let wind = wind_part.strip_suffix("KT")?;
+    if wind.len() != 5 || !wind.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let height_hundreds_ft: u16 = height_part.parse().ok()?;
+    let direction: u16 = wind[0..3].parse().ok()?;
+    let speed_kt: u16 = wind[3..5].parse().ok()?;
+
+    if direction > 360 || speed_kt == 0 {
+        return None;
+    }
+
+    Some(TafWindShear {
+        height_hundreds_ft,
+        direction,
+        speed_kt,
+    })
 }
 
 fn parse_taf_temperature(token: &str) -> Option<(bool, TafTemperature)> {
