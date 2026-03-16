@@ -19,6 +19,16 @@ use crate::metar::parser::wind::parse_wind;
 
 /// Parses input tokens into typed data for `parse_metar`.
 pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
+    parse_metar_with_mode(input, false)
+}
+
+/// Parses input tokens into typed data for `parse_metar_strict`.
+pub fn parse_metar_strict(input: &str) -> Result<Metar, MetarError> {
+    parse_metar_with_mode(input, true)
+}
+
+/// Parses input tokens into typed data for `parse_metar_with_mode`.
+fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError> {
     let mut tokenizer = Tokenizer::new(input);
 
     // Optional leading "METAR"
@@ -145,6 +155,17 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
 
     if rmk_started && !remaining_tokens.is_empty() {
         metar.rmk = Some(remaining_tokens.join(" "));
+    }
+
+    if strict {
+        let mut unsupported = metar.unparsed_groups.clone();
+        if let Some(detail) = &metar.trend_detail {
+            unsupported.extend(detail.unparsed_groups.clone());
+        }
+
+        if !unsupported.is_empty() {
+            return Err(MetarError::UnknownGroup(unsupported.join(" ")));
+        }
     }
 
     Ok(metar)

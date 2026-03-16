@@ -24,6 +24,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.25] - 2026-03-16
+
+### Added
+
+- Added `parse_metar_strict`, which rejects METAR messages containing unsupported/unparsed groups (including trend-detail unknown payload tokens).
+- Added strict-mode METAR regression tests and README usage example.
+
+### Changed
+
+- Completed strict/tolerant review milestone for both METAR and TAF parser flows.
+- Bumped crate version and README dependency markers to `0.2.25`.
+
+---
+
 ## [0.2.24] - 2026-03-16
 
 ### Added

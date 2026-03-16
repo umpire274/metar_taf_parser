@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.24`
+> ⚠️ **Status:** Active development – current version `0.2.25`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,7 +52,7 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.2.24"
+metar-taf-parser = "0.2.25"
 ```
 
 ### METAR example
@@ -81,6 +81,18 @@ let taf = parse_taf(
 assert_eq!(taf.station, "LIRF");
 assert!(!taf.forecasts.is_empty());
 // In tolerant mode, unsupported tokens are preserved in `unparsed_groups`.
+```
+
+### METAR strict mode example
+
+```rust
+use metar_taf_parser::parse_metar_strict;
+
+let strict_result = parse_metar_strict(
+    "LIRF 121250Z 18010KT 9999 FEW030 UNKNOWN 18/12 Q1015"
+);
+
+assert!(strict_result.is_err());
 ```
 
 ### TAF strict mode example

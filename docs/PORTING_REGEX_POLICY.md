@@ -12,4 +12,4 @@ using the same regex definitions used by the Mivek's Python original project (`m
 
 ## Immediate next modules
 
-- Strict/tolerant parsing review for remaining unsupported METAR/TAF groups
+- (No open immediate modules at the moment; keep parity review ongoing as new groups are introduced)
