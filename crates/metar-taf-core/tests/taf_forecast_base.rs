@@ -1,5 +1,6 @@
 use metar_taf_core::metar::models::cloud::CloudAmount;
 use metar_taf_core::metar::models::visibility::Visibility;
+use metar_taf_core::metar::models::weather::{WeatherIntensity, WeatherPhenomenon};
 use metar_taf_core::parse_taf;
 
 #[test]
@@ -22,4 +23,22 @@ fn taf_base_forecast_parsing() {
     assert_eq!(fc.clouds.len(), 2);
     assert!(matches!(fc.clouds[0].amount, CloudAmount::FEW));
     assert!(matches!(fc.clouds[1].amount, CloudAmount::SCT));
+}
+
+#[test]
+fn taf_base_forecast_parses_weather_groups() {
+    let input = "TAF LIRF 121100Z 1212/1318 18010KT 8000 -RA BKN020";
+
+    let taf = parse_taf(input).expect("TAF should parse");
+    let fc = &taf.forecasts[0];
+
+    assert_eq!(fc.weather.len(), 1);
+    let weather = &fc.weather[0];
+    assert!(matches!(weather.intensity, Some(WeatherIntensity::Light)));
+    assert!(
+        weather
+            .phenomena
+            .iter()
+            .any(|p| matches!(p, WeatherPhenomenon::Rain))
+    );
 }

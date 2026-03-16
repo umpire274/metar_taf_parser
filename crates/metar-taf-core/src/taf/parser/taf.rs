@@ -5,6 +5,14 @@ use crate::taf::models::taf::Taf;
 use crate::taf::parser::time::{parse_taf_time, parse_validity};
 
 pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
+    parse_taf_with_mode(input, false)
+}
+
+pub fn parse_taf_strict(input: &str) -> Result<Taf, TafError> {
+    parse_taf_with_mode(input, true)
+}
+
+fn parse_taf_with_mode(input: &str, strict: bool) -> Result<Taf, TafError> {
     let normalized = input
         .lines()
         .map(str::trim)
@@ -30,15 +38,21 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
             validity: Default::default(),
             modifier: ReportModifier::Nil,
             forecasts: Vec::new(),
+            unparsed_groups: Vec::new(),
         });
     }
 
-    // Optional AMD
-    let (modifier, station) = if token == "AMD" {
-        let s = tokenizer.next().ok_or(TafError::InvalidFormat)?;
-        (ReportModifier::Amendment, s)
-    } else {
-        (ReportModifier::Normal, token)
+    // Optional AMD/COR
+    let (modifier, station) = match token.as_str() {
+        "AMD" => (
+            ReportModifier::Amendment,
+            tokenizer.next().ok_or(TafError::InvalidFormat)?,
+        ),
+        "COR" => (
+            ReportModifier::Correction,
+            tokenizer.next().ok_or(TafError::InvalidFormat)?,
+        ),
+        _ => (ReportModifier::Normal, token),
     };
 
     // Issue time: DDHHMMZ
@@ -50,7 +64,11 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
     let validity = parse_validity(&validity_token)?;
 
     let remaining: Vec<String> = tokenizer.map(|s| s.to_string()).collect();
-    let forecasts = crate::taf::parser::forecast::parse_forecasts(&remaining);
+    let (forecasts, unparsed_groups) = crate::taf::parser::forecast::parse_forecasts(&remaining);
+
+    if strict && !unparsed_groups.is_empty() {
+        return Err(TafError::UnsupportedGroup(unparsed_groups.join(" ")));
+    }
 
     Ok(Taf {
         station: station.to_string(),
@@ -58,5 +76,6 @@ pub fn parse_taf(input: &str) -> Result<Taf, TafError> {
         validity: Some(validity),
         modifier,
         forecasts,
+        unparsed_groups,
     })
 }

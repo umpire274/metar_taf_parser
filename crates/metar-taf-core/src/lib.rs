@@ -4,4 +4,4 @@ pub mod metar;
 pub mod taf;
 
 pub use metar::parser::metar::parse_metar;
-pub use taf::parser::taf::parse_taf;
+pub use taf::parser::taf::{parse_taf, parse_taf_strict};
