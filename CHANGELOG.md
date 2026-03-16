@@ -501,8 +501,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This is the **initial stable release** of the project.
 - Public API is considered **experimental** and may evolve in future minor versions.
 
-[0.1.0]: ../../releases/tag/v0.1.0
+[0.1.0]: releases/tag/v0.1.0
 
-[0.2.0-alpha1]: ../../releases/tag/v0.2.0-alpha1
+[0.2.0-alpha1]: releases/tag/v0.2.0-alpha1
 
-[0.2.0-alpha2]: ../../releases/tag/v0.2.0-alpha2
+[0.2.0-alpha2]: releases/tag/v0.2.0-alpha2
