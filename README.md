@@ -71,6 +71,13 @@ For strict parsing (error on unsupported groups), use `parse_taf_strict`.
 
 ---
 
+## 📘 Documentation
+
+- Porting policy: [`docs/PORTING_REGEX_POLICY.md`](docs/PORTING_REGEX_POLICY.md)
+- Full codebase reference (modules, structs, enums, functions): [`docs/CODEBASE_REFERENCE.md`](docs/CODEBASE_REFERENCE.md)
+
+---
+
 ## 🧪 Testing
 
 ```bash

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
+- Added `docs/CODEBASE_REFERENCE.md` with an English inventory of modules, structs, enums, and functions across the codebase.
 
 ### Changed
 
