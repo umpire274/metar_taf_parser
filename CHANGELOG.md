@@ -7,6 +7,265 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
+
+### Changed
+
+- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-core`.
+- README updated to document the library-first direction and Python fork porting objective.
+
+---
+
+## [0.2.19] - 2026-03-16
+
+### Changed
+
+- Promoted the core library crate to repository root and renamed package to `metar-taf-parser` for crates.io publication.
+- Removed workspace-style root manifest and replaced it with the single-package crate manifest.
+- Updated README usage examples and test commands to the new root crate name/layout.
+
+### Notes
+
+- Existing Rust import path is now `metar_taf_parser` (instead of `metar_taf_core`).
+
+---
+
+## [0.2.18] - 2026-03-16
+
+### Added
+
+- Added `parse_taf_strict`, which rejects TAF messages containing unsupported/unparsed groups.
+- Added regression tests for tolerant vs strict TAF parsing behavior.
+
+### Changed
+
+- Updated README examples to reference `metar-taf-parser = "0.2.19"` and document strict TAF parsing mode.
+
+---
+
+## [0.2.17] - 2026-03-16
+
+### Changed
+
+- Updated `thiserror` dependency to `2.0.18`.
+- README dependency snippet now matches current crate line (`metar-taf-core = "0.2.17"`).
+
+### Improved
+
+- Extended METAR trend parsing to recognize `BECMG` and `TEMPO` marker tokens in addition to `NOSIG`.
+- Updated porting policy "Immediate next modules" to reflect remaining parity targets (RVR, advanced METAR trend payloads, TAF `TX`/`TN` + wind-shear sections).
+
+### Added
+
+- Added regression tests for `NOSIG`, `BECMG`, and `TEMPO` METAR trend markers.
+
+---
+
+## [0.2.16] - 2026-03-16
+
+### Added
+
+- Added diagnostics regression tests for unknown/unparsed groups in both METAR and TAF parsing flows.
+
+### Improved
+
+- METAR parser now stores unknown tokens in `unparsed_groups` instead of silently dropping them.
+- TAF parser now exposes `unparsed_groups` and collects tokens that are not consumed by forecast group parsers.
+
+---
+
+## [0.2.15] - 2026-03-16
+
+### Added
+
+- Added TAF regression checks that assert weather parsing across base, `TEMPO`, and `PROBxx` forecast groups.
+
+### Improved
+
+- Extended TAF forecast model/parser to capture weather groups (e.g. `-RA`, `TSRA`, `SHRA`) in structured output.
+
+---
+
+## [0.2.14] - 2026-03-16
+
+### Improved
+
+- Tightened TAF validity hour checks so the start hour (`from`) is limited to `00..23`, while preserving `24` support only for validity end hour (`to`).
+
+### Added
+
+- Added regression coverage for invalid `from` hour `24` in TAF validity groups.
+
+---
+
+## [0.2.13] - 2026-03-16
+
+### Added
+
+- Added TAF modifier regression tests for `COR` parsing (with and without the `TAF` prefix).
+
+### Improved
+
+- Extended TAF header parsing to recognize `COR` as `ReportModifier::Correction` in addition to existing `AMD`/`NIL` handling.
+
+---
+
+## [0.2.12] - 2026-03-16
+
+### Added
+
+- Added TAF time/validity regression tests for malformed widths, non-numeric values, and out-of-range components.
+
+### Improved
+
+- Hardened TAF issue-time parsing to require strict `DDHHMMZ` numeric tokens and valid day/hour/minute ranges.
+- Hardened TAF validity parsing to require strict `DDHH/DDHH` numeric tokens and valid day/hour ranges.
+
+---
+
+## [0.2.11] - 2026-03-15
+
+### Added
+
+- Added METAR temperature regression tests for malformed token width and out-of-range values.
+
+### Improved
+
+- Hardened METAR temperature parsing to require 2-digit components (with optional `M` prefix) and conservative range validation.
+
+---
+
+## [0.2.10] - 2026-03-15
+
+### Added
+
+- Added METAR time regression tests for valid groups plus invalid range/non-numeric cases.
+
+### Improved
+
+- Hardened METAR time parsing to validate `DDHHMMZ` numeric content and range limits (day/hour/minute).
+
+---
+
+## [0.2.9] - 2026-03-15
+
+### Added
+
+- Added METAR runway-state regression tests for invalid runway designators and invalid data characters.
+
+### Improved
+
+- Hardened runway-state parsing to require numeric runway designators and digit-or-slash-only state payloads.
+
+---
+
+## [0.2.8] - 2026-03-15
+
+### Added
+
+- Added regression tests for trailing `=` terminator handling in both METAR and TAF inputs.
+
+### Improved
+
+- Tokenizer now strips trailing `=` from tokens, allowing last-group parsing to remain deterministic (e.g. `NOSIG=`, `FEW030=`).
+
+---
+
+## [0.2.7] - 2026-03-15
+
+### Added
+
+- Added METAR pressure parser regression tests for valid QNH/altimeter groups and malformed tokens.
+
+### Improved
+
+- Hardened METAR pressure parsing to accept only strict ICAO token formats (`Qdddd`, `Adddd`).
+- Malformed pressure tokens are now ignored deterministically instead of being partially parsed.
+
+---
+
+## [0.2.6] - 2026-03-15
+
+### Added
+
+- Added TAF regression tests for invalid `TEMPO`/`BECMG` periods to ensure following tokens remain parseable.
+
+### Improved
+
+- Hardened `TEMPO` and `BECMG` parsing to consume period tokens only after successful period validation.
+- Reused non-consuming lookahead strategy across change-group parsing helpers to avoid token swallowing on invalid groups.
+
+---
+
+## [0.2.5] - 2026-03-15
+
+### Added
+
+- Added METAR weather regression tests for `FZFG`, `VCBR`, `+SHGR`, unknown phenomena pairs, and malformed odd-length groups.
+
+### Improved
+
+- Hardened METAR weather parsing for descriptor/phenomena chaining and malformed trailing fragments.
+- Unknown phenomena are now consumed in 2-character groups to preserve token progression deterministically.
+
+---
+
+## [0.2.4] - 2026-03-15
+
+### Added
+
+- Added TAF regression tests for `PROB40` without `TEMPO`, invalid `PROB` periods, and invalid `FM` times.
+
+### Improved
+
+- Hardened TAF change-group parsing to avoid consuming tokens when `PROBxx` period parsing fails.
+- Added validation for `FMDDHHMM` and `DDHH/DDHH` period fragments before creating forecast groups.
+
+---
+
+## [0.2.3] - 2026-03-15
+
+### Added
+
+- TAF forecast parsing now supports statute-mile visibility in split-token form (e.g. `1 1/2SM`).
+- Added dedicated TAF visibility statute-mile tests for both single-token and split-token forms.
+
+### Improved
+
+- Reused METAR split-token visibility parsing logic inside TAF forecast parsing to reduce behavioral drift.
+
+---
+
+## [0.2.2] - 2026-03-15
+
+### Added
+
+- METAR cloud parsing now supports `VV///` (vertical visibility with unknown height).
+- Added cloud regression tests for `VV///` and invalid suffix handling (e.g. `SCT050ABC`).
+
+### Improved
+
+- Hardened cloud-layer parsing to reject unknown cloud suffixes and malformed layer lengths.
+
+---
+
+## [0.2.1] - 2026-03-15
+
+### Added
+
+- METAR wind parsing now supports explicit calm wind group `00000KT` with deterministic structured output.
+- Added regression tests for calm wind and malformed wind groups (`36110KT`, `180ABKT`).
+
+### Improved
+
+- Hardened METAR wind parser validation for direction range and numeric speed/gust groups.
+
+---
+
 ## [0.2.0-alpha5] - 2025-12-18
 
 ### Added
