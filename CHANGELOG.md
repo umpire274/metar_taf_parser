@@ -24,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-03-16
+
+### Added
+
+- Declared porting-baseline completion for METAR/TAF parser parity and moved roadmap guidance to maintenance mode.
+
+### Changed
+
+- Bumped crate version and README dependency markers to `0.3.0`.
+- Updated porting status notes in `docs/PORTING_REGEX_POLICY.md` and `docs/CODEBASE_REFERENCE.md` to reflect baseline completion.
+
+---
+
 ## [0.2.25] - 2026-03-16
 
 ### Added

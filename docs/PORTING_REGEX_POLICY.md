@@ -12,4 +12,5 @@ using the same regex definitions used by the Mivek's Python original project (`m
 
 ## Immediate next modules
 
-- (No open immediate modules at the moment; keep parity review ongoing as new groups are introduced)
+- No open immediate modules.
+- Porting baseline is considered complete as of `v0.3.0`; future work is incremental maintenance/parity updates.

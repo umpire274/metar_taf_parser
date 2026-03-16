@@ -2,7 +2,7 @@
 
 This document provides an English reference for the current Rust codebase, including modules, structs, enums, and functions (public and internal helpers).
 
-> Porting status note: parser parity work is still in progress; see `docs/PORTING_REGEX_POLICY.md` for remaining modules before declaring porting complete.
+> Porting status note: baseline parser parity is complete as of `v0.3.0`; see `docs/PORTING_REGEX_POLICY.md` for maintenance guidance.
 
 
 ## Module Map
