@@ -1,6 +1,10 @@
-[workspace]
-members = [
-    "crates/metar-taf-core",
-    "crates/metar-taf-cli",
-]
-resolver = "2"
+[package]
+name = "metar-taf-parser"
+version = "0.2.22"
+edition = "2024"
+description = "METAR and TAF parsing library"
+license = "MIT"
+
+[dependencies]
+thiserror = "2.0.18"
+serde = { version = "1.0.228", features = ["derive"] }
