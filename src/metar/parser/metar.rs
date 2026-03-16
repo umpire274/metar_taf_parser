@@ -6,6 +6,7 @@ use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
 use crate::metar::parser::pressure::parse_pressure;
 use crate::metar::parser::runway_state::parse_runway_state;
+use crate::metar::parser::rvr::parse_rvr;
 use crate::metar::parser::temperature::parse_temperature;
 use crate::metar::parser::time::parse_time;
 use crate::metar::parser::trend::parse_trend;
@@ -94,6 +95,11 @@ pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
             if matches!(metar.visibility, Some(Visibility::CAVOK)) {
                 metar.clouds.clear();
             }
+            continue;
+        }
+
+        if let Some(rvr) = parse_rvr(&token) {
+            metar.runway_visual_range.push(rvr);
             continue;
         }
 

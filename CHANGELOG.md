@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.20] - 2026-03-16
+
+### Added
+
+- Added dedicated METAR RVR (runway visual range) parsing with structured model fields (qualifier, variable range, tendency, and unit).
+- Added regression tests covering RVR valid/invalid tokens and coexistence with runway-state groups.
+
+### Improved
+
+- METAR parsing now captures RVR groups separately from runway-state groups, avoiding cross-group misclassification.
+
+---
+
 ## [0.2.19] - 2026-03-16
 
 ### Changed

@@ -3,6 +3,7 @@ pub mod metar;
 pub mod pressure;
 pub mod rmk;
 pub mod runway_state;
+pub mod rvr;
 pub mod temperature;
 pub mod time;
 pub mod trend;

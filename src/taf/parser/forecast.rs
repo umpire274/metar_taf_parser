@@ -251,6 +251,7 @@ fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
         weather: Vec::new(),
         rmk: None,
         runway_state: Vec::new(),
+        runway_visual_range: Vec::new(),
         trend: None,
         unparsed_groups: Vec::new(),
         raw: String::new(),

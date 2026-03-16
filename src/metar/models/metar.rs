@@ -2,6 +2,7 @@ use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::cloud::CloudLayer;
 use crate::metar::models::pressure::Pressure;
 use crate::metar::models::runway_state::RunwayState;
+use crate::metar::models::rvr::RunwayVisualRange;
 use crate::metar::models::temperature::Temperature;
 use crate::metar::models::trend::MetarTrend;
 use crate::metar::models::visibility::Visibility;
@@ -22,6 +23,7 @@ pub struct Metar {
     pub weather: Vec<Weather>,
     pub rmk: Option<String>,
     pub runway_state: Vec<RunwayState>,
+    pub runway_visual_range: Vec<RunwayVisualRange>,
     pub trend: Option<MetarTrend>,
     pub unparsed_groups: Vec<String>,
     pub raw: String,
@@ -41,6 +43,7 @@ impl Metar {
             weather: Vec::new(),
             rmk: None,
             runway_state: Vec::new(),
+            runway_visual_range: Vec::new(),
             trend: None,
             unparsed_groups: Vec::new(),
             raw: raw.to_string(),
