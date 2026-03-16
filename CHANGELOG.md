@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.14] - 2026-03-16
+
+### Improved
+
+- Tightened TAF validity hour checks so the start hour (`from`) is limited to `00..23`, while preserving `24` support only for validity end hour (`to`).
+
+### Added
+
+- Added regression coverage for invalid `from` hour `24` in TAF validity groups.
+
+---
+
 ## [0.2.13] - 2026-03-16
 
 ### Added

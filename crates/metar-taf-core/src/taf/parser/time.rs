@@ -36,7 +36,7 @@ pub fn parse_validity(token: &str) -> Result<TafValidity, TafError> {
 
     if !(1..=31).contains(&from_day)
         || !(1..=31).contains(&to_day)
-        || from_hour > 24
+        || from_hour > 23
         || to_hour > 24
     {
         return Err(TafError::InvalidFormat);

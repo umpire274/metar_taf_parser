@@ -27,6 +27,7 @@ fn rejects_invalid_taf_validity_format_and_ranges() {
     assert!(parse_taf("TAF LIRF 121100Z 122/1318 18010KT CAVOK").is_err());
     assert!(parse_taf("TAF LIRF 121100Z 0012/1318 18010KT CAVOK").is_err());
     assert!(parse_taf("TAF LIRF 121100Z 1230/1318 18010KT CAVOK").is_err());
+    assert!(parse_taf("TAF LIRF 121100Z 1224/1318 18010KT CAVOK").is_err());
     assert!(parse_taf("TAF LIRF 121100Z 1212/1325 18010KT CAVOK").is_err());
     assert!(parse_taf("TAF LIRF 121100Z 1212/1324 18010KT CAVOK").is_ok());
 }
