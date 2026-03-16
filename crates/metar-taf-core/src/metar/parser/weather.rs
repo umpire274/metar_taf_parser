@@ -1,6 +1,10 @@
 use crate::metar::models::weather::*;
 
 pub fn parse_weather(token: &str) -> Option<Weather> {
+    if token.is_empty() {
+        return None;
+    }
+
     let mut s = token;
 
     // ---- intensity ----
@@ -20,8 +24,8 @@ pub fn parse_weather(token: &str) -> Option<Weather> {
     let mut phenomena = Vec::new();
 
     // ---- descriptors (2-char codes) ----
-    loop {
-        let code = s.get(0..2)?;
+    while s.len() >= 2 {
+        let code = &s[0..2];
         let desc = match code {
             "MI" => WeatherDescriptor::Shallow,
             "PR" => WeatherDescriptor::Partial,
@@ -34,12 +38,14 @@ pub fn parse_weather(token: &str) -> Option<Weather> {
             "VC" => WeatherDescriptor::Vicinity,
             _ => break,
         };
+
         descriptors.push(desc);
         s = &s[2..];
     }
 
     // ---- phenomena (2-char codes, repeatable) ----
-    while let Some(code) = s.get(0..2) {
+    while s.len() >= 2 {
+        let code = &s[0..2];
         let phen = match code {
             "RA" => WeatherPhenomenon::Rain,
             "SN" => WeatherPhenomenon::Snow,
@@ -51,13 +57,16 @@ pub fn parse_weather(token: &str) -> Option<Weather> {
             "PL" => WeatherPhenomenon::IcePellets,
             "SG" => WeatherPhenomenon::SnowGrains,
             "TS" => WeatherPhenomenon::Thunder,
-            _ => {
-                phenomena.push(WeatherPhenomenon::Unknown(code.to_string()));
-                break;
-            }
+            _ => WeatherPhenomenon::Unknown(code.to_string()),
         };
+
         phenomena.push(phen);
         s = &s[2..];
+    }
+
+    // malformed trailing token fragment (odd length)
+    if !s.is_empty() {
+        return None;
     }
 
     if descriptors.is_empty() && phenomena.is_empty() {
