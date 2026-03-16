@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.15] - 2026-03-16
+
+### Added
+
+- Added TAF regression checks that assert weather parsing across base, `TEMPO`, and `PROBxx` forecast groups.
+
+### Improved
+
+- Extended TAF forecast model/parser to capture weather groups (e.g. `-RA`, `TSRA`, `SHRA`) in structured output.
+
+---
+
 ## [0.2.14] - 2026-03-16
 
 ### Improved

@@ -5,6 +5,7 @@ use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
 use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
+use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
 use crate::taf::models::forecast::{TafForecast, TafForecastKind};
 use crate::taf::models::time::TafPeriod;
@@ -86,6 +87,12 @@ pub fn parse_forecasts(tokens: &[String]) -> Vec<TafForecast> {
             current.clouds.push(cloud);
             continue;
         }
+
+        // -------- Weather --------
+        if let Some(weather) = parse_weather(token) {
+            current.weather.push(weather);
+            continue;
+        }
     }
 
     forecasts.push(current);
@@ -102,6 +109,7 @@ fn new_base_forecast() -> TafForecast {
         probability: None,
         wind: None,
         visibility: None,
+        weather: Vec::new(),
         clouds: Vec::new(),
     }
 }
@@ -114,6 +122,7 @@ fn new_fm_forecast(from: (u8, u8, u8)) -> TafForecast {
         probability: None,
         wind: None,
         visibility: None,
+        weather: Vec::new(),
         clouds: Vec::new(),
     }
 }
@@ -130,6 +139,7 @@ fn new_period_forecast(
         probability,
         wind: None,
         visibility: None,
+        weather: Vec::new(),
         clouds: Vec::new(),
     }
 }

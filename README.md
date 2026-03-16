@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.2.14`
+> ⚠️ **Status:** Active development – current version `0.2.15`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 

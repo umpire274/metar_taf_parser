@@ -1,3 +1,4 @@
+use metar_taf_core::metar::models::weather::WeatherPhenomenon;
 use metar_taf_core::parse_taf;
 use metar_taf_core::taf::models::forecast::TafForecastKind;
 
@@ -28,6 +29,13 @@ TEMPO 1220/1222 4000 -RA BKN015";
         _ => panic!("unexpected visibility type"),
     }
 
+    assert!(!tempo.weather.is_empty());
+    assert!(
+        tempo.weather[0]
+            .phenomena
+            .iter()
+            .any(|p| matches!(p, WeatherPhenomenon::Rain))
+    );
     assert!(!tempo.clouds.is_empty());
 }
 
