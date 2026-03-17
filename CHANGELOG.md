@@ -7,20 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.4.0] - 2026-03-17
 
 ### Added
 
-- Porting policy updated: parser groups will be aligned to the same regex definitions used in the Python fork, starting from upcoming METAR/TAF parser modules.
-- Added `docs/CODEBASE_REFERENCE.md` with an English inventory of modules, structs, enums, and functions across the codebase.
-- Added advanced METAR trend payload parsing for `BECMG`/`TEMPO` details (`FM`/`TL`/`AT` times, trend wind/visibility/weather/clouds, and trend-level unknown group capture).
+- Added `common::describe` module providing natural language output for parsed METAR and TAF reports.
+- Added `describe_metar(metar: &Metar, lang: Language) -> MetarDescription` public function.
+- Added `describe_taf(taf: &Taf, lang: Language) -> TafDescription` public function.
+- Added `Language` enum (`En` variant) to select the output language; defaults to English.
+- Added `MetarDescription` struct with human-readable `Option<String>` fields for each METAR group
+  (`station`, `time`, `modifier`, `wind`, `visibility`, `weather`, `clouds`, `temperature`, `pressure`, `trend`, `remarks`).
+- Added `TafDescription` and `ForecastDescription` structs for TAF natural language output.
+- Added `Locale` trait (`common::describe::locale`) to allow future language implementations
+  without touching parser or domain model code.
+- Added English locale (`locale::en::En`) covering all current METAR and TAF domain types.
+- Re-exported `describe_metar`, `describe_taf`, `Language`, `MetarDescription`, `TafDescription`,
+  and `ForecastDescription` from `lib.rs` for direct crate-level access.
+- Added 33 integration tests across `tests/describe_metar.rs` and `tests/describe_taf.rs` covering
+  wind (directional, variable, gust), visibility (CAVOK, metres, >10 km), cloud layers (with CB/TCU),
+  weather phenomena (intensity, descriptor, phenomenon), temperature (positive and negative),
+  pressure (QNH and inHg), modifiers (AUTO, COR, AMD), trends (NOSIG, TEMPO+time),
+  remarks preservation, TAF blocks (Base, FM, BECMG, TEMPO, PROB), wind shear, and temperatures.
 
 ### Changed
 
-- Removed `crates/metar-taf-cli`; the repository is now library-only with `metar-taf-parser`.
-- README updated to document the library-first direction and Python fork porting objective.
-- README usage section now includes explicit METAR/TAF examples and strict-vs-tolerant TAF parsing use cases.
-- Updated porting policy immediate-next list after completing METAR advanced trend payload support.
+- Bumped crate version to `0.4.0`.
+- README updated with `describe_metar` and `describe_taf` usage examples and dependency snippet.
 
 ---
 

@@ -9,5 +9,8 @@ pub mod metar;
 /// Exposes the `taf` module.
 pub mod taf;
 
+pub use common::describe::{
+    describe_metar, describe_taf, ForecastDescription, Language, MetarDescription, TafDescription,
+};
 pub use metar::parser::metar::{parse_metar, parse_metar_strict};
 pub use taf::parser::taf::{parse_taf, parse_taf_strict};
