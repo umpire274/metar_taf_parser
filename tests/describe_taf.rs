@@ -1,4 +1,4 @@
-use metar_taf_parser::{describe_taf, parse_taf, Language};
+use metar_taf_parser::{Language, describe_taf, parse_taf};
 
 #[test]
 fn describe_taf_station_and_times() {
@@ -23,7 +23,11 @@ fn describe_taf_base_forecast_wind_and_visibility() {
     assert!(wind.contains("10"), "expected speed in: {}", wind);
 
     let vis = base.visibility.as_ref().unwrap();
-    assert!(vis.contains("greater than 10 km"), "expected >10km in: {}", vis);
+    assert!(
+        vis.contains("greater than 10 km"),
+        "expected >10km in: {}",
+        vis
+    );
 }
 
 #[test]
@@ -39,41 +43,48 @@ fn describe_taf_base_forecast_clouds() {
 
 #[test]
 fn describe_taf_tempo_block() {
-    let taf = parse_taf(
-        "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TEMPO 1218/1222 4000 -RA",
-    )
-    .unwrap();
+    let taf = parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TEMPO 1218/1222 4000 -RA")
+        .unwrap();
     let desc = describe_taf(&taf, Language::En);
 
-    let tempo = desc.forecasts.iter().find(|f| f.kind == "Temporary").unwrap();
+    let tempo = desc
+        .forecasts
+        .iter()
+        .find(|f| f.kind == "Temporary")
+        .unwrap();
     let period = tempo.period.as_ref().unwrap();
     assert!(period.contains("12/18Z"), "expected from in: {}", period);
     assert!(period.contains("12/22Z"), "expected to in: {}", period);
 
     assert!(!tempo.weather.is_empty());
     let w = &tempo.weather[0];
-    assert!(w.contains("light") && w.contains("rain"), "expected -RA in: {}", w);
+    assert!(
+        w.contains("light") && w.contains("rain"),
+        "expected -RA in: {}",
+        w
+    );
 }
 
 #[test]
 fn describe_taf_becmg_block() {
-    let taf = parse_taf(
-        "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 BECMG 1215/1217 24015KT",
-    )
-    .unwrap();
+    let taf = parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 BECMG 1215/1217 24015KT")
+        .unwrap();
     let desc = describe_taf(&taf, Language::En);
 
-    let becmg = desc.forecasts.iter().find(|f| f.kind == "Becoming").unwrap();
+    let becmg = desc
+        .forecasts
+        .iter()
+        .find(|f| f.kind == "Becoming")
+        .unwrap();
     let wind = becmg.wind.as_ref().unwrap();
     assert!(wind.contains("240°"), "expected direction in: {}", wind);
 }
 
 #[test]
 fn describe_taf_fm_block() {
-    let taf = parse_taf(
-        "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 FM121800 24020KT 9999 BKN040",
-    )
-    .unwrap();
+    let taf =
+        parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 FM121800 24020KT 9999 BKN040")
+            .unwrap();
     let desc = describe_taf(&taf, Language::En);
 
     let fm = desc.forecasts.iter().find(|f| f.kind == "From").unwrap();
@@ -102,18 +113,24 @@ fn describe_taf_prob30_tempo_block() {
 
 #[test]
 fn describe_taf_temperatures() {
-    let taf = parse_taf(
-        "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TX18/1214Z TN08/1304Z",
-    )
-    .unwrap();
+    let taf =
+        parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TX18/1214Z TN08/1304Z").unwrap();
     let desc = describe_taf(&taf, Language::En);
 
     let base = &desc.forecasts[0];
     let max_temp = base.max_temperature.as_ref().unwrap();
-    assert!(max_temp.contains("18°C"), "expected max temp in: {}", max_temp);
+    assert!(
+        max_temp.contains("18°C"),
+        "expected max temp in: {}",
+        max_temp
+    );
 
     let min_temp = base.min_temperature.as_ref().unwrap();
-    assert!(min_temp.contains("8°C"), "expected min temp in: {}", min_temp);
+    assert!(
+        min_temp.contains("8°C"),
+        "expected min temp in: {}",
+        min_temp
+    );
 }
 
 #[test]
@@ -122,13 +139,16 @@ fn describe_taf_modifier_amd() {
     let desc = describe_taf(&taf, Language::En);
 
     let modifier = desc.modifier.unwrap();
-    assert!(modifier.contains("amended"), "expected AMD in: {}", modifier);
+    assert!(
+        modifier.contains("amended"),
+        "expected AMD in: {}",
+        modifier
+    );
 }
 
 #[test]
 fn describe_taf_wind_shear() {
-    let taf =
-        parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 WS020/25040KT").unwrap();
+    let taf = parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 WS020/25040KT").unwrap();
     let desc = describe_taf(&taf, Language::En);
 
     let base = &desc.forecasts[0];
@@ -147,4 +167,3 @@ fn describe_taf_cavok_base() {
     let vis = base.visibility.as_ref().unwrap();
     assert!(vis.contains("CAVOK"), "expected CAVOK in: {}", vis);
 }
-

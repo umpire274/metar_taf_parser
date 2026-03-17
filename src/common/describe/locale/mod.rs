@@ -51,4 +51,3 @@ pub trait Locale {
     /// Returns the natural language label for a METAR trend time indicator.
     fn metar_trend_time_kind(&self, k: &MetarTrendTimeKind) -> &'static str;
 }
-

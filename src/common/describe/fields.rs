@@ -15,14 +15,17 @@ use crate::taf::models::wind_shear::TafWindShear;
 /// `"wind from variable direction at 5 kt, gusting 15 kt"`.
 pub fn describe_wind<L: Locale>(wind: &Wind, locale: &L) -> String {
     let dir = match wind.direction {
-        None    => "variable direction".to_string(),
+        None => "variable direction".to_string(),
         Some(d) => format!("{}°", d),
     };
     let unit = locale.wind_unit(&wind.unit);
 
     match wind.gust {
-        None    => format!("wind from {} at {} {}", dir, wind.speed, unit),
-        Some(g) => format!("wind from {} at {} {}, gusting {} {}", dir, wind.speed, unit, g, unit),
+        None => format!("wind from {} at {} {}", dir, wind.speed, unit),
+        Some(g) => format!(
+            "wind from {} at {} {}, gusting {} {}",
+            dir, wind.speed, unit, g, unit
+        ),
     }
 }
 
@@ -39,9 +42,16 @@ pub fn describe_visibility<L: Locale>(vis: &Visibility, locale: &L) -> String {
                 format!("visibility {} m", prevailing)
             }
         }
-        Visibility::WithMinimum { prevailing, minimum, direction } => {
+        Visibility::WithMinimum {
+            prevailing,
+            minimum,
+            direction,
+        } => {
             let dir = locale.visibility_direction(direction);
-            format!("visibility {} m, minimum {} m to the {}", prevailing, minimum, dir)
+            format!(
+                "visibility {} m, minimum {} m to the {}",
+                prevailing, minimum, dir
+            )
         }
     }
 }
@@ -54,18 +64,18 @@ pub fn describe_cloud<L: Locale>(cloud: &CloudLayer, locale: &L) -> String {
     match &cloud.amount {
         CloudAmount::NSC => "no significant clouds".to_string(),
         CloudAmount::SKC => "sky clear".to_string(),
-        CloudAmount::VV  => match cloud.altitude_ft {
-            None    => "vertical visibility not available".to_string(),
+        CloudAmount::VV => match cloud.altitude_ft {
+            None => "vertical visibility not available".to_string(),
             Some(f) => format!("vertical visibility {} ft", f),
         },
         amount => {
             let amount_str = locale.cloud_amount(amount);
             match cloud.altitude_ft {
-                None    => format!("{} (height not available)", amount_str),
+                None => format!("{} (height not available)", amount_str),
                 Some(f) => {
                     let base = format!("{} at {} ft", amount_str, f);
                     match &cloud.cloud_type {
-                        None    => base,
+                        None => base,
                         Some(t) => format!("{} ({})", base, locale.cloud_type(t)),
                     }
                 }
@@ -99,7 +109,7 @@ pub fn describe_weather<L: Locale>(weather: &Weather, locale: &L) -> String {
 /// Supports both QNH in hPa and altimeter in inHg.
 pub fn describe_pressure(pressure: &Pressure) -> String {
     match pressure {
-        Pressure::QnhHpa(v)        => format!("QNH {} hPa", v),
+        Pressure::QnhHpa(v) => format!("QNH {} hPa", v),
         Pressure::AltimeterInHg(v) => format!("altimeter {:.2} inHg", v),
     }
 }
@@ -139,4 +149,3 @@ pub fn describe_wind_shear(ws: &TafWindShear) -> String {
         ws.speed_kt,
     )
 }
-

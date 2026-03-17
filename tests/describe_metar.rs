@@ -1,4 +1,4 @@
-use metar_taf_parser::{describe_metar, parse_metar, Language};
+use metar_taf_parser::{Language, describe_metar, parse_metar};
 
 #[test]
 fn describe_metar_station_and_time() {
@@ -26,7 +26,11 @@ fn describe_metar_wind_variable() {
     let desc = describe_metar(&metar, Language::En);
 
     let wind = desc.wind.unwrap();
-    assert!(wind.contains("variable direction"), "expected VRB in: {}", wind);
+    assert!(
+        wind.contains("variable direction"),
+        "expected VRB in: {}",
+        wind
+    );
 }
 
 #[test]
@@ -54,7 +58,11 @@ fn describe_metar_visibility_greater_than_10km() {
     let desc = describe_metar(&metar, Language::En);
 
     let vis = desc.visibility.unwrap();
-    assert!(vis.contains("greater than 10 km"), "expected >10km in: {}", vis);
+    assert!(
+        vis.contains("greater than 10 km"),
+        "expected >10km in: {}",
+        vis
+    );
 }
 
 #[test]
@@ -73,7 +81,11 @@ fn describe_metar_clouds_few() {
 
     assert_eq!(desc.clouds.len(), 1);
     let cloud = &desc.clouds[0];
-    assert!(cloud.contains("few clouds"), "expected 'few clouds' in: {}", cloud);
+    assert!(
+        cloud.contains("few clouds"),
+        "expected 'few clouds' in: {}",
+        cloud
+    );
     assert!(cloud.contains("3000 ft"), "expected altitude in: {}", cloud);
 }
 
@@ -83,7 +95,11 @@ fn describe_metar_clouds_with_cb() {
     let desc = describe_metar(&metar, Language::En);
 
     let cloud = &desc.clouds[0];
-    assert!(cloud.contains("cumulonimbus"), "expected CB type in: {}", cloud);
+    assert!(
+        cloud.contains("cumulonimbus"),
+        "expected CB type in: {}",
+        cloud
+    );
 }
 
 #[test]
@@ -112,7 +128,11 @@ fn describe_metar_temperature_negative() {
 
     let temp = desc.temperature.unwrap();
     assert!(temp.contains("-2°C"), "expected negative temp in: {}", temp);
-    assert!(temp.contains("-8°C"), "expected negative dew point in: {}", temp);
+    assert!(
+        temp.contains("-8°C"),
+        "expected negative dew point in: {}",
+        temp
+    );
 }
 
 #[test]
@@ -161,7 +181,11 @@ fn describe_metar_modifier_auto() {
     let desc = describe_metar(&metar, Language::En);
 
     let modifier = desc.modifier.unwrap();
-    assert!(modifier.contains("automated"), "expected AUTO in: {}", modifier);
+    assert!(
+        modifier.contains("automated"),
+        "expected AUTO in: {}",
+        modifier
+    );
 }
 
 #[test]
@@ -170,7 +194,11 @@ fn describe_metar_modifier_cor() {
     let desc = describe_metar(&metar, Language::En);
 
     let modifier = desc.modifier.unwrap();
-    assert!(modifier.contains("corrected"), "expected COR in: {}", modifier);
+    assert!(
+        modifier.contains("corrected"),
+        "expected COR in: {}",
+        modifier
+    );
 }
 
 #[test]
@@ -187,7 +215,11 @@ fn describe_metar_trend_nosig() {
     let desc = describe_metar(&metar, Language::En);
 
     let trend = desc.trend.unwrap();
-    assert!(trend.contains("no significant change"), "expected NOSIG in: {}", trend);
+    assert!(
+        trend.contains("no significant change"),
+        "expected NOSIG in: {}",
+        trend
+    );
 }
 
 #[test]
@@ -197,7 +229,11 @@ fn describe_metar_trend_tempo_with_time() {
     let desc = describe_metar(&metar, Language::En);
 
     let trend = desc.trend.unwrap();
-    assert!(trend.contains("temporarily"), "expected TEMPO in: {}", trend);
+    assert!(
+        trend.contains("temporarily"),
+        "expected TEMPO in: {}",
+        trend
+    );
     assert!(trend.contains("14:00Z"), "expected time in: {}", trend);
 }
 
@@ -209,4 +245,3 @@ fn describe_metar_remarks_preserved() {
     let rmk = desc.remarks.unwrap();
     assert!(rmk.contains("AO2"), "expected RMK text in: {}", rmk);
 }
-

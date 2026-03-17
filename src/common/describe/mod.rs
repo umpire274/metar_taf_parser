@@ -21,15 +21,15 @@
 //! assert!(!desc.clouds.is_empty());
 //! ```
 
-pub mod locale;
 mod fields;
+pub mod locale;
 
 use crate::common::describe::fields::{
     describe_cloud, describe_pressure, describe_trend_detail, describe_visibility,
     describe_weather, describe_wind, describe_wind_shear,
 };
-use crate::common::describe::locale::en::En;
 use crate::common::describe::locale::Locale;
+use crate::common::describe::locale::en::En;
 use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::metar::Metar;
 use crate::taf::models::forecast::TafForecast;
@@ -170,24 +170,46 @@ fn describe_metar_with_locale<L: Locale>(metar: &Metar, locale: &L) -> MetarDesc
     };
 
     MetarDescription {
-        station:     metar.station.clone(),
-        time:        metar.time.as_ref().map(|t| {
-            format!("Day {} at {:02}:{:02}Z", t.day, t.hour, t.minute)
-        }),
+        station: metar.station.clone(),
+        time: metar
+            .time
+            .as_ref()
+            .map(|t| format!("Day {} at {:02}:{:02}Z", t.day, t.hour, t.minute)),
         modifier,
-        wind:        metar.wind.as_ref().map(|w| describe_wind(w, locale)),
-        visibility:  metar.visibility.as_ref().map(|v| describe_visibility(v, locale)),
-        weather:     metar.weather.iter().map(|w| describe_weather(w, locale)).collect(),
-        clouds:      metar.clouds.iter().map(|c| describe_cloud(c, locale)).collect(),
+        wind: metar.wind.as_ref().map(|w| describe_wind(w, locale)),
+        visibility: metar
+            .visibility
+            .as_ref()
+            .map(|v| describe_visibility(v, locale)),
+        weather: metar
+            .weather
+            .iter()
+            .map(|w| describe_weather(w, locale))
+            .collect(),
+        clouds: metar
+            .clouds
+            .iter()
+            .map(|c| describe_cloud(c, locale))
+            .collect(),
         temperature: metar.temperature.as_ref().map(|t| {
-            format!("temperature {}°C, dew point {}°C", t.temperature, t.dew_point)
+            format!(
+                "temperature {}°C, dew point {}°C",
+                t.temperature, t.dew_point
+            )
         }),
-        pressure:    metar.pressure.as_ref().map(describe_pressure),
+        pressure: metar.pressure.as_ref().map(describe_pressure),
         // For NOSIG, only `metar.trend` is set (no trend_detail); handle both cases.
-        trend:       metar.trend_detail.as_ref()
+        trend: metar
+            .trend_detail
+            .as_ref()
             .map(|td| describe_trend_detail(td, locale))
-            .or_else(|| metar.trend.as_ref().map(|t| locale.metar_trend(t).to_string())),
-        remarks:     metar.rmk.clone(),
+            .or_else(|| {
+                metar
+                    .trend
+                    .as_ref()
+                    .map(|t| locale.metar_trend(t).to_string())
+            }),
+        remarks: metar.rmk.clone(),
     }
 }
 
@@ -198,15 +220,23 @@ fn describe_taf_with_locale<L: Locale>(taf: &Taf, locale: &L) -> TafDescription 
     };
 
     TafDescription {
-        station:   taf.station.clone(),
-        issued_at: taf.issued_at.as_ref().map(|t| {
-            format!("Day {} at {:02}:{:02}Z", t.day, t.hour, t.minute)
-        }),
-        validity:  taf.validity.as_ref().map(|v| {
-            format!("{}/{:02}Z to {}/{:02}Z", v.from_day, v.from_hour, v.to_day, v.to_hour)
+        station: taf.station.clone(),
+        issued_at: taf
+            .issued_at
+            .as_ref()
+            .map(|t| format!("Day {} at {:02}:{:02}Z", t.day, t.hour, t.minute)),
+        validity: taf.validity.as_ref().map(|v| {
+            format!(
+                "{}/{:02}Z to {}/{:02}Z",
+                v.from_day, v.from_hour, v.to_day, v.to_hour
+            )
         }),
         modifier,
-        forecasts: taf.forecasts.iter().map(|f| describe_forecast(f, locale)).collect(),
+        forecasts: taf
+            .forecasts
+            .iter()
+            .map(|f| describe_forecast(f, locale))
+            .collect(),
     }
 }
 
@@ -215,26 +245,43 @@ fn describe_forecast<L: Locale>(forecast: &TafForecast, locale: &L) -> ForecastD
         .period
         .map(|p| describe_taf_period(&p))
         .or_else(|| {
-            forecast.from.map(|(day, hour, min)| {
-                format!("from day {} at {:02}:{:02}Z", day, hour, min)
-            })
+            forecast
+                .from
+                .map(|(day, hour, min)| format!("from day {} at {:02}:{:02}Z", day, hour, min))
         });
 
     ForecastDescription {
-        kind:            locale.forecast_kind(&forecast.kind).to_string(),
+        kind: locale.forecast_kind(&forecast.kind).to_string(),
         period,
-        probability:     forecast.probability.map(|p| format!("{}%", p)),
-        wind:            forecast.wind.as_ref().map(|w| describe_wind(w, locale)),
-        visibility:      forecast.visibility.as_ref().map(|v| describe_visibility(v, locale)),
-        weather:         forecast.weather.iter().map(|w| describe_weather(w, locale)).collect(),
-        clouds:          forecast.clouds.iter().map(|c| describe_cloud(c, locale)).collect(),
+        probability: forecast.probability.map(|p| format!("{}%", p)),
+        wind: forecast.wind.as_ref().map(|w| describe_wind(w, locale)),
+        visibility: forecast
+            .visibility
+            .as_ref()
+            .map(|v| describe_visibility(v, locale)),
+        weather: forecast
+            .weather
+            .iter()
+            .map(|w| describe_weather(w, locale))
+            .collect(),
+        clouds: forecast
+            .clouds
+            .iter()
+            .map(|c| describe_cloud(c, locale))
+            .collect(),
         max_temperature: forecast.max_temperature.as_ref().map(|t| {
-            format!("maximum temperature {}°C on day {} at {:02}:00Z", t.value, t.day, t.hour)
+            format!(
+                "maximum temperature {}°C on day {} at {:02}:00Z",
+                t.value, t.day, t.hour
+            )
         }),
         min_temperature: forecast.min_temperature.as_ref().map(|t| {
-            format!("minimum temperature {}°C on day {} at {:02}:00Z", t.value, t.day, t.hour)
+            format!(
+                "minimum temperature {}°C on day {} at {:02}:00Z",
+                t.value, t.day, t.hour
+            )
         }),
-        wind_shear:      forecast.wind_shear.as_ref().map(describe_wind_shear),
+        wind_shear: forecast.wind_shear.as_ref().map(describe_wind_shear),
     }
 }
 
@@ -247,4 +294,3 @@ fn describe_taf_period(p: &TafPeriod) -> String {
         format!("{}/{:02}:{:02}Z to {}/{:02}:{:02}Z", fd, fh, fm, td, th, tm)
     }
 }
-
