@@ -224,4 +224,3 @@ fn strict_rejects_invalid_issued_at() {
 fn strict_rejects_invalid_validity() {
     assert!(parse_taf_strict("TAF LIRF 121100Z 1224/1318 18010KT 9999 SCT020").is_err());
 }
-

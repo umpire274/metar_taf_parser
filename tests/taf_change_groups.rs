@@ -18,10 +18,9 @@ use metar_taf_parser::{Language, describe_taf, parse_taf};
 #[test]
 fn fm_creates_new_forecast_block() {
     // FM251800 — inizio blocco autonomo dal 25° giorno alle 18:00Z
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 22013KT 9999 FEW030",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 22013KT 9999 FEW030")
+            .unwrap();
     assert_eq!(t.forecasts.len(), 2);
     let fm = &t.forecasts[1];
     assert_eq!(fm.kind, TafForecastKind::FM);
@@ -30,10 +29,9 @@ fn fm_creates_new_forecast_block() {
 
 #[test]
 fn fm_fields_correct() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 22013KT 9999 FEW030",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 22013KT 9999 FEW030")
+            .unwrap();
     let fm = &t.forecasts[1];
     let w = fm.wind.as_ref().unwrap();
     assert_eq!(w.direction, Some(220));
@@ -63,10 +61,9 @@ fn fm_replaces_all_previous_conditions() {
 #[test]
 fn fm_with_non_zero_minutes() {
     // FM251830 — ore 18:30Z
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251830 22013KT 9999 FEW030",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251830 22013KT 9999 FEW030")
+            .unwrap();
     let fm = &t.forecasts[1];
     assert_eq!(fm.from, Some((25, 18, 30)));
 }
@@ -87,10 +84,7 @@ fn fm_multiple_groups() {
 #[test]
 fn fm_invalid_time_ignored() {
     // FM con orario invalido (minuti 99) non deve aprire un nuovo blocco
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251899 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251899 22013KT").unwrap();
     // FM invalido: rimane un solo blocco, ma il vento viene parsato nel base
     assert_eq!(t.forecasts.len(), 1);
 }
@@ -103,10 +97,8 @@ fn fm_invalid_time_ignored() {
 fn becmg_manual_example_wind_change() {
     // Esempio dal manuale: BECMG 2521/2523 22013KT
     // Dalle 21:00Z del 25° al 23:00Z del 25°, vento 220°/13 kt
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT")
+        .unwrap();
     assert_eq!(t.forecasts.len(), 2);
 
     let becmg = &t.forecasts[1];
@@ -124,10 +116,8 @@ fn becmg_manual_example_wind_change() {
 #[test]
 fn becmg_period_within_4_hours() {
     // La specifica dice: il periodo di BECMG non supera le 4 ore
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT")
+        .unwrap();
     let p = t.forecasts[1].period.as_ref().unwrap();
     // da 21 a 23 = 2 ore <= 4 ore
     let duration_h = (p.to.1 as i16) - (p.from.1 as i16);
@@ -138,10 +128,8 @@ fn becmg_period_within_4_hours() {
 fn becmg_unmodified_elements_are_absent() {
     // Un elemento non descritto in BECMG non deve apparire nel blocco
     // (il consumatore mantiene il valore precedente).
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT")
+        .unwrap();
     let becmg = &t.forecasts[1];
     // La visibilità non è descritta nel BECMG → deve essere None
     assert!(
@@ -158,10 +146,8 @@ fn becmg_unmodified_elements_are_absent() {
 #[test]
 fn becmg_crosses_midnight() {
     // BECMG 2523/2601 — da 23:00Z del 25° alle 01:00Z del 26°
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2523/2601 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2523/2601 22013KT")
+        .unwrap();
     let p = t.forecasts[1].period.as_ref().unwrap();
     assert_eq!(p.from, (25, 23, 0));
     assert_eq!(p.to, (26, 1, 0));
@@ -188,10 +174,9 @@ fn becmg_multiple_groups() {
 fn tempo_manual_example_tsra() {
     // Esempio dal manuale: TEMPO 2600/2603 TSRA
     // Tra le 00:00Z del 26° e le 03:00Z del 26° temporali con pioggia
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2600/2603 TSRA SCT020CB",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2600/2603 TSRA SCT020CB")
+            .unwrap();
     assert_eq!(t.forecasts.len(), 2);
 
     let tempo = &t.forecasts[1];
@@ -202,18 +187,17 @@ fn tempo_manual_example_tsra() {
     assert_eq!(p.to, (26, 3, 0));
 
     let w = &tempo.weather[0];
-    assert!(w
-        .descriptors
-        .contains(&metar_taf_parser::metar::models::weather::WeatherDescriptor::Thunderstorm));
+    assert!(
+        w.descriptors
+            .contains(&metar_taf_parser::metar::models::weather::WeatherDescriptor::Thunderstorm)
+    );
     assert!(w.phenomena.contains(&WeatherPhenomenon::Rain));
 }
 
 #[test]
 fn tempo_period_correct() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2514/2516 -RA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2514/2516 -RA").unwrap();
     let p = t.forecasts[1].period.as_ref().unwrap();
     assert_eq!(p.from, (25, 14, 0));
     assert_eq!(p.to, (25, 16, 0));
@@ -222,10 +206,8 @@ fn tempo_period_correct() {
 #[test]
 fn tempo_crosses_midnight() {
     // TEMPO 2523/2601 — tra 23:00Z del 25° e 01:00Z del 26°
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2523/2601 +RASN",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2523/2601 +RASN").unwrap();
     let p = t.forecasts[1].period.as_ref().unwrap();
     assert_eq!(p.from, (25, 23, 0));
     assert_eq!(p.to, (26, 1, 0));
@@ -240,9 +222,11 @@ fn tempo_multiple_groups() {
     )
     .unwrap();
     assert_eq!(t.forecasts.len(), 3);
-    assert!(t.forecasts.iter().all(|f|
-        f.kind == TafForecastKind::Base || f.kind == TafForecastKind::TEMPO
-    ));
+    assert!(
+        t.forecasts
+            .iter()
+            .all(|f| f.kind == TafForecastKind::Base || f.kind == TafForecastKind::TEMPO)
+    );
 }
 
 #[test]
@@ -307,10 +291,9 @@ fn change_groups_preserve_independent_content() {
 
 #[test]
 fn describe_fm_kind_label() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 22013KT 9999 FEW030",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 22013KT 9999 FEW030")
+            .unwrap();
     let desc = describe_taf(&t, Language::En);
     assert_eq!(desc.forecasts.len(), 2);
     // Il blocco FM ha un proprio campo "kind"
@@ -323,10 +306,8 @@ fn describe_fm_kind_label() {
 
 #[test]
 fn describe_becmg_kind_label() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT")
+        .unwrap();
     let desc = describe_taf(&t, Language::En);
     let kind = &desc.forecasts[1].kind;
     assert!(
@@ -337,10 +318,8 @@ fn describe_becmg_kind_label() {
 
 #[test]
 fn describe_tempo_kind_label() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2514/2516 -RA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2514/2516 -RA").unwrap();
     let desc = describe_taf(&t, Language::En);
     let kind = &desc.forecasts[1].kind;
     assert!(
@@ -351,10 +330,8 @@ fn describe_tempo_kind_label() {
 
 #[test]
 fn describe_becmg_period() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 BECMG 2521/2523 22013KT")
+        .unwrap();
     let desc = describe_taf(&t, Language::En);
     let period = desc.forecasts[1].period.as_ref().unwrap();
     assert!(period.contains("25"), "expected day 25 in period: {period}");
@@ -362,12 +339,9 @@ fn describe_becmg_period() {
 
 #[test]
 fn describe_tempo_period() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2600/2603 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2600/2603 TSRA").unwrap();
     let desc = describe_taf(&t, Language::En);
     let period = desc.forecasts[1].period.as_ref().unwrap();
     assert!(period.contains("26"), "expected day 26 in period: {period}");
 }
-

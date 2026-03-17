@@ -154,10 +154,8 @@ fn cloud_nsc_no_significant_clouds() {
 
 #[test]
 fn cloud_nsc_in_fm_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 5000 BKN010 FM251800 18005KT 9999 NSC",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 5000 BKN010 FM251800 18005KT 9999 NSC")
+        .unwrap();
     let fm = t
         .forecasts
         .iter()
@@ -190,10 +188,9 @@ fn cloud_multiple_layers() {
 
 #[test]
 fn cloud_in_fm_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 18005KT 9999 BKN010",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 FM251800 18005KT 9999 BKN010")
+            .unwrap();
     let fm = t
         .forecasts
         .iter()
@@ -205,10 +202,8 @@ fn cloud_in_fm_group() {
 
 #[test]
 fn cloud_in_tempo_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 FEW030 TEMPO 2514/2516 OVC010",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 FEW030 TEMPO 2514/2516 OVC010").unwrap();
     let tempo = t
         .forecasts
         .iter()
@@ -220,10 +215,8 @@ fn cloud_in_tempo_group() {
 
 #[test]
 fn cloud_in_becmg_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 OVC015 BECMG 2516/2518 SCT030",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 OVC015 BECMG 2516/2518 SCT030").unwrap();
     let becmg = t
         .forecasts
         .iter()
@@ -246,10 +239,8 @@ fn cavok_produces_no_clouds() {
 #[test]
 fn cloud_absent_when_not_reported() {
     // Un blocco TEMPO che non riporta nubi deve avere il Vec vuoto
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT030 TEMPO 2514/2516 -RA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT030 TEMPO 2514/2516 -RA").unwrap();
     let tempo = t
         .forecasts
         .iter()
@@ -267,7 +258,10 @@ fn describe_cloud_sct020() {
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020").unwrap();
     let desc = describe_taf(&t, Language::En);
     let cloud = &desc.forecasts[0].clouds[0];
-    assert!(cloud.contains("scattered"), "expected 'scattered' in: {cloud}");
+    assert!(
+        cloud.contains("scattered"),
+        "expected 'scattered' in: {cloud}"
+    );
     assert!(cloud.contains("2000 ft"), "expected altitude in: {cloud}");
 }
 
@@ -285,7 +279,10 @@ fn describe_cloud_cb() {
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 3000 TSRA SCT020CB").unwrap();
     let desc = describe_taf(&t, Language::En);
     let cloud = &desc.forecasts[0].clouds[0];
-    assert!(cloud.contains("cumulonimbus"), "expected 'cumulonimbus' in: {cloud}");
+    assert!(
+        cloud.contains("cumulonimbus"),
+        "expected 'cumulonimbus' in: {cloud}"
+    );
 }
 
 #[test]
@@ -298,4 +295,3 @@ fn describe_cloud_nsc() {
         "expected NSC description in: {cloud}"
     );
 }
-

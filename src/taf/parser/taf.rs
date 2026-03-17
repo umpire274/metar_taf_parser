@@ -118,4 +118,3 @@ fn parse_taf_with_mode(input: &str, strict: bool) -> Result<Taf, TafError> {
 fn is_valid_icao_station(s: &str) -> bool {
     s.len() == 4 && s.bytes().all(|b| b.is_ascii_uppercase())
 }
-

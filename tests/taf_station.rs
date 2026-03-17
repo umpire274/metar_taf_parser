@@ -127,4 +127,3 @@ fn tolerant_accepts_non_icao_station() {
     // the important thing is it does NOT panic.
     let _ = result;
 }
-

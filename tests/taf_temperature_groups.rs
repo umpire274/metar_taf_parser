@@ -59,10 +59,8 @@ fn malformed_taf_temperature_group_is_unparsed() {
 #[test]
 fn tx22_manual_example() {
     // TX22/1718Z — temperatura massima 22°C alle 18:00Z del 17°
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z").unwrap();
     let base = &t.forecasts[0];
     let tx = base.max_temperature.as_ref().expect("TX should be parsed");
     assert_eq!(tx.value, 22);
@@ -73,10 +71,8 @@ fn tx22_manual_example() {
 #[test]
 fn tnm01_manual_example() {
     // TNM01/1801Z — temperatura minima -1°C alle 01:00Z del 18°
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z").unwrap();
     let base = &t.forecasts[0];
     let tn = base.min_temperature.as_ref().expect("TN should be parsed");
     assert_eq!(tn.value, -1);
@@ -87,10 +83,8 @@ fn tnm01_manual_example() {
 #[test]
 fn tx_and_tn_manual_example_combined() {
     // Entrambi i gruppi presenti nello stesso TAF — come da esempio del manuale
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z").unwrap();
     let base = &t.forecasts[0];
     assert!(base.max_temperature.is_some(), "TX deve essere presente");
     assert!(base.min_temperature.is_some(), "TN deve essere presente");
@@ -103,10 +97,7 @@ fn tx_and_tn_manual_example_combined() {
 #[test]
 fn tx_only_no_tn() {
     // Solo TX, senza TN
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z").unwrap();
     let base = &t.forecasts[0];
     assert!(base.max_temperature.is_some());
     assert!(
@@ -118,10 +109,7 @@ fn tx_only_no_tn() {
 #[test]
 fn tn_only_no_tx() {
     // Solo TN, senza TX
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TNM01/1801Z",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TNM01/1801Z").unwrap();
     let base = &t.forecasts[0];
     assert!(base.min_temperature.is_some());
     assert!(
@@ -133,10 +121,8 @@ fn tn_only_no_tx() {
 #[test]
 fn tx_zero_degrees() {
     // TX00 — temperatura massima esattamente 0°C
-    let t = parse_taf(
-        "TAF UUEE 171100Z 1712/1818 18010KT 9999 OVC010 TX00/1712Z TN00/1800Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF UUEE 171100Z 1712/1818 18010KT 9999 OVC010 TX00/1712Z TN00/1800Z").unwrap();
     let base = &t.forecasts[0];
     assert_eq!(base.max_temperature.as_ref().unwrap().value, 0);
     assert_eq!(base.min_temperature.as_ref().unwrap().value, 0);
@@ -145,10 +131,8 @@ fn tx_zero_degrees() {
 #[test]
 fn tx_crosses_midnight_into_next_day() {
     // TX prevista il giorno successivo rispetto alla validità iniziale
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TX20/2514Z TN08/2604Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TX20/2514Z TN08/2604Z").unwrap();
     let base = &t.forecasts[0];
     let tx = base.max_temperature.as_ref().unwrap();
     let tn = base.min_temperature.as_ref().unwrap();
@@ -177,10 +161,7 @@ fn tx_in_fm_block() {
 #[test]
 fn malformed_tx_missing_z_suffix() {
     // TX senza 'Z' finale — deve finire in unparsed_groups
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718").unwrap();
     assert!(
         t.unparsed_groups.iter().any(|g| g == "TX22/1718"),
         "token senza Z deve essere non parsato"
@@ -192,10 +173,7 @@ fn malformed_tx_non_numeric_when() {
     // TX con parte oraria non numerica — il token non viene riconosciuto come TX/TN
     // e viene consumato da parse_weather come Unknown phenomena (non arriva a
     // unparsed_groups). L'invariante rilevante è che la temperatura MAX resti None.
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/17AAZ",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/17AAZ").unwrap();
     assert!(
         t.forecasts[0].max_temperature.is_none(),
         "token TX malformato non deve essere parsato come temperatura massima"
@@ -209,10 +187,8 @@ fn malformed_tx_non_numeric_when() {
 #[test]
 fn describe_tx_max_temperature_field() {
     // Il campo max_temperature nel describe deve contenere valore, giorno e ora
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z").unwrap();
     let desc = describe_taf(&t, Language::En);
     let s = desc.forecasts[0]
         .max_temperature
@@ -226,10 +202,8 @@ fn describe_tx_max_temperature_field() {
 #[test]
 fn describe_tn_min_temperature_field() {
     // Il campo min_temperature nel describe deve contenere valore negativo, giorno e ora
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z TNM01/1801Z").unwrap();
     let desc = describe_taf(&t, Language::En);
     let s = desc.forecasts[0]
         .min_temperature
@@ -237,21 +211,21 @@ fn describe_tn_min_temperature_field() {
         .expect("min_temperature should be described");
     assert!(s.contains("-1"), "deve contenere il valore -1: {s}");
     assert!(s.contains("18"), "deve contenere il giorno 18: {s}");
-    assert!(s.contains("01") || s.contains("1"), "deve contenere l'ora 01: {s}");
+    assert!(
+        s.contains("01") || s.contains("1"),
+        "deve contenere l'ora 01: {s}"
+    );
 }
 
 #[test]
 fn describe_tx_format_contains_celsius_and_day() {
     // Verifica il formato completo: "maximum temperature X°C on day D at HH:00Z"
-    let t = parse_taf(
-        "TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 171100Z 1712/1818 18010KT 9999 SCT020 TX22/1718Z").unwrap();
     let desc = describe_taf(&t, Language::En);
     let s = desc.forecasts[0].max_temperature.as_ref().unwrap();
+    assert!(s.contains("maximum"), "deve contenere 'maximum': {s}");
     assert!(
-        s.contains("maximum"),
-        "deve contenere 'maximum': {s}"
+        s.contains("°C") || s.contains("C"),
+        "deve contenere l'unità: {s}"
     );
-    assert!(s.contains("°C") || s.contains("C"), "deve contenere l'unità: {s}");
 }

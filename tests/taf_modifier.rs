@@ -92,4 +92,3 @@ fn describe_taf_modifier_normal_is_absent() {
     let desc = describe_taf(&t, Language::En);
     assert!(desc.modifier.is_none());
 }
-

@@ -192,7 +192,10 @@ fn weather_nsw_no_significant_weather() {
     // NSW come token autonomo in un blocco base
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 NSW SCT040").unwrap();
     let w = &t.forecasts[0].weather[0];
-    assert!(w.phenomena.contains(&WeatherPhenomenon::NoSignificantWeather));
+    assert!(
+        w.phenomena
+            .contains(&WeatherPhenomenon::NoSignificantWeather)
+    );
     assert!(w.intensity.is_none());
     assert!(w.descriptors.is_empty());
 }
@@ -210,25 +213,28 @@ fn weather_nsw_in_becmg() {
         .find(|f| matches!(f.kind, TafForecastKind::BECMG))
         .unwrap();
     assert_eq!(becmg.weather.len(), 1);
-    assert!(becmg.weather[0]
-        .phenomena
-        .contains(&WeatherPhenomenon::NoSignificantWeather));
+    assert!(
+        becmg.weather[0]
+            .phenomena
+            .contains(&WeatherPhenomenon::NoSignificantWeather)
+    );
 }
 
 #[test]
 fn weather_nsw_in_tempo() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 5000 -RA BKN010 TEMPO 2514/2516 9999 NSW",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 5000 -RA BKN010 TEMPO 2514/2516 9999 NSW")
+            .unwrap();
     let tempo = t
         .forecasts
         .iter()
         .find(|f| matches!(f.kind, TafForecastKind::TEMPO))
         .unwrap();
-    assert!(tempo.weather[0]
-        .phenomena
-        .contains(&WeatherPhenomenon::NoSignificantWeather));
+    assert!(
+        tempo.weather[0]
+            .phenomena
+            .contains(&WeatherPhenomenon::NoSignificantWeather)
+    );
 }
 
 #[test]
@@ -242,9 +248,11 @@ fn weather_nsw_in_fm() {
         .iter()
         .find(|f| matches!(f.kind, TafForecastKind::FM))
         .unwrap();
-    assert!(fm.weather[0]
-        .phenomena
-        .contains(&WeatherPhenomenon::NoSignificantWeather));
+    assert!(
+        fm.weather[0]
+            .phenomena
+            .contains(&WeatherPhenomenon::NoSignificantWeather)
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -284,7 +292,10 @@ fn describe_weather_tsra() {
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 3000 TSRA SCT020CB").unwrap();
     let desc = describe_taf(&t, Language::En);
     let wx = &desc.forecasts[0].weather[0];
-    assert!(wx.contains("thunderstorm"), "expected 'thunderstorm' in: {wx}");
+    assert!(
+        wx.contains("thunderstorm"),
+        "expected 'thunderstorm' in: {wx}"
+    );
     assert!(wx.contains("rain"), "expected 'rain' in: {wx}");
 }
 
@@ -298,4 +309,3 @@ fn describe_weather_nsw() {
         "expected NSW description in: {wx}"
     );
 }
-

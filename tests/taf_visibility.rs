@@ -19,7 +19,11 @@ use metar_taf_parser::{Language, describe_taf, parse_taf};
 fn visibility_8000m() {
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 8000 SCT020").unwrap();
     match t.forecasts[0].visibility.as_ref().unwrap() {
-        Visibility::Single { prevailing, qualifier, ndv } => {
+        Visibility::Single {
+            prevailing,
+            qualifier,
+            ndv,
+        } => {
             assert_eq!(*prevailing, 8000);
             assert!(qualifier.is_none());
             assert!(!ndv);
@@ -106,10 +110,8 @@ fn cavok_clears_weather_parsed_before_it() {
 
 #[test]
 fn cavok_in_fm_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 5000 BKN010 FM251800 18005KT CAVOK",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 5000 BKN010 FM251800 18005KT CAVOK").unwrap();
     assert_eq!(t.forecasts.len(), 2);
     assert!(matches!(
         t.forecasts[1].visibility.as_ref().unwrap(),
@@ -120,30 +122,42 @@ fn cavok_in_fm_group() {
 
 #[test]
 fn cavok_in_becmg_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 5000 BKN010 BECMG 2516/2518 CAVOK",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 5000 BKN010 BECMG 2516/2518 CAVOK").unwrap();
     let becmg = t
         .forecasts
         .iter()
-        .find(|f| matches!(f.kind, metar_taf_parser::taf::models::forecast::TafForecastKind::BECMG))
+        .find(|f| {
+            matches!(
+                f.kind,
+                metar_taf_parser::taf::models::forecast::TafForecastKind::BECMG
+            )
+        })
         .unwrap();
-    assert!(matches!(becmg.visibility.as_ref().unwrap(), Visibility::CAVOK));
+    assert!(matches!(
+        becmg.visibility.as_ref().unwrap(),
+        Visibility::CAVOK
+    ));
 }
 
 #[test]
 fn cavok_in_tempo_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 8000 SCT020 TEMPO 2514/2516 CAVOK",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 8000 SCT020 TEMPO 2514/2516 CAVOK").unwrap();
     let tempo = t
         .forecasts
         .iter()
-        .find(|f| matches!(f.kind, metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO))
+        .find(|f| {
+            matches!(
+                f.kind,
+                metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO
+            )
+        })
         .unwrap();
-    assert!(matches!(tempo.visibility.as_ref().unwrap(), Visibility::CAVOK));
+    assert!(matches!(
+        tempo.visibility.as_ref().unwrap(),
+        Visibility::CAVOK
+    ));
     assert!(tempo.clouds.is_empty());
 }
 
@@ -154,14 +168,17 @@ fn cavok_in_tempo_group() {
 #[test]
 fn visibility_absent_is_none() {
     // Un blocco TEMPO che non modifica la visibilità non deve avere il campo
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2514/2516 02015G25KT",
-    )
-    .unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 TEMPO 2514/2516 02015G25KT")
+        .unwrap();
     let tempo = t
         .forecasts
         .iter()
-        .find(|f| matches!(f.kind, metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO))
+        .find(|f| {
+            matches!(
+                f.kind,
+                metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO
+            )
+        })
         .unwrap();
     assert!(tempo.visibility.is_none());
 }
@@ -196,4 +213,3 @@ fn describe_visibility_cavok() {
     let vis = desc.forecasts[0].visibility.as_ref().unwrap();
     assert!(vis.contains("CAVOK"), "expected CAVOK in: {vis}");
 }
-

@@ -152,30 +152,28 @@ fn prob40_manual_example_period() {
 #[test]
 fn prob50_is_not_recognized() {
     // PROB50 non è un valore valido nei TAF: il token non deve aprire un blocco PROB.
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB50 2514/2516 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB50 2514/2516 TSRA").unwrap();
     // Nessun blocco PROB deve essere creato; rimane solo il blocco base.
-    assert_eq!(t.forecasts.len(), 1, "PROB50 non deve creare un blocco PROB");
+    assert_eq!(
+        t.forecasts.len(),
+        1,
+        "PROB50 non deve creare un blocco PROB"
+    );
 }
 
 #[test]
 fn prob30_is_recognized() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB30 2514/2516 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB30 2514/2516 TSRA").unwrap();
     assert_eq!(t.forecasts.len(), 2);
     assert_eq!(t.forecasts[1].probability, Some(30));
 }
 
 #[test]
 fn prob40_is_recognized() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA").unwrap();
     assert_eq!(t.forecasts.len(), 2);
     assert_eq!(t.forecasts[1].probability, Some(40));
 }
@@ -187,10 +185,8 @@ fn prob40_is_recognized() {
 #[test]
 fn prob30_crosses_midnight() {
     // PROB30 2523/2601 — probabilità che attraversa la mezzanotte
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB30 2523/2601 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB30 2523/2601 TSRA").unwrap();
     let p = t.forecasts[1].period.as_ref().unwrap();
     assert_eq!(p.from, (25, 23, 0));
     assert_eq!(p.to, (26, 1, 0));
@@ -219,10 +215,8 @@ fn prob_combined_with_other_change_groups() {
 #[test]
 fn prob_unmodified_elements_are_absent() {
     // Elementi non descritti nel blocco PROB non devono essere presenti
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA").unwrap();
     let prob = &t.forecasts[1];
     assert!(
         prob.wind.is_none(),
@@ -244,10 +238,8 @@ fn prob_unmodified_elements_are_absent() {
 
 #[test]
 fn describe_prob_kind_label() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA").unwrap();
     let desc = describe_taf(&t, Language::En);
     let kind = &desc.forecasts[1].kind;
     assert!(
@@ -259,10 +251,8 @@ fn describe_prob_kind_label() {
 #[test]
 fn describe_prob_probability_field() {
     // Il campo describe.probability deve contenere la percentuale
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2514/2516 TSRA").unwrap();
     let desc = describe_taf(&t, Language::En);
     let prob_str = desc.forecasts[1]
         .probability
@@ -277,10 +267,8 @@ fn describe_prob_probability_field() {
 #[test]
 fn describe_prob_period_field() {
     // Il campo describe.period deve contenere il periodo del blocco PROB
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2510/2513 TSRA",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 18010KT 9999 SCT020 PROB40 2510/2513 TSRA").unwrap();
     let desc = describe_taf(&t, Language::En);
     let period = desc.forecasts[1]
         .period
@@ -291,4 +279,3 @@ fn describe_prob_period_field() {
         "expected day 25 in period string: {period}"
     );
 }
-

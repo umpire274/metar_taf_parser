@@ -107,10 +107,9 @@ fn wind_indeterminate() {
 
 #[test]
 fn wind_in_fm_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 FM251800 18015KT 9999 FEW030",
-    )
-    .unwrap();
+    let t =
+        parse_taf("TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 FM251800 18015KT 9999 FEW030")
+            .unwrap();
     assert_eq!(t.forecasts.len(), 2);
     let fm = &t.forecasts[1];
     let w = fm.wind.as_ref().unwrap();
@@ -120,13 +119,18 @@ fn wind_in_fm_group() {
 
 #[test]
 fn wind_in_becmg_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 BECMG 2516/2518 VRB03KT",
-    )
-    .unwrap();
-    let becmg = t.forecasts.iter().find(|f| {
-        matches!(f.kind, metar_taf_parser::taf::models::forecast::TafForecastKind::BECMG)
-    }).unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 BECMG 2516/2518 VRB03KT")
+        .unwrap();
+    let becmg = t
+        .forecasts
+        .iter()
+        .find(|f| {
+            matches!(
+                f.kind,
+                metar_taf_parser::taf::models::forecast::TafForecastKind::BECMG
+            )
+        })
+        .unwrap();
     let w = becmg.wind.as_ref().unwrap();
     assert_eq!(w.direction, None); // VRB
     assert_eq!(w.speed, 3);
@@ -134,13 +138,18 @@ fn wind_in_becmg_group() {
 
 #[test]
 fn wind_in_tempo_group() {
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 TEMPO 2514/2516 02015G25KT",
-    )
-    .unwrap();
-    let tempo = t.forecasts.iter().find(|f| {
-        matches!(f.kind, metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO)
-    }).unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 TEMPO 2514/2516 02015G25KT")
+        .unwrap();
+    let tempo = t
+        .forecasts
+        .iter()
+        .find(|f| {
+            matches!(
+                f.kind,
+                metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO
+            )
+        })
+        .unwrap();
     let w = tempo.wind.as_ref().unwrap();
     assert_eq!(w.speed, 15);
     assert_eq!(w.gust, Some(25));
@@ -153,13 +162,18 @@ fn wind_in_tempo_group() {
 #[test]
 fn wind_absent_is_none() {
     // Il vento può essere assente in un blocco di cambiamento che non lo modifica
-    let t = parse_taf(
-        "TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 TEMPO 2514/2516 4000 RASN",
-    )
-    .unwrap();
-    let tempo = t.forecasts.iter().find(|f| {
-        matches!(f.kind, metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO)
-    }).unwrap();
+    let t = parse_taf("TAF LIRF 251100Z 2512/2618 02008KT 9999 SCT020 TEMPO 2514/2516 4000 RASN")
+        .unwrap();
+    let tempo = t
+        .forecasts
+        .iter()
+        .find(|f| {
+            matches!(
+                f.kind,
+                metar_taf_parser::taf::models::forecast::TafForecastKind::TEMPO
+            )
+        })
+        .unwrap();
     assert!(tempo.wind.is_none());
 }
 
@@ -182,8 +196,10 @@ fn describe_wind_calm() {
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 00000KT 9999 SCT020").unwrap();
     let desc = describe_taf(&t, Language::En);
     let wind = desc.forecasts[0].wind.as_ref().unwrap();
-    assert!(wind.contains("0°") || wind.contains("calm") || wind.contains("0 kt"),
-        "expected calm wind description in: {wind}");
+    assert!(
+        wind.contains("0°") || wind.contains("calm") || wind.contains("0 kt"),
+        "expected calm wind description in: {wind}"
+    );
 }
 
 #[test]
@@ -199,6 +215,8 @@ fn describe_wind_with_gust() {
     let t = parse_taf("TAF LIRF 251100Z 2512/2618 02008G19KT 9999 SCT020").unwrap();
     let desc = describe_taf(&t, Language::En);
     let wind = desc.forecasts[0].wind.as_ref().unwrap();
-    assert!(wind.contains("gust") || wind.contains("19"), "expected gust in: {wind}");
+    assert!(
+        wind.contains("gust") || wind.contains("19"),
+        "expected gust in: {wind}"
+    );
 }
-
