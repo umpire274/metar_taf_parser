@@ -8,6 +8,7 @@ use crate::metar::models::Metar;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
 use crate::metar::parser::pressure::parse_pressure;
+use crate::metar::parser::rmk::parse_rmk;
 use crate::metar::parser::runway_state::parse_runway_state;
 use crate::metar::parser::rvr::parse_rvr;
 use crate::metar::parser::temperature::parse_temperature;
@@ -138,6 +139,9 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
         }
 
         if let Some(t) = parse_trend(&token) {
+            if matches!(t, crate::metar::models::trend::MetarTrend::Nosig) {
+                metar.nosig = true;
+            }
             metar.trend = Some(t.clone());
             if !matches!(t, crate::metar::models::trend::MetarTrend::Nosig) {
                 metar.trend_detail = Some(parse_trend_detail(t, &mut tokenizer));
@@ -154,7 +158,7 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
     }
 
     if rmk_started && !remaining_tokens.is_empty() {
-        metar.rmk = Some(remaining_tokens.join(" "));
+        metar.remarks = parse_rmk(&remaining_tokens);
     }
 
     if strict {

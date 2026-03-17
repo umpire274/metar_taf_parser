@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.4.0`
+> ⚠️ **Status:** Active development – current version `0.4.2`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,7 +52,7 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.4.0"
+metar-taf-parser = "0.4.2"
 ```
 
 ### METAR example
@@ -218,6 +218,51 @@ TAF LIRF
     Visibility:  visibility 4000 m
     Weather:     light rain
 ```
+
+### Structured METAR remarks (RMK section)
+
+The RMK section is parsed into typed variants instead of a raw string.
+Access the raw text via `remarks.raw`; inspect parsed groups via `remarks.items`.
+
+```rust
+use metar_taf_parser::parse_metar;
+use metar_taf_parser::metar::models::remark::{AutoStationKind, Remark};
+
+let metar = parse_metar(
+    "KORD 121750Z 18010KT 9999 FEW030 18/12 A2992 RMK AO2 SLP132 T02560178"
+)?;
+
+for remark in &metar.remarks.items {
+    match remark {
+        Remark::AutoStation(AutoStationKind::AO2) => {
+            println!("automated station with precipitation discriminator");
+        }
+        Remark::SeaLevelPressure(hpa) => {
+            println!("SLP: {:.1} hPa", hpa); // "SLP: 1013.2 hPa"
+        }
+        Remark::HourlyTemperature { temperature, dewpoint } => {
+            println!("T: {:.1}°C  Td: {:.1}°C", temperature, dewpoint);
+        }
+        _ => {}
+    }
+}
+
+// Raw text is always preserved:
+assert_eq!(metar.remarks.raw, "AO2 SLP132 T02560178");
+
+// Unrecognised tokens end up in remarks.unparsed:
+let m2 = parse_metar("UOOO 181500Z 07002MPS CAVOK M25/M28 Q1014 RMK QFE746/0995")?;
+assert_eq!(m2.remarks.unparsed, vec!["QFE746/0995"]);
+```
+
+Recognised remark variants: `PeakWind`, `WindShift`, `SeaLevelPressure`,
+`PrecipitationAmount`, `HourlyTemperature`, `MaxMinTemperature`, `PressureTendency`,
+`AutoStation`, `Lightning`, `Virga`, `MaintenanceIndicator`,
+`PressureRisingRapidly`, `PressureFallingRapidly`, `SensorStatus`.
+
+The `nosig` field on `Metar` is `true` whenever a `NOSIG` trend group is present.
+
+---
 
 ### Typical parser use cases
 

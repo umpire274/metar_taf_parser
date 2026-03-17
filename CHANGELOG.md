@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.2] - 2026-03-17
+
+### Added
+
+- Added `metar::models::remark` module with:
+  - `Remark` enum covering the most common NWS/ICAO remark groups:
+    `PeakWind`, `WindShift`, `SeaLevelPressure`, `PrecipitationAmount`,
+    `HourlyTemperature`, `MaxMinTemperature`, `PressureTendency`,
+    `AutoStation`, `Lightning`, `MaintenanceIndicator`, `Virga`,
+    `PressureRisingRapidly`, `PressureFallingRapidly`, `SensorStatus`.
+  - `Remarks` struct with `items: Vec<Remark>`, `unparsed: Vec<String>`,
+    `raw: String`; implements `Default`.
+  - `AutoStationKind` enum (`AO1` / `AO2`).
+  - `LightningType` enum (`IC`, `CC`, `CA`, `CG`).
+- Replaced trivial `parse_rmk` with a structured multi-token parser that:
+  - handles two-token groups (`PK WND dddff/HHmm`, `WSHFT HHmm [FROPA]`);
+  - parses single-token groups by format recognition (no regex);
+  - places unrecognised tokens verbatim in `Remarks::unparsed`.
+- Added `nosig: bool` field to `Metar`, set to `true` when a `NOSIG` trend is present.
+- Added `describe_remarks(remarks: &Remarks) -> Option<String>` helper in
+  `common::describe::fields`, used automatically by `describe_metar`.
+- Added 22 integration tests in `tests/metar_remark_parser.rs` covering all
+  recognised remark variants, multi-remark sections, and unknown-token fallback.
+
+### Changed — **Breaking**
+
+- `Metar::rmk: Option<String>` replaced by `Metar::remarks: Remarks`.
+  - Raw text is still accessible via `metar.remarks.raw`.
+  - Code using `metar.rmk` must be updated to `metar.remarks.raw`.
+- `tests/metar_rmk.rs` updated to use `remarks.raw` instead of `rmk`.
+- Bumped crate version to `0.4.2`.
+- README updated with structured remark access example and dependency version.
+
+---
+
 ## [0.4.0] - 2026-03-17
 
 ### Added

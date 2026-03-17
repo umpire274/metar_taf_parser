@@ -5,7 +5,7 @@
 //!
 //! The output language is selected via the [`Language`] enum. Only English
 //! is supported in the current version; additional locales can be added by
-//! implementing the [`locale::Locale`] trait.
+//! implementing the [`Locale`] trait.
 //!
 //! # Example
 //!
@@ -25,8 +25,8 @@ mod fields;
 pub mod locale;
 
 use crate::common::describe::fields::{
-    describe_cloud, describe_pressure, describe_trend_detail, describe_visibility,
-    describe_weather, describe_wind, describe_wind_shear,
+    describe_cloud, describe_pressure, describe_remarks, describe_trend_detail,
+    describe_visibility, describe_weather, describe_wind, describe_wind_shear,
 };
 use crate::common::describe::locale::Locale;
 use crate::common::describe::locale::en::En;
@@ -387,7 +387,7 @@ fn describe_metar_with_locale<L: Locale>(metar: &Metar, locale: &L) -> MetarDesc
                     .as_ref()
                     .map(|t| locale.metar_trend(t).to_string())
             }),
-        remarks: metar.rmk.clone(),
+        remarks: describe_remarks(&metar.remarks),
     }
 }
 

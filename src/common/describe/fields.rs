@@ -3,6 +3,7 @@
 use crate::common::describe::locale::Locale;
 use crate::metar::models::cloud::{CloudAmount, CloudLayer};
 use crate::metar::models::pressure::Pressure;
+use crate::metar::models::remark::{AutoStationKind, LightningType, Remark, Remarks};
 use crate::metar::models::trend::MetarTrendDetail;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::models::weather::Weather;
@@ -148,4 +149,100 @@ pub fn describe_wind_shear(ws: &TafWindShear) -> String {
         ws.direction,
         ws.speed_kt,
     )
+}
+
+/// Produces a human-readable summary of the RMK section.
+///
+/// Structured items are described individually; unrecognised tokens are appended verbatim.
+/// Returns `None` when the remarks section is empty.
+pub fn describe_remarks(remarks: &Remarks) -> Option<String> {
+    if remarks.raw.is_empty() {
+        return None;
+    }
+
+    let mut parts: Vec<String> = remarks.items.iter().map(describe_remark).collect();
+    parts.extend(remarks.unparsed.iter().cloned());
+
+    Some(parts.join("; "))
+}
+
+fn describe_remark(r: &Remark) -> String {
+    match r {
+        Remark::PeakWind {
+            direction,
+            speed,
+            hour,
+            minute,
+        } => {
+            format!(
+                "peak wind {}° at {} kt at {:02}:{:02}Z",
+                direction, speed, hour, minute
+            )
+        }
+        Remark::WindShift {
+            hour,
+            minute,
+            frontal,
+        } => {
+            if *frontal {
+                format!("wind shift at {:02}:{:02}Z (frontal passage)", hour, minute)
+            } else {
+                format!("wind shift at {:02}:{:02}Z", hour, minute)
+            }
+        }
+        Remark::SeaLevelPressure(hpa) => format!("sea level pressure {:.1} hPa", hpa),
+        Remark::PrecipitationAmount(inches) => {
+            format!("precipitation {:.2} in", inches)
+        }
+        Remark::HourlyTemperature {
+            temperature,
+            dewpoint,
+        } => {
+            format!(
+                "temperature {:.1}°C, dew point {:.1}°C",
+                temperature, dewpoint
+            )
+        }
+        Remark::MaxMinTemperature { max, min } => {
+            format!("24h max {:.1}°C, min {:.1}°C", max, min)
+        }
+        Remark::PressureTendency {
+            tendency_code,
+            change_hpa,
+        } => {
+            format!(
+                "pressure tendency code {} ({:.1} hPa)",
+                tendency_code, change_hpa
+            )
+        }
+        Remark::AutoStation(kind) => match kind {
+            AutoStationKind::AO1 => {
+                "automated station without precipitation discriminator (AO1)".to_string()
+            }
+            AutoStationKind::AO2 => {
+                "automated station with precipitation discriminator (AO2)".to_string()
+            }
+        },
+        Remark::Lightning { types, direction } => {
+            let type_str: Vec<&str> = types
+                .iter()
+                .map(|t| match t {
+                    LightningType::IC => "IC",
+                    LightningType::CC => "CC",
+                    LightningType::CA => "CA",
+                    LightningType::CG => "CG",
+                })
+                .collect();
+            let base = format!("lightning ({})", type_str.join("/"));
+            match direction {
+                None => base,
+                Some(d) => format!("{} to the {}", base, d),
+            }
+        }
+        Remark::MaintenanceIndicator => "maintenance check indicator".to_string(),
+        Remark::Virga => "virga".to_string(),
+        Remark::PressureRisingRapidly => "pressure rising rapidly".to_string(),
+        Remark::PressureFallingRapidly => "pressure falling rapidly".to_string(),
+        Remark::SensorStatus(code) => format!("sensor not available ({})", code),
+    }
 }

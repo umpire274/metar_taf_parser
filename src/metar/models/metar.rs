@@ -4,6 +4,7 @@
 use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::cloud::CloudLayer;
 use crate::metar::models::pressure::Pressure;
+use crate::metar::models::remark::Remarks;
 use crate::metar::models::runway_state::RunwayState;
 use crate::metar::models::rvr::RunwayVisualRange;
 use crate::metar::models::temperature::Temperature;
@@ -25,7 +26,10 @@ pub struct Metar {
     pub temperature: Option<Temperature>,
     pub pressure: Option<Pressure>,
     pub weather: Vec<Weather>,
-    pub rmk: Option<String>,
+    /// Structured parsed RMK section. Access raw text via `remarks.raw`.
+    pub remarks: Remarks,
+    /// Whether a NOSIG trend is present.
+    pub nosig: bool,
     pub runway_state: Vec<RunwayState>,
     pub runway_visual_range: Vec<RunwayVisualRange>,
     pub trend: Option<MetarTrend>,
@@ -35,7 +39,7 @@ pub struct Metar {
 }
 
 impl Metar {
-    /// Creates a new `new` value with normalized defaults.
+    /// Creates a new [`Metar`] with normalized defaults.
     pub fn new(station: &str, raw: &str) -> Self {
         Self {
             station: station.to_string(),
@@ -47,7 +51,8 @@ impl Metar {
             temperature: None,
             pressure: None,
             weather: Vec::new(),
-            rmk: None,
+            remarks: Remarks::default(),
+            nosig: false,
             runway_state: Vec::new(),
             runway_visual_range: Vec::new(),
             trend: None,

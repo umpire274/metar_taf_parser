@@ -6,6 +6,8 @@ pub mod cloud;
 pub mod metar;
 /// Exposes the `pressure` module.
 pub mod pressure;
+/// Exposes the `remark` module.
+pub mod remark;
 pub(crate) mod runway_state;
 /// Exposes the `rvr` module.
 pub mod rvr;
