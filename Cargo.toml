@@ -1,9 +1,23 @@
 [package]
 name = "metar-taf-parser"
-version = "0.4.8"
+version = "0.4.9"
 edition = "2024"
-description = "METAR and TAF parsing library"
+rust-version = "1.88"
+description = "A strongly-typed METAR and TAF parser library for aviation weather reports"
 license = "MIT"
+authors = ["Alessandro Maestri <umpire274@gmail.com>"]
+repository = "https://github.com/umpire274/metar_taf_parser"
+homepage = "https://github.com/umpire274/metar_taf_parser"
+documentation = "https://docs.rs/metar-taf-parser"
+readme = "README.md"
+keywords = ["metar", "taf", "aviation", "weather", "parser"]
+categories = ["parsing", "science"]
+exclude = [
+    "dev_tools/",
+    "docs/",
+    ".github/",
+    "AGENTS.md",
+]
 
 [dependencies]
 thiserror = "2.0.18"
