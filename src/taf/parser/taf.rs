@@ -48,21 +48,47 @@ fn parse_taf_with_mode(input: &str, strict: bool) -> Result<Taf, TafError> {
         });
     }
 
-    // Optional AMD/COR
+    // Optional AMD/COR — check if the next token is NIL before treating it as station
     let (modifier, station) = match token.as_str() {
-        "AMD" => (
-            ReportModifier::Amendment,
-            tokenizer.next().ok_or(TafError::InvalidFormat)?,
-        ),
-        "COR" => (
-            ReportModifier::Correction,
-            tokenizer.next().ok_or(TafError::InvalidFormat)?,
-        ),
+        "AMD" => {
+            let next = tokenizer.next().ok_or(TafError::InvalidFormat)?;
+            if next == "NIL" {
+                return Ok(Taf {
+                    station: String::new(),
+                    issued_at: None,
+                    validity: None,
+                    modifier: ReportModifier::Nil,
+                    forecasts: Vec::new(),
+                    unparsed_groups: Vec::new(),
+                });
+            }
+            (ReportModifier::Amendment, next)
+        }
+        "COR" => {
+            let next = tokenizer.next().ok_or(TafError::InvalidFormat)?;
+            if next == "NIL" {
+                return Ok(Taf {
+                    station: String::new(),
+                    issued_at: None,
+                    validity: None,
+                    modifier: ReportModifier::Nil,
+                    forecasts: Vec::new(),
+                    unparsed_groups: Vec::new(),
+                });
+            }
+            (ReportModifier::Correction, next)
+        }
         _ => (ReportModifier::Normal, token),
     };
 
     // Issue time: DDHHMMZ
     let time_token = tokenizer.next().ok_or(TafError::InvalidFormat)?;
+
+    // In strict mode the station must be a valid 4-letter ICAO identifier.
+    if strict && !is_valid_icao_station(&station) {
+        return Err(TafError::InvalidFormat);
+    }
+
     let issued_at = parse_taf_time(&time_token)?;
 
     // Validity: DDHH/DDHH
@@ -84,4 +110,11 @@ fn parse_taf_with_mode(input: &str, strict: bool) -> Result<Taf, TafError> {
         forecasts,
         unparsed_groups,
     })
+}
+
+/// Returns `true` if `s` is a valid ICAO aerodrome identifier.
+///
+/// ICAO identifiers consist of exactly 4 ASCII uppercase letters (A–Z).
+fn is_valid_icao_station(s: &str) -> bool {
+    s.len() == 4 && s.bytes().all(|b| b.is_ascii_uppercase())
 }
