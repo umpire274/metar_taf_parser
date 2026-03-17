@@ -9,6 +9,8 @@ fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
         Some((rest, WindUnit::KT))
     } else if let Some(rest) = token.strip_suffix("MPS") {
         Some((rest, WindUnit::MPS))
+    } else if let Some(rest) = token.strip_suffix("MPH") {
+        Some((rest, WindUnit::MPH))
     } else {
         None
     }
@@ -18,6 +20,18 @@ fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
 pub fn parse_wind(token: &str) -> Option<Wind> {
     let (body, unit) = strip_unit(token)?;
 
+    // Indeterminate wind: direction and speed both unknown
+    if body == "/////" {
+        return Some(Wind {
+            direction: None,
+            speed: 0,
+            gust: None,
+            unit,
+            variation: None,
+            indeterminate: true,
+        });
+    }
+
     // Calm wind
     if body == "00000" {
         return Some(Wind {
@@ -26,6 +40,7 @@ pub fn parse_wind(token: &str) -> Option<Wind> {
             gust: None,
             unit,
             variation: None,
+            indeterminate: false,
         });
     }
 
@@ -75,6 +90,7 @@ pub fn parse_wind(token: &str) -> Option<Wind> {
         gust,
         unit,
         variation: None,
+        indeterminate: false,
     })
 }
 

@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.5] - 2026-03-17
+
+### Added
+
+- Added `metar::models::color_code` module with:
+  - `MilitaryColorCode` enum (`Blu`, `Wht`, `Grn`, `Ylo`, `Amb`, `Red`).
+  - `MilitaryColor { code, black }` struct — `black: true` for `BLU+` / `WHT+` variants.
+- Added `color_code: Option<MilitaryColor>` and `color_code_forecast: Option<MilitaryColor>`
+  fields to `Metar`; the first bare color code token sets `color_code`, a second bare token
+  (without `BECMG` keyword) sets `color_code_forecast`.
+- Added `describe_military_color` helper in `common::describe::fields`.
+- Added `color_code` and `color_code_forecast` fields to `MetarDescription`; printed by
+  `Display` / `format_metar`.
+- Added 15 integration tests in `tests/metar_color_code.rs` covering all six codes, `BLACK`
+  variants, implicit BECMG forecast code, and describe output.
+
+- Added `metar::models::sea_state` module with:
+  - `WaveHeightKind` enum (`StateCode` / `Height`).
+  - `SeaState { water_temperature, wave_kind, wave_value }` struct.
+- Added `sea_state: Option<SeaState>` field to `Metar`.
+- Added `describe_sea_state` helper in `common::describe::fields`.
+- Added `sea_state: Option<String>` field to `MetarDescription`.
+- Added 10 integration tests in `tests/metar_sea_state.rs`.
+
+- Added `metar::models::wind_shear` module with:
+  - `MetarWindShearRunway` enum (`Runway(String)` / `AllRunways`).
+- Added `wind_shear: Vec<MetarWindShearRunway>` field to `Metar`; parser recognises
+  `WS R<rwy>` (specific runway) and `WS ALL RWY` (all runways).
+- Added `describe_metar_wind_shear_runway` helper in `common::describe::fields`.
+- Added `wind_shear: Vec<String>` field to `MetarDescription`.
+- Added 8 integration tests in `tests/metar_wind_shear_runway.rs`.
+
+- Added `metar::models::report_type` module with `MetarReportType { Metar, Speci }` enum.
+- Added `report_type: MetarReportType` field to `Metar`; defaults to `Metar`.
+- Parser now recognises `SPECI` as an optional leading token (in addition to `METAR`),
+  setting `report_type` to `Speci` accordingly. Report type is preserved even in NIL
+  and COR NIL early-return paths.
+- Added `report_type: String` field to `MetarDescription` (always `"METAR"` or `"SPECI"`).
+- Added 8 tests in `tests/metar_modifier.rs` covering `SPECI` parsing, `SPECI COR`,
+  `SPECI NIL`, and describe output for both types.
+
+- Extended `tests/metar_runway_state.rs` with 9 new parsing tests covering: `R/SNOCLO`,
+  designators with `L`/`R`/`C` suffixes, all data positions as `/` (all fields `None`),
+  individual missing fields (thickness or braking action), multiple runway state tokens
+  in a single METAR, and rejection of invalid suffixes.
+- Added `tests/describe_runway_state.rs` with 15 tests covering: SNOCLO description,
+  all-fields-missing (`"not reported"`), deposit 0 (*clear and dry*), coverage codes 1
+  and 2, thickness codes `00`/`92`/`98`/`99`, braking action as µ coefficient, braking
+  action codes `91`/`93`/`95`/`99`, and designators with suffix.
+
+### Changed — **Breaking**
+
+- `Metar` struct gains four new fields: `report_type`, `color_code`, `color_code_forecast`,
+  `sea_state`, `wind_shear`. Code constructing `Metar` literals must add these fields.
+- `MetarDescription` gains `report_type: String`. Code destructuring `MetarDescription`
+  must add this field.
+- Bumped crate version to `0.4.5`.
+- README and CHANGELOG updated.
+
+---
+
 ## [0.4.3] - 2026-03-17
 
 ### Added

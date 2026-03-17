@@ -7,6 +7,7 @@ use crate::metar::models::trend::{
 };
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
+use crate::metar::parser::color_code::parse_color_code;
 use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
@@ -30,6 +31,7 @@ pub fn parse_trend_detail(kind: MetarTrend, tokenizer: &mut Tokenizer) -> MetarT
         visibility: None,
         weather: Vec::new(),
         clouds: Vec::new(),
+        color_code: None,
         raw_tokens: Vec::new(),
         unparsed_groups: Vec::new(),
     };
@@ -59,7 +61,11 @@ pub fn parse_trend_detail(kind: MetarTrend, tokenizer: &mut Tokenizer) -> MetarT
             && let Some(next) = tokenizer.peek()
             && let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next)
         {
-            detail.visibility = Some(Visibility::Single { prevailing });
+            detail.visibility = Some(Visibility::Single {
+                prevailing,
+                qualifier: None,
+                ndv: false,
+            });
             let split = tokenizer.next().unwrap_or_default();
             detail.raw_tokens.push(split);
             continue;
@@ -75,6 +81,11 @@ pub fn parse_trend_detail(kind: MetarTrend, tokenizer: &mut Tokenizer) -> MetarT
 
         if let Some(v) = parse_cloud(&token) {
             detail.clouds.push(v);
+            continue;
+        }
+
+        if let Some(color) = parse_color_code(&token) {
+            detail.color_code = Some(color);
             continue;
         }
 

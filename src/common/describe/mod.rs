@@ -25,13 +25,16 @@ mod fields;
 pub mod locale;
 
 use crate::common::describe::fields::{
-    describe_cloud, describe_icing, describe_pressure, describe_remarks, describe_trend_detail,
-    describe_turbulence, describe_visibility, describe_weather, describe_wind, describe_wind_shear,
+    describe_cloud, describe_icing, describe_metar_wind_shear_runway, describe_military_color,
+    describe_pressure, describe_remarks, describe_runway_state, describe_rvr, describe_sea_state,
+    describe_trend_detail, describe_turbulence, describe_visibility, describe_weather,
+    describe_wind, describe_wind_shear,
 };
 use crate::common::describe::locale::Locale;
 use crate::common::describe::locale::en::En;
 use crate::common::report_modifier::ReportModifier;
 use crate::metar::models::metar::Metar;
+use crate::metar::models::report_type::MetarReportType;
 use crate::taf::models::forecast::TafForecast;
 use crate::taf::models::taf::Taf;
 use crate::taf::models::time::TafPeriod;
@@ -54,6 +57,9 @@ pub enum Language {
 pub struct MetarDescription {
     /// ICAO station identifier.
     pub station: String,
+    /// Report type: `"METAR"` for routine observations, `"SPECI"` for special observations.
+    /// Always present (never `None`).
+    pub report_type: String,
     /// Observation time, e.g. `"Day 12 at 12:50Z"`.
     pub time: Option<String>,
     /// Report modifier, e.g. `"automated report"` or `"corrected report"`.
@@ -70,8 +76,20 @@ pub struct MetarDescription {
     pub temperature: Option<String>,
     /// Pressure setting, e.g. `"QNH 1015 hPa"`.
     pub pressure: Option<String>,
+    /// Runway Visual Range groups, one entry per runway.
+    pub runway_visual_range: Vec<String>,
     /// METAR trend (TEMPO / BECMG / NOSIG), if present.
     pub trend: Option<String>,
+    /// Military flight-condition color code, if present.
+    pub color_code: Option<String>,
+    /// Implicit BECMG forecast color code (second bare color code), if present.
+    pub color_code_forecast: Option<String>,
+    /// Sea state reported by an offshore station, if present.
+    pub sea_state: Option<String>,
+    /// Wind shear runway groups, one entry per `WS` group.
+    pub wind_shear: Vec<String>,
+    /// Runway state groups, one entry per runway.
+    pub runway_state: Vec<String>,
     /// Raw RMK section text, if present.
     pub remarks: Option<String>,
 }
@@ -165,6 +183,24 @@ impl fmt::Display for MetarDescription {
         }
         if let Some(ref v) = self.trend {
             writeln!(f, "  Trend:       {}", v)?;
+        }
+        if let Some(ref v) = self.color_code {
+            writeln!(f, "  Color code:  {}", v)?;
+        }
+        if let Some(ref v) = self.color_code_forecast {
+            writeln!(f, "  Color fcst:  {}", v)?;
+        }
+        if let Some(ref v) = self.sea_state {
+            writeln!(f, "  Sea state:   {}", v)?;
+        }
+        for ws in &self.wind_shear {
+            writeln!(f, "  Wind shear:  {}", ws)?;
+        }
+        for rvr in &self.runway_visual_range {
+            writeln!(f, "  RVR:         {}", rvr)?;
+        }
+        for rs in &self.runway_state {
+            writeln!(f, "  Runway:      {}", rs)?;
         }
         if let Some(ref v) = self.remarks {
             writeln!(f, "  Remarks:     {}", v)?;
@@ -359,6 +395,10 @@ fn describe_metar_with_locale<L: Locale>(metar: &Metar, locale: &L) -> MetarDesc
 
     MetarDescription {
         station: metar.station.clone(),
+        report_type: match metar.report_type {
+            MetarReportType::Metar => "METAR".to_string(),
+            MetarReportType::Speci => "SPECI".to_string(),
+        },
         time: metar
             .time
             .as_ref()
@@ -397,6 +437,23 @@ fn describe_metar_with_locale<L: Locale>(metar: &Metar, locale: &L) -> MetarDesc
                     .as_ref()
                     .map(|t| locale.metar_trend(t).to_string())
             }),
+        color_code: metar.color_code.as_ref().map(describe_military_color),
+        color_code_forecast: metar
+            .color_code_forecast
+            .as_ref()
+            .map(describe_military_color),
+        sea_state: metar.sea_state.as_ref().map(describe_sea_state),
+        wind_shear: metar
+            .wind_shear
+            .iter()
+            .map(describe_metar_wind_shear_runway)
+            .collect(),
+        runway_visual_range: metar.runway_visual_range.iter().map(describe_rvr).collect(),
+        runway_state: metar
+            .runway_state
+            .iter()
+            .map(describe_runway_state)
+            .collect(),
         remarks: describe_remarks(&metar.remarks),
     }
 }

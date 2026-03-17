@@ -77,7 +77,11 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
             && let Some(next) = iter.peek()
             && let Some(prevailing) = parse_split_statute_miles_to_meters(token, next)
         {
-            let vis = Visibility::Single { prevailing };
+            let vis = Visibility::Single {
+                prevailing,
+                qualifier: None,
+                ndv: false,
+            };
             visibility_context = Some(vis.clone());
             current.visibility = Some(vis);
             iter.next();
@@ -428,6 +432,7 @@ fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
 
     Metar {
         station: String::new(),
+        report_type: crate::metar::models::report_type::MetarReportType::default(),
         time: None,
         modifier: ReportModifier::Normal,
         wind: None,
@@ -442,6 +447,10 @@ fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
         runway_visual_range: Vec::new(),
         trend: None,
         trend_detail: None,
+        color_code: None,
+        color_code_forecast: None,
+        sea_state: None,
+        wind_shear: Vec::new(),
         unparsed_groups: Vec::new(),
         raw: String::new(),
     }

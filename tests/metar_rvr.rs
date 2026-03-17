@@ -1,5 +1,35 @@
 use metar_taf_parser::metar::models::rvr::{RvrQualifier, RvrTendency, RvrUnit};
-use metar_taf_parser::parse_metar;
+use metar_taf_parser::{Language, describe_metar, parse_metar};
+
+// ...existing code...
+
+#[test]
+fn describe_rvr_basic() {
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 R16/0800 FEW030 18/12 Q1015").unwrap();
+    let desc = describe_metar(&m, Language::En);
+    assert_eq!(desc.runway_visual_range.len(), 1);
+    let rvr = &desc.runway_visual_range[0];
+    assert!(rvr.contains("runway 16"), "{}", rvr);
+    assert!(rvr.contains("800 m"), "{}", rvr);
+}
+
+#[test]
+fn describe_rvr_with_tendency_and_qualifier() {
+    let m =
+        parse_metar("METAR LIRF 121250Z 18010KT 9999 R27/P1500V2000U FEW030 18/12 Q1015").unwrap();
+    let desc = describe_metar(&m, Language::En);
+    let rvr = &desc.runway_visual_range[0];
+    assert!(rvr.contains("more than 1500 m"), "{}", rvr);
+    assert!(rvr.contains("up to 2000 m"), "{}", rvr);
+    assert!(rvr.contains("increasing"), "{}", rvr);
+}
+
+#[test]
+fn describe_rvr_decreasing() {
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 R16/0500D FEW030 18/12 Q1015").unwrap();
+    let desc = describe_metar(&m, Language::En);
+    assert!(desc.runway_visual_range[0].contains("decreasing"));
+}
 
 #[test]
 fn parse_basic_rvr_group() {

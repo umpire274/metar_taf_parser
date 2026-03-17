@@ -23,7 +23,7 @@ PROB30 TEMPO 1220/1224 3000 TSRA BKN010";
 
     let vis = prob.visibility.as_ref().expect("visibility missing");
     match vis {
-        metar_taf_parser::metar::models::visibility::Visibility::Single { prevailing } => {
+        metar_taf_parser::metar::models::visibility::Visibility::Single { prevailing, .. } => {
             assert_eq!(*prevailing, 3000);
         }
         _ => panic!("unexpected visibility"),
