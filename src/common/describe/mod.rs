@@ -35,6 +35,7 @@ use crate::metar::models::metar::Metar;
 use crate::taf::models::forecast::TafForecast;
 use crate::taf::models::taf::Taf;
 use crate::taf::models::time::TafPeriod;
+use std::fmt;
 
 /// Supported output languages for natural language METAR/TAF descriptions.
 ///
@@ -113,6 +114,137 @@ pub struct TafDescription {
     pub modifier: Option<String>,
     /// Forecast blocks in order of appearance.
     pub forecasts: Vec<ForecastDescription>,
+}
+
+// ---------------------------------------------------------------------------
+// Display implementations
+// ---------------------------------------------------------------------------
+
+/// Formats a [`MetarDescription`] as a human-readable multi-line block.
+///
+/// Only fields that are present in the parsed message are included in the output.
+///
+/// # Example
+///
+/// ```rust
+/// use metar_taf_parser::{parse_metar, format_metar, Language};
+///
+/// let metar = parse_metar("LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
+/// println!("{}", format_metar(&metar, Language::En));
+/// ```
+impl fmt::Display for MetarDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "METAR {}", self.station)?;
+        if let Some(ref v) = self.time        { writeln!(f, "  Time:        {}", v)?; }
+        if let Some(ref v) = self.modifier    { writeln!(f, "  Status:      {}", v)?; }
+        if let Some(ref v) = self.wind        { writeln!(f, "  Wind:        {}", v)?; }
+        if let Some(ref v) = self.visibility  { writeln!(f, "  Visibility:  {}", v)?; }
+        for w in &self.weather                { writeln!(f, "  Weather:     {}", w)?; }
+        for c in &self.clouds                 { writeln!(f, "  Clouds:      {}", c)?; }
+        if let Some(ref v) = self.temperature { writeln!(f, "  Temperature: {}", v)?; }
+        if let Some(ref v) = self.pressure    { writeln!(f, "  Pressure:    {}", v)?; }
+        if let Some(ref v) = self.trend       { writeln!(f, "  Trend:       {}", v)?; }
+        if let Some(ref v) = self.remarks     { writeln!(f, "  Remarks:     {}", v)?; }
+        Ok(())
+    }
+}
+
+/// Formats a [`ForecastDescription`] as a human-readable indented block.
+///
+/// Only fields present in the forecast group are included.
+impl fmt::Display for ForecastDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "  [{}]", self.kind)?;
+        if let Some(ref p) = self.period      { write!(f, "  {}", p)?; }
+        if let Some(ref p) = self.probability { write!(f, "  ({})", p)?; }
+        writeln!(f)?;
+        if let Some(ref v) = self.wind        { writeln!(f, "    Wind:        {}", v)?; }
+        if let Some(ref v) = self.visibility  { writeln!(f, "    Visibility:  {}", v)?; }
+        for w in &self.weather                { writeln!(f, "    Weather:     {}", w)?; }
+        for c in &self.clouds                 { writeln!(f, "    Clouds:      {}", c)?; }
+        if let Some(ref v) = self.max_temperature { writeln!(f, "    Max temp:    {}", v)?; }
+        if let Some(ref v) = self.min_temperature { writeln!(f, "    Min temp:    {}", v)?; }
+        if let Some(ref v) = self.wind_shear  { writeln!(f, "    Wind shear:  {}", v)?; }
+        Ok(())
+    }
+}
+
+/// Formats a [`TafDescription`] as a human-readable multi-line block.
+///
+/// Includes header fields followed by each forecast block. Only present
+/// fields are printed.
+///
+/// # Example
+///
+/// ```rust
+/// use metar_taf_parser::{parse_taf, format_taf, Language};
+///
+/// let taf = parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020").unwrap();
+/// println!("{}", format_taf(&taf, Language::En));
+/// ```
+impl fmt::Display for TafDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "TAF {}", self.station)?;
+        if let Some(ref v) = self.issued_at { writeln!(f, "  Issued:    {}", v)?; }
+        if let Some(ref v) = self.validity  { writeln!(f, "  Validity:  {}", v)?; }
+        if let Some(ref v) = self.modifier  { writeln!(f, "  Status:    {}", v)?; }
+        for forecast in &self.forecasts     { write!(f, "{}", forecast)?; }
+        Ok(())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Convenience formatting functions
+// ---------------------------------------------------------------------------
+
+/// Describes and formats a parsed [`Metar`] as a complete human-readable text block.
+///
+/// Equivalent to `format!("{}", describe_metar(metar, lang))`.
+/// Only fields present in the parsed message are included.
+///
+/// # Arguments
+///
+/// * `metar` - Reference to the parsed METAR.
+/// * `lang`  - The desired output language.
+///
+/// # Example
+///
+/// ```rust
+/// use metar_taf_parser::{parse_metar, format_metar, Language};
+///
+/// let metar = parse_metar("LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
+/// let text = format_metar(&metar, Language::En);
+/// assert!(text.contains("METAR LIRF"));
+/// assert!(text.contains("Wind:"));
+/// assert!(text.contains("Pressure:"));
+/// ```
+pub fn format_metar(metar: &Metar, lang: Language) -> String {
+    format!("{}", describe_metar(metar, lang))
+}
+
+/// Describes and formats a parsed [`Taf`] as a complete human-readable text block.
+///
+/// Equivalent to `format!("{}", describe_taf(taf, lang))`.
+/// Includes the TAF header and all forecast blocks, printing only present fields.
+///
+/// # Arguments
+///
+/// * `taf`  - Reference to the parsed TAF.
+/// * `lang` - The desired output language.
+///
+/// # Example
+///
+/// ```rust
+/// use metar_taf_parser::{parse_taf, format_taf, Language};
+///
+/// let taf = parse_taf("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TEMPO 1218/1222 4000 -RA").unwrap();
+/// let text = format_taf(&taf, Language::En);
+/// assert!(text.contains("TAF LIRF"));
+/// assert!(text.contains("[Base forecast]"));
+/// assert!(text.contains("[Temporary]"));
+/// ```
+pub fn format_taf(taf: &Taf, lang: Language) -> String {
+    format!("{}", describe_taf(taf, lang))
 }
 
 /// Returns a natural language description of a parsed [`Metar`] report.
