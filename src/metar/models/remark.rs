@@ -2,6 +2,7 @@
 //!
 //! Defines the structured types used to represent parsed METAR remark (RMK) groups.
 
+use crate::metar::models::cloud::CloudAmount;
 use serde::Serialize;
 
 /// Indicates the type of automated station.
@@ -71,6 +72,30 @@ pub enum Remark {
     PressureFallingRapidly,
     /// Sensor status indicator, e.g. `RVRNO`, `PWINO`, `TSNO`, `VISNO`, `CHINO`.
     SensorStatus(String),
+    /// Cloud ceiling reported by an automated sensor where the cloud type (CB/TCU)
+    /// is not measurable. Appears in RMK as e.g. `OVC014///`, `BKN020///`.
+    ///
+    /// This is the standard ASOS/AWOS augmented cloud format used at automated stations.
+    CloudAugmentation {
+        /// Cloud coverage amount.
+        amount: CloudAmount,
+        /// Base altitude in feet.
+        base_ft: u16,
+    },
+    /// Wind observation from a named secondary sensor or anemometer.
+    ///
+    /// Appears in RMK as `WIND <sensor_id> <wind_group>`,
+    /// e.g. `WIND SKEID VRB01G22KT`.
+    WindAtSensor {
+        /// Identifier of the secondary sensor or reference station.
+        sensor_id: String,
+        /// Wind direction in degrees. `None` indicates variable direction (VRB).
+        direction: Option<u16>,
+        /// Wind speed in knots (or MPS, depending on originating source).
+        speed: u16,
+        /// Gust speed, if reported.
+        gust: Option<u16>,
+    },
 }
 
 /// The collection of parsed and unparsed remark groups for a METAR message.

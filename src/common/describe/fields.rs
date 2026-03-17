@@ -528,5 +528,34 @@ fn describe_remark(r: &Remark) -> String {
         Remark::PressureRisingRapidly => "pressure rising rapidly".to_string(),
         Remark::PressureFallingRapidly => "pressure falling rapidly".to_string(),
         Remark::SensorStatus(code) => format!("sensor not available ({})", code),
+        Remark::CloudAugmentation { amount, base_ft } => {
+            let amount_str = match amount {
+                CloudAmount::FEW => "few clouds",
+                CloudAmount::SCT => "scattered clouds",
+                CloudAmount::BKN => "broken clouds",
+                CloudAmount::OVC => "overcast",
+                _ => "clouds",
+            };
+            format!("{} at {} ft (type undeterminable)", amount_str, base_ft)
+        }
+        Remark::WindAtSensor {
+            sensor_id,
+            direction,
+            speed,
+            gust,
+        } => {
+            let dir_str = match direction {
+                None => "variable".to_string(),
+                Some(d) => format!("from {}°", d),
+            };
+            let base = format!(
+                "wind at sensor {} {} at {} kt",
+                sensor_id, dir_str, speed
+            );
+            match gust {
+                None => base,
+                Some(g) => format!("{}, gusting {} kt", base, g),
+            }
+        }
     }
 }
