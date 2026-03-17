@@ -1,6 +1,7 @@
 //! Module `mod`.
 //!
 //! Contains types and parsing logic implemented for this crate.
+pub mod describe;
 pub mod report_modifier;
 /// Exposes the `tokenizer` module.
 pub mod tokenizer;

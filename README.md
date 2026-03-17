@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.3.0`
+> ⚠️ **Status:** Active development – current version `0.4.0`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,7 +52,7 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.3.0"
+metar-taf-parser = "0.4.0"
 ```
 
 ### METAR example
@@ -105,6 +105,62 @@ let strict_result = parse_taf_strict(
 );
 
 assert!(strict_result.is_err());
+```
+
+### Natural language description (METAR)
+
+```rust
+use metar_taf_parser::{parse_metar, describe_metar, Language};
+
+let metar = parse_metar(
+    "LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015"
+)?;
+
+let desc = describe_metar(&metar, Language::En);
+
+println!("{}", desc.wind.unwrap());
+// "wind from 180° at 10 kt"
+
+println!("{}", desc.visibility.unwrap());
+// "visibility greater than 10 km"
+
+println!("{}", desc.clouds[0]);
+// "few clouds at 3000 ft"
+
+println!("{}", desc.temperature.unwrap());
+// "temperature 18°C, dew point 12°C"
+
+println!("{}", desc.pressure.unwrap());
+// "QNH 1015 hPa"
+```
+
+### Natural language description (TAF)
+
+```rust
+use metar_taf_parser::{parse_taf, describe_taf, Language};
+
+let taf = parse_taf(
+    "TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 TX18/1214Z TN08/1304Z TEMPO 1218/1222 4000 -RA"
+)?;
+
+let desc = describe_taf(&taf, Language::En);
+
+println!("{}", desc.validity.unwrap());
+// "12/12Z to 13/18Z"
+
+for forecast in &desc.forecasts {
+    println!("[{}]", forecast.kind);
+    if let Some(wind) = &forecast.wind { println!("  {}", wind); }
+    if let Some(vis)  = &forecast.visibility { println!("  {}", vis); }
+    for cloud in &forecast.clouds { println!("  {}", cloud); }
+}
+// [Base forecast]
+//   wind from 180° at 10 kt
+//   visibility greater than 10 km
+//   scattered clouds at 2000 ft
+// [Temporary]
+//   visibility 4000 m
+//   light rain
 ```
 
 ### Typical parser use cases
