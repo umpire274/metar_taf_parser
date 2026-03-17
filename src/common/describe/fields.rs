@@ -548,10 +548,7 @@ fn describe_remark(r: &Remark) -> String {
                 None => "variable".to_string(),
                 Some(d) => format!("from {}°", d),
             };
-            let base = format!(
-                "wind at sensor {} {} at {} kt",
-                sensor_id, dir_str, speed
-            );
+            let base = format!("wind at sensor {} {} at {} kt", sensor_id, dir_str, speed);
             match gust {
                 None => base,
                 Some(g) => format!("{}, gusting {} kt", base, g),

@@ -1,7 +1,7 @@
-use metar_taf_parser::metar::models::remark::{AutoStationKind, LightningType, Remark};
 use metar_taf_parser::metar::models::cloud::CloudAmount;
-use metar_taf_parser::{Language, describe_metar};
+use metar_taf_parser::metar::models::remark::{AutoStationKind, LightningType, Remark};
 use metar_taf_parser::parse_metar;
+use metar_taf_parser::{Language, describe_metar};
 
 // ---------------------------------------------------------------------------
 // AutoStation
@@ -301,10 +301,7 @@ fn no_rmk_section_gives_empty_remarks() {
 #[test]
 fn remark_ovc_cloud_augmentation_parsed() {
     // RMK OVC014/// — overcast a 1400 ft, tipo non determinabile
-    let m = parse_metar(
-        "ENGM 121250Z 18010KT 9999 OVC020 18/12 Q1015 RMK OVC014///",
-    )
-    .unwrap();
+    let m = parse_metar("ENGM 121250Z 18010KT 9999 OVC020 18/12 Q1015 RMK OVC014///").unwrap();
     assert!(
         matches!(
             m.remarks.items[0],
@@ -320,10 +317,7 @@ fn remark_ovc_cloud_augmentation_parsed() {
 
 #[test]
 fn remark_bkn_cloud_augmentation_parsed() {
-    let m = parse_metar(
-        "ENGM 121250Z 18010KT 9999 BKN020 18/12 Q1015 RMK BKN020///",
-    )
-    .unwrap();
+    let m = parse_metar("ENGM 121250Z 18010KT 9999 BKN020 18/12 Q1015 RMK BKN020///").unwrap();
     assert!(matches!(
         m.remarks.items[0],
         Remark::CloudAugmentation {
@@ -335,10 +329,7 @@ fn remark_bkn_cloud_augmentation_parsed() {
 
 #[test]
 fn remark_few_cloud_augmentation_parsed() {
-    let m = parse_metar(
-        "ENGM 121250Z 18010KT 9999 FEW030 18/12 Q1015 RMK FEW030///",
-    )
-    .unwrap();
+    let m = parse_metar("ENGM 121250Z 18010KT 9999 FEW030 18/12 Q1015 RMK FEW030///").unwrap();
     assert!(matches!(
         m.remarks.items[0],
         Remark::CloudAugmentation {
@@ -351,10 +342,7 @@ fn remark_few_cloud_augmentation_parsed() {
 #[test]
 fn remark_cloud_augmentation_not_confused_with_normal_cloud() {
     // Nel corpo del METAR OVC014CB è un cloud normale; dopo RMK OVC014/// è augmentation
-    let m = parse_metar(
-        "ENGM 121250Z 18010KT 9999 OVC014CB 18/12 Q1015 RMK OVC014///",
-    )
-    .unwrap();
+    let m = parse_metar("ENGM 121250Z 18010KT 9999 OVC014CB 18/12 Q1015 RMK OVC014///").unwrap();
     // Il cloud nel corpo rimane intatto
     assert_eq!(m.clouds[0].amount, CloudAmount::OVC);
     // Nel RMK viene riconosciuta la CloudAugmentation
@@ -367,10 +355,7 @@ fn remark_cloud_augmentation_not_confused_with_normal_cloud() {
 #[test]
 fn remark_cloud_augmentation_not_parsed_without_triple_slash() {
     // OVC014CB NON è una CloudAugmentation: finisce in unparsed
-    let m = parse_metar(
-        "ENGM 121250Z 18010KT 9999 FEW030 18/12 Q1015 RMK OVC014CB",
-    )
-    .unwrap();
+    let m = parse_metar("ENGM 121250Z 18010KT 9999 FEW030 18/12 Q1015 RMK OVC014CB").unwrap();
     assert!(m.remarks.items.is_empty());
     assert!(m.remarks.unparsed.contains(&"OVC014CB".to_string()));
 }
@@ -413,10 +398,8 @@ fn remark_wind_at_sensor_vrb_parsed() {
 #[test]
 fn remark_wind_at_sensor_fixed_direction() {
     // WIND LOCREF 18010KT — vento fisso a 180° 10 kt
-    let m = parse_metar(
-        "ENBR 121250Z 18010KT 9999 FEW030 10/08 Q1013 RMK WIND LOCREF 18010KT",
-    )
-    .unwrap();
+    let m = parse_metar("ENBR 121250Z 18010KT 9999 FEW030 10/08 Q1013 RMK WIND LOCREF 18010KT")
+        .unwrap();
     match &m.remarks.items[0] {
         Remark::WindAtSensor {
             sensor_id,
@@ -436,12 +419,15 @@ fn remark_wind_at_sensor_fixed_direction() {
 #[test]
 fn remark_wind_at_sensor_with_gust_fixed_direction() {
     // WIND ANEMREF 24015G25KT
-    let m = parse_metar(
-        "ENBR 121250Z 18010KT 9999 FEW030 10/08 Q1013 RMK WIND ANEMREF 24015G25KT",
-    )
-    .unwrap();
+    let m = parse_metar("ENBR 121250Z 18010KT 9999 FEW030 10/08 Q1013 RMK WIND ANEMREF 24015G25KT")
+        .unwrap();
     match &m.remarks.items[0] {
-        Remark::WindAtSensor { direction, speed, gust, .. } => {
+        Remark::WindAtSensor {
+            direction,
+            speed,
+            gust,
+            ..
+        } => {
             assert_eq!(*direction, Some(240));
             assert_eq!(*speed, 15);
             assert_eq!(*gust, Some(25));
@@ -453,10 +439,8 @@ fn remark_wind_at_sensor_with_gust_fixed_direction() {
 #[test]
 fn remark_wind_at_sensor_invalid_wind_falls_to_unparsed() {
     // Se il token vento è malformato, WIND non viene riconosciuto e i token finiscono in unparsed
-    let m = parse_metar(
-        "ENBR 121250Z 18010KT 9999 FEW030 10/08 Q1013 RMK WIND SKEID INVALID",
-    )
-    .unwrap();
+    let m =
+        parse_metar("ENBR 121250Z 18010KT 9999 FEW030 10/08 Q1013 RMK WIND SKEID INVALID").unwrap();
     assert!(m.remarks.items.is_empty());
     assert!(m.remarks.unparsed.contains(&"WIND".to_string()));
 }
@@ -467,10 +451,7 @@ fn remark_wind_at_sensor_invalid_wind_falls_to_unparsed() {
 
 #[test]
 fn describe_cloud_augmentation() {
-    let m = parse_metar(
-        "ENGM 121250Z 18010KT 9999 OVC020 18/12 Q1015 RMK OVC014///",
-    )
-    .unwrap();
+    let m = parse_metar("ENGM 121250Z 18010KT 9999 OVC020 18/12 Q1015 RMK OVC014///").unwrap();
     let desc = describe_metar(&m, Language::En);
     let rmk = desc.remarks.as_ref().expect("remarks should be described");
     assert!(rmk.contains("overcast"), "deve contenere 'overcast': {rmk}");
@@ -483,10 +464,8 @@ fn describe_cloud_augmentation() {
 
 #[test]
 fn describe_wind_at_sensor() {
-    let m = parse_metar(
-        "ENBR 121250Z 18010KT 9999 OVC020 10/08 Q1013 RMK WIND SKEID VRB01G22KT",
-    )
-    .unwrap();
+    let m = parse_metar("ENBR 121250Z 18010KT 9999 OVC020 10/08 Q1013 RMK WIND SKEID VRB01G22KT")
+        .unwrap();
     let desc = describe_metar(&m, Language::En);
     let rmk = desc.remarks.as_ref().expect("remarks should be described");
     assert!(rmk.contains("SKEID"), "deve contenere 'SKEID': {rmk}");

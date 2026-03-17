@@ -400,4 +400,3 @@ fn parse_speed_gust(s: &str) -> Option<(u16, Option<u16>)> {
         Some((speed, None))
     }
 }
-
