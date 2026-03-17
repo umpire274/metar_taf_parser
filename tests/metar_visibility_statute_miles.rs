@@ -10,7 +10,7 @@ fn metar_visibility_statute_miles_single_token() {
     let visibility = metar.visibility.expect("visibility missing");
 
     match visibility {
-        Visibility::Single { prevailing } => {
+        Visibility::Single { prevailing, .. } => {
             assert_eq!(prevailing, 16093);
         }
         _ => panic!("unexpected visibility variant"),
@@ -26,7 +26,7 @@ fn metar_visibility_statute_miles_split_token() {
     let visibility = metar.visibility.expect("visibility missing");
 
     match visibility {
-        Visibility::Single { prevailing } => {
+        Visibility::Single { prevailing, .. } => {
             assert_eq!(prevailing, 2414);
         }
         _ => panic!("unexpected visibility variant"),
@@ -42,7 +42,7 @@ fn metar_visibility_statute_miles_prefixed_token() {
     let visibility = metar.visibility.expect("visibility missing");
 
     match visibility {
-        Visibility::Single { prevailing } => {
+        Visibility::Single { prevailing, .. } => {
             assert_eq!(prevailing, 9656);
         }
         _ => panic!("unexpected visibility variant"),

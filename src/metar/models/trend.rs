@@ -4,6 +4,7 @@
 use serde::Serialize;
 
 use crate::metar::models::cloud::CloudLayer;
+use crate::metar::models::color_code::MilitaryColor;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::models::weather::Weather;
 use crate::metar::models::wind::Wind;
@@ -41,6 +42,8 @@ pub struct MetarTrendDetail {
     pub visibility: Option<Visibility>,
     pub weather: Vec<Weather>,
     pub clouds: Vec<CloudLayer>,
+    /// Military color code carried by this trend block, if present.
+    pub color_code: Option<MilitaryColor>,
     pub raw_tokens: Vec<String>,
     pub unparsed_groups: Vec<String>,
 }

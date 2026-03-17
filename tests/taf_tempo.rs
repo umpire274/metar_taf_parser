@@ -23,7 +23,7 @@ TEMPO 1220/1222 4000 -RA BKN015";
     let vis = tempo.visibility.as_ref().expect("visibility missing");
     // 4000 metri
     match vis {
-        metar_taf_parser::metar::models::visibility::Visibility::Single { prevailing } => {
+        metar_taf_parser::metar::models::visibility::Visibility::Single { prevailing, .. } => {
             assert_eq!(*prevailing, 4000);
         }
         _ => panic!("unexpected visibility type"),

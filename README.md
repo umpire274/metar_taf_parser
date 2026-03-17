@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.4.3`
+> ⚠️ **Status:** Active development – current version `0.4.5`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,7 +52,7 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.4.3"
+metar-taf-parser = "0.4.5"
 ```
 
 ### METAR example
@@ -300,6 +300,73 @@ assert_eq!(fc.icing[0].base_ft, 3000);
 // Turbulence: 5 + intensity=2(ModerateInCloud) + base=080(8000 ft) + thickness=3(3000 ft)
 assert_eq!(fc.turbulence[0].intensity, TurbulenceIntensity::ModerateInCloud);
 assert_eq!(fc.turbulence[0].base_ft, 8000);
+```
+
+---
+
+### SPECI (special observation)
+
+The parser recognises `SPECI` as an optional leading token alongside `METAR`.
+The report type is stored in `metar.report_type` and reflected in `MetarDescription::report_type`.
+
+```rust
+use metar_taf_parser::parse_metar;
+use metar_taf_parser::metar::models::report_type::MetarReportType;
+
+let m = parse_metar("SPECI EGLL 121250Z 24015KT 0800 FG VV002 08/07 Q1008")?;
+assert_eq!(m.report_type, MetarReportType::Speci);
+```
+
+---
+
+### Military color code (NATO/UK MIL-METAR)
+
+Military airfield METARs carry a NATO color state (`BLU`, `WHT`, `GRN`, `YLO`, `AMB`, `RED`).
+A `BLACK` variant (`BLU+`, etc.) indicates the field is closed for that state.
+A second bare color code token is treated as the implicit BECMG forecast state.
+
+```rust
+use metar_taf_parser::parse_metar;
+use metar_taf_parser::metar::models::color_code::{MilitaryColor, MilitaryColorCode};
+
+let m = parse_metar("METAR EGVN 120930Z 25010KT 7000 BKN020 15/10 Q1013 GRN WHT")?;
+assert_eq!(m.color_code.as_ref().map(|c| &c.code), Some(&MilitaryColorCode::Grn));
+assert_eq!(m.color_code_forecast.as_ref().map(|c| &c.code), Some(&MilitaryColorCode::Wht));
+```
+
+---
+
+### Sea state (offshore stations)
+
+Offshore and ship stations report water temperature and wave state using `W<TT>/S<n>` or
+`W<TT>/H<hh>` tokens. The optional `M` prefix encodes negative temperatures.
+
+```rust
+use metar_taf_parser::parse_metar;
+use metar_taf_parser::metar::models::sea_state::WaveHeightKind;
+
+let m = parse_metar("METAR EKCH 120930Z 25010KT 9999 FEW020 12/08 Q1013 W12/S8")?;
+let ss = m.sea_state.unwrap();
+assert_eq!(ss.water_temperature, Some(12));
+assert_eq!(ss.wave_kind, WaveHeightKind::StateCode);
+assert_eq!(ss.wave_value, Some(8));
+```
+
+---
+
+### Wind shear on runways (METAR)
+
+The `WS R<rwy>` and `WS ALL RWY` groups are parsed into a typed `Vec` on the `Metar` struct.
+
+```rust
+use metar_taf_parser::parse_metar;
+use metar_taf_parser::metar::models::wind_shear::MetarWindShearRunway;
+
+let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY")?;
+assert_eq!(m.wind_shear[0], MetarWindShearRunway::AllRunways);
+
+let m2 = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23")?;
+assert_eq!(m2.wind_shear[0], MetarWindShearRunway::Runway("23".to_string()));
 ```
 
 ---

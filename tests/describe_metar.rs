@@ -245,3 +245,35 @@ fn describe_metar_remarks_preserved() {
     let rmk = desc.remarks.unwrap();
     assert!(rmk.contains("AO2"), "expected RMK text in: {}", rmk);
 }
+
+#[test]
+fn describe_metar_runway_state_included() {
+    let metar =
+        parse_metar("METAR UOOO 191400Z 00000MPS CAVOK M28/M31 Q1020 R19/450235 NOSIG")
+            .unwrap();
+    let desc = describe_metar(&metar, Language::En);
+
+    assert_eq!(desc.runway_state.len(), 1);
+    let rs = &desc.runway_state[0];
+    assert!(rs.contains("runway 19"), "expected designator in: {}", rs);
+    assert!(rs.contains("dry snow"), "expected deposit type in: {}", rs);
+    assert!(rs.contains("26–50%"), "expected coverage in: {}", rs);
+}
+
+#[test]
+fn describe_metar_runway_state_in_display() {
+    let metar =
+        parse_metar("METAR UOOO 191400Z 00000MPS CAVOK M28/M31 Q1020 R19/450235 NOSIG")
+            .unwrap();
+    let text = metar_taf_parser::format_metar(&metar, Language::En);
+    assert!(text.contains("Runway:"), "expected Runway line in:\n{}", text);
+    assert!(text.contains("runway 19"), "expected designator in:\n{}", text);
+}
+
+#[test]
+fn describe_metar_no_runway_state_when_absent() {
+    let metar = parse_metar("LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
+    let desc = describe_metar(&metar, Language::En);
+    assert!(desc.runway_state.is_empty());
+}
+

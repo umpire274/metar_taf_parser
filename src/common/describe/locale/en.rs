@@ -22,6 +22,8 @@ impl Locale for En {
             CloudAmount::NSC => "no significant clouds",
             CloudAmount::SKC => "sky clear",
             CloudAmount::VV => "vertical visibility",
+            CloudAmount::NCD => "no clouds detected",
+            CloudAmount::CLR => "no cloud below 12,000 ft",
         }
     }
 
@@ -36,6 +38,7 @@ impl Locale for En {
         match unit {
             WindUnit::KT => "kt",
             WindUnit::MPS => "m/s",
+            WindUnit::MPH => "mph",
         }
     }
 
@@ -44,6 +47,7 @@ impl Locale for En {
             WeatherIntensity::Light => "light",
             WeatherIntensity::Moderate => "moderate",
             WeatherIntensity::Heavy => "heavy",
+            WeatherIntensity::Recent => "recent",
         }
     }
 
@@ -69,10 +73,23 @@ impl Locale for En {
             WeatherPhenomenon::Thunder => "thunderstorm".to_string(),
             WeatherPhenomenon::Fog => "fog".to_string(),
             WeatherPhenomenon::Mist => "mist".to_string(),
+            WeatherPhenomenon::Haze => "haze".to_string(),
+            WeatherPhenomenon::Smoke => "smoke".to_string(),
             WeatherPhenomenon::Hail => "hail".to_string(),
             WeatherPhenomenon::SmallHail => "small hail".to_string(),
             WeatherPhenomenon::IcePellets => "ice pellets".to_string(),
+            WeatherPhenomenon::IceCrystals => "ice crystals".to_string(),
             WeatherPhenomenon::SnowGrains => "snow grains".to_string(),
+            WeatherPhenomenon::SandWhirls => "sand whirls".to_string(),
+            WeatherPhenomenon::Squalls => "squalls".to_string(),
+            WeatherPhenomenon::FunnelCloud => "funnel cloud".to_string(),
+            WeatherPhenomenon::Sand => "sand".to_string(),
+            WeatherPhenomenon::Dust => "widespread dust".to_string(),
+            WeatherPhenomenon::DustStorm => "dust storm".to_string(),
+            WeatherPhenomenon::SandStorm => "sand storm".to_string(),
+            WeatherPhenomenon::Spray => "spray".to_string(),
+            WeatherPhenomenon::VolcanicAsh => "volcanic ash".to_string(),
+            WeatherPhenomenon::UnknownPrecipitation => "unknown precipitation".to_string(),
             WeatherPhenomenon::NoSignificantWeather => "no significant weather".to_string(),
             WeatherPhenomenon::Unknown(code) => format!("unknown weather ({})", code),
         }

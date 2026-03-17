@@ -24,6 +24,20 @@ pub fn parse_cloud(token: &str) -> Option<CloudLayer> {
                 cloud_type: None,
             });
         }
+        "NCD" => {
+            return Some(CloudLayer {
+                amount: CloudAmount::NCD,
+                altitude_ft: None,
+                cloud_type: None,
+            });
+        }
+        "CLR" => {
+            return Some(CloudLayer {
+                amount: CloudAmount::CLR,
+                altitude_ft: None,
+                cloud_type: None,
+            });
+        }
         _ => {}
     }
 
@@ -59,7 +73,7 @@ pub fn parse_cloud(token: &str) -> Option<CloudLayer> {
         });
     }
 
-    if rest.len() != 3 && rest.len() != 5 {
+    if rest.len() != 3 && rest.len() != 5 && rest.len() != 6 {
         return None;
     }
 
@@ -68,6 +82,8 @@ pub fn parse_cloud(token: &str) -> Option<CloudLayer> {
         Some("") | None => None,
         Some("CB") => Some(CloudType::CB),
         Some("TCU") => Some(CloudType::TCU),
+        // "///" means cloud type not measurable — treat as no type
+        Some("///") => None,
         _ => return None,
     };
 

@@ -21,6 +21,10 @@ pub enum CloudAmount {
     NSC,
     SKC,
     VV,
+    /// No clouds detected — reported by automatic weather stations.
+    NCD,
+    /// No cloud detected below 12,000 ft — reported by automatic weather stations.
+    CLR,
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]

@@ -8,6 +8,8 @@ use serde::Serialize;
 pub enum WindUnit {
     KT,
     MPS,
+    /// Miles per hour (rare, used in some North American feeds).
+    MPH,
 }
 
 /// Variable wind direction range reported alongside the main wind group.
@@ -25,18 +27,22 @@ pub struct WindVariation {
 #[derive(Debug, Clone, PartialEq, Serialize)]
 /// Stores parsed wind-related values for Wind.
 pub struct Wind {
-    /// Wind direction in degrees, None for VRB
+    /// Wind direction in degrees, None for VRB or when indeterminate.
     pub direction: Option<u16>,
 
-    /// Wind speed in the given unit
+    /// Wind speed in the given unit. Zero when indeterminate.
     pub speed: u16,
 
-    /// Gust speed in the given unit
+    /// Gust speed in the given unit.
     pub gust: Option<u16>,
 
-    /// Unit of measure (KT or MPS)
+    /// Unit of measure (KT, MPS or MPH).
     pub unit: WindUnit,
 
     /// Variable wind direction range, when reported (e.g. `180V240`).
     pub variation: Option<WindVariation>,
+
+    /// `true` when the group `/////KT` is received, meaning both direction
+    /// and speed cannot be determined.
+    pub indeterminate: bool,
 }

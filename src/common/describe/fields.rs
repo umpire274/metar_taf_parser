@@ -2,12 +2,17 @@
 
 use crate::common::describe::locale::Locale;
 use crate::metar::models::cloud::{CloudAmount, CloudLayer};
+use crate::metar::models::color_code::{MilitaryColor, MilitaryColorCode};
 use crate::metar::models::pressure::Pressure;
 use crate::metar::models::remark::{AutoStationKind, LightningType, Remark, Remarks};
+use crate::metar::models::runway_state::RunwayState;
+use crate::metar::models::rvr::{RunwayVisualRange, RvrQualifier, RvrTendency, RvrUnit};
+use crate::metar::models::sea_state::{SeaState, WaveHeightKind};
 use crate::metar::models::trend::MetarTrendDetail;
-use crate::metar::models::visibility::Visibility;
+use crate::metar::models::visibility::{Visibility, VisibilityQualifier};
 use crate::metar::models::weather::Weather;
 use crate::metar::models::wind::Wind;
+use crate::metar::models::wind_shear::MetarWindShearRunway;
 use crate::taf::models::icing::{Icing, IcingIntensity};
 use crate::taf::models::turbulence::{Turbulence, TurbulenceIntensity};
 use crate::taf::models::wind_shear::TafWindShear;
@@ -18,6 +23,10 @@ use crate::taf::models::wind_shear::TafWindShear;
 /// `"wind from variable direction at 5 kt, gusting 15 kt"`, or
 /// `"wind from 200° at 8 kt, variable 180 to 240°"`.
 pub fn describe_wind<L: Locale>(wind: &Wind, locale: &L) -> String {
+    if wind.indeterminate {
+        return "wind direction and speed not available".to_string();
+    }
+
     let dir = match wind.direction {
         None => "variable direction".to_string(),
         Some(d) => format!("{}°", d),
@@ -40,22 +49,34 @@ pub fn describe_wind<L: Locale>(wind: &Wind, locale: &L) -> String {
 
 /// Describes a visibility group in natural language.
 ///
-/// Handles CAVOK, prevailing visibility in metres, and directional minimum visibility.
+/// Handles CAVOK, prevailing visibility in metres (with optional NDV and
+/// above/below qualifiers), statute-mile groups, and directional minimums.
 pub fn describe_visibility<L: Locale>(vis: &Visibility, locale: &L) -> String {
     match vis {
         Visibility::CAVOK => "CAVOK (ceiling and visibility OK)".to_string(),
-        Visibility::Single { prevailing } => {
-            if *prevailing >= 9999 {
-                "visibility greater than 10 km".to_string()
+        Visibility::Single { prevailing, qualifier, ndv } => {
+            let base = match qualifier {
+                None => {
+                    if *prevailing >= 9999 {
+                        "visibility greater than 10 km".to_string()
+                    } else {
+                        format!("visibility {} m", prevailing)
+                    }
+                }
+                Some(VisibilityQualifier::Above) => {
+                    format!("visibility more than {} m", prevailing)
+                }
+                Some(VisibilityQualifier::Below) => {
+                    format!("visibility less than {} m", prevailing)
+                }
+            };
+            if *ndv {
+                format!("{} (no directional variation)", base)
             } else {
-                format!("visibility {} m", prevailing)
+                base
             }
         }
-        Visibility::WithMinimum {
-            prevailing,
-            minimum,
-            direction,
-        } => {
+        Visibility::WithMinimum { prevailing, minimum, direction } => {
             let dir = locale.visibility_direction(direction);
             format!(
                 "visibility {} m, minimum {} m to the {}",
@@ -73,6 +94,8 @@ pub fn describe_cloud<L: Locale>(cloud: &CloudLayer, locale: &L) -> String {
     match &cloud.amount {
         CloudAmount::NSC => "no significant clouds".to_string(),
         CloudAmount::SKC => "sky clear".to_string(),
+        CloudAmount::NCD => "no clouds detected".to_string(),
+        CloudAmount::CLR => "no cloud below 12,000 ft".to_string(),
         CloudAmount::VV => match cloud.altitude_ft {
             None => "vertical visibility not available".to_string(),
             Some(f) => format!("vertical visibility {} ft", f),
@@ -123,6 +146,30 @@ pub fn describe_pressure(pressure: &Pressure) -> String {
     }
 }
 
+/// Describes a military flight-condition color code in natural language.
+///
+/// When `black` is `true`, the description is prefixed with `"closed field"`.
+///
+/// # Examples
+///
+/// `GRN` → `"Green (GRN)"`
+/// `BLACKAMB` → `"closed field – Amber (AMB)"`
+pub fn describe_military_color(color: &MilitaryColor) -> String {
+    let label = match color.code {
+        MilitaryColorCode::Blu => "Blue (BLU)",
+        MilitaryColorCode::Wht => "White (WHT)",
+        MilitaryColorCode::Grn => "Green (GRN)",
+        MilitaryColorCode::Ylo => "Yellow (YLO)",
+        MilitaryColorCode::Amb => "Amber (AMB)",
+        MilitaryColorCode::Red => "Red (RED)",
+    };
+    if color.black {
+        format!("closed field – {}", label)
+    } else {
+        label.to_string()
+    }
+}
+
 /// Describes a METAR trend detail (TEMPO, BECMG, NOSIG) in natural language.
 pub fn describe_trend_detail<L: Locale>(detail: &MetarTrendDetail, locale: &L) -> String {
     let kind = locale.metar_trend(&detail.kind);
@@ -146,7 +193,149 @@ pub fn describe_trend_detail<L: Locale>(detail: &MetarTrendDetail, locale: &L) -
         parts.push(describe_cloud(c, locale));
     }
 
+    if let Some(color) = &detail.color_code {
+        parts.push(describe_military_color(color));
+    }
+
     parts.join(", ")
+}
+
+/// Describes a Runway Visual Range group in natural language.
+///
+/// Example outputs:
+/// - `"RVR runway 23: 500 m"`
+/// - `"RVR runway 23: more than 1500 m, up to 2000 m (increasing)"`
+pub fn describe_rvr(rvr: &RunwayVisualRange) -> String {
+    let unit = match rvr.unit {
+        RvrUnit::Meters => "m",
+        RvrUnit::Feet => "ft",
+    };
+
+    let fmt_value = |v: &crate::metar::models::rvr::RvrValue| -> String {
+        match &v.qualifier {
+            None => format!("{} {}", v.value, unit),
+            Some(RvrQualifier::Above) => format!("more than {} {}", v.value, unit),
+            Some(RvrQualifier::Below) => format!("less than {} {}", v.value, unit),
+        }
+    };
+
+    let range = match &rvr.max {
+        None => fmt_value(&rvr.min),
+        Some(max) => format!("{}, up to {}", fmt_value(&rvr.min), fmt_value(max)),
+    };
+
+    let tendency = match &rvr.tendency {
+        None => String::new(),
+        Some(RvrTendency::Upward) => " (increasing)".to_string(),
+        Some(RvrTendency::Downward) => " (decreasing)".to_string(),
+        Some(RvrTendency::NoChange) => " (no change)".to_string(),
+    };
+
+    format!("RVR runway {}: {}{}", rvr.runway_designator, range, tendency)
+}
+
+/// Describes a runway state group in natural language.
+///
+/// Produces output such as
+/// `"runway 19: dry snow, coverage 26–50%, thickness 2 mm, braking action 35"`.
+/// For `R/SNOCLO` returns `"airfield closed due to snow/ice"`.
+///
+/// ICAO codes are translated to human-readable labels where defined; raw values
+/// are shown for reserved or unknown codes.
+pub fn describe_runway_state(rs: &RunwayState) -> String {
+    if rs.snoclo {
+        return "airfield closed due to snow/ice (SNOCLO)".to_string();
+    }
+
+    let deposit = rs.deposit_type.map(deposit_type_label).unwrap_or("not reported");
+    let coverage = rs.coverage.map(coverage_label).unwrap_or("not reported");
+
+    let mut parts = vec![
+        format!("runway {}", rs.runway_designator),
+        format!("deposit: {}", deposit),
+        format!("coverage: {}", coverage),
+    ];
+
+    match rs.thickness.as_deref() {
+        None => parts.push("thickness: not reported".to_string()),
+        Some(v) => parts.push(format!("thickness: {}", thickness_label(v))),
+    }
+
+    match rs.braking_action.as_deref() {
+        None => parts.push("braking: not reported".to_string()),
+        Some(v) => parts.push(format!("braking: {}", braking_label(v))),
+    }
+
+    parts.join(", ")
+}
+
+fn deposit_type_label(code: u8) -> &'static str {
+    match code {
+        0 => "clear and dry",
+        1 => "damp",
+        2 => "wet or water patches",
+        3 => "rime or frost covered",
+        4 => "dry snow",
+        5 => "wet snow",
+        6 => "slush",
+        7 => "ice",
+        8 => "compacted or rolled snow",
+        9 => "frozen ruts or ridges",
+        _ => "unknown deposit",
+    }
+}
+
+fn coverage_label(code: u8) -> &'static str {
+    match code {
+        1 => "10% or less",
+        2 => "11–25%",
+        5 => "26–50%",
+        9 => "51–100%",
+        _ => "unknown coverage",
+    }
+}
+
+fn thickness_label(code: &str) -> String {
+    match code {
+        "00" => "less than 1 mm".to_string(),
+        "99" => "closed".to_string(),
+        v => {
+            if let Ok(n) = v.parse::<u8>() {
+                match n {
+                    92 => "10 cm".to_string(),
+                    93 => "15 cm".to_string(),
+                    94 => "20 cm".to_string(),
+                    95 => "25 cm".to_string(),
+                    96 => "30 cm".to_string(),
+                    97 => "35 cm".to_string(),
+                    98 => "40 cm or more".to_string(),
+                    mm => format!("{} mm", mm),
+                }
+            } else {
+                v.to_string()
+            }
+        }
+    }
+}
+
+fn braking_label(code: &str) -> String {
+    match code {
+        "91" => "poor".to_string(),
+        "92" => "medium/poor".to_string(),
+        "93" => "medium".to_string(),
+        "94" => "medium/good".to_string(),
+        "95" => "good".to_string(),
+        "99" => "figures unreliable".to_string(),
+        v => {
+            // Values 28–75 are friction coefficients (/100)
+            if let Ok(n) = v.parse::<u8>() {
+                if n <= 75 {
+                    return format!("µ = {:.2}", f32::from(n) / 100.0);
+                }
+            }
+            v.to_string()
+        }
+    }
 }
 
 /// Describes a TAF wind shear group in natural language.
@@ -195,6 +384,41 @@ pub fn describe_turbulence(turb: &Turbulence) -> String {
         "{} from {} ft, depth {} ft",
         intensity, turb.base_ft, turb.thickness_ft
     )
+}
+
+/// Describes a sea state group in natural language.
+///
+/// Example outputs:
+/// - `"sea water 12°C, wave state 8 (WMO code)"`
+/// - `"sea water -2°C, significant wave height 15 dm"`
+/// - `"sea water temperature not available, wave state not available"`
+pub fn describe_sea_state(ss: &SeaState) -> String {
+    let temp = match ss.water_temperature {
+        Some(t) => format!("sea water {}°C", t),
+        None => "sea water temperature not available".to_string(),
+    };
+
+    let wave = match ss.wave_value {
+        None => "wave state not available".to_string(),
+        Some(v) => match ss.wave_kind {
+            WaveHeightKind::StateCode => format!("wave state {} (WMO code)", v),
+            WaveHeightKind::HeightDm => format!("significant wave height {} dm", v),
+        },
+    };
+
+    format!("{}, {}", temp, wave)
+}
+
+/// Describes a METAR wind shear runway group in natural language.
+///
+/// Example outputs:
+/// - `"wind shear on runway 23"`
+/// - `"wind shear on all runways"`
+pub fn describe_metar_wind_shear_runway(ws: &MetarWindShearRunway) -> String {
+    match ws {
+        MetarWindShearRunway::Runway(rwy) => format!("wind shear on runway {}", rwy),
+        MetarWindShearRunway::AllRunways => "wind shear on all runways".to_string(),
+    }
 }
 
 /// Produces a human-readable summary of the RMK section.

@@ -5,18 +5,22 @@ use crate::common::report_modifier::ReportModifier;
 use crate::common::tokenizer::Tokenizer;
 use crate::metar::errors::MetarError;
 use crate::metar::models::Metar;
+use crate::metar::models::report_type::MetarReportType;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::parser::cloud::parse_cloud;
+use crate::metar::parser::color_code::parse_color_code;
 use crate::metar::parser::pressure::parse_pressure;
 use crate::metar::parser::rmk::parse_rmk;
 use crate::metar::parser::runway_state::parse_runway_state;
 use crate::metar::parser::rvr::parse_rvr;
+use crate::metar::parser::sea_state::parse_sea_state;
 use crate::metar::parser::temperature::parse_temperature;
 use crate::metar::parser::time::parse_time;
 use crate::metar::parser::trend::{parse_trend, parse_trend_detail};
 use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::{parse_wind, parse_wind_variation};
+use crate::metar::parser::wind_shear::parse_metar_wind_shear_runway;
 
 /// Parses input tokens into typed data for `parse_metar`.
 pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
@@ -32,18 +36,24 @@ pub fn parse_metar_strict(input: &str) -> Result<Metar, MetarError> {
 fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError> {
     let mut tokenizer = Tokenizer::new(input);
 
-    // Optional leading "METAR"
+    // Optional leading "METAR" or "SPECI"
     let first = tokenizer.next().ok_or(MetarError::InvalidFormat)?;
-    let token = if first == "METAR" {
-        tokenizer.next()
-    } else {
-        Some(first)
-    }
-    .ok_or(MetarError::InvalidFormat)?;
+    let (report_type, token) = match first.as_str() {
+        "METAR" => (
+            MetarReportType::Metar,
+            tokenizer.next().ok_or(MetarError::InvalidFormat)?,
+        ),
+        "SPECI" => (
+            MetarReportType::Speci,
+            tokenizer.next().ok_or(MetarError::InvalidFormat)?,
+        ),
+        _ => (MetarReportType::Metar, first),
+    };
 
     // NIL report: may appear as "METAR NIL" (or sometimes "NIL" after METAR/COR)
     if token == "NIL" {
         let mut metar = Metar::new("", input);
+        metar.report_type = report_type;
         metar.modifier = ReportModifier::Nil;
         return Ok(metar);
     }
@@ -51,12 +61,19 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
     // Optional COR
     let (modifier, station) = if token == "COR" {
         let s = tokenizer.next().ok_or(MetarError::InvalidFormat)?;
+        if s == "NIL" {
+            let mut metar = Metar::new("", input);
+            metar.report_type = report_type;
+            metar.modifier = ReportModifier::Nil;
+            return Ok(metar);
+        }
         (ReportModifier::Correction, s)
     } else {
         (ReportModifier::Normal, token)
     };
 
     let mut metar = Metar::new(&station, input);
+    metar.report_type = report_type;
     metar.modifier = modifier;
 
     let mut rmk_started = false;
@@ -107,7 +124,7 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
             && let Some(next) = tokenizer.peek()
             && let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next)
         {
-            metar.visibility = Some(Visibility::Single { prevailing });
+            metar.visibility = Some(Visibility::Single { prevailing, qualifier: None, ndv: false });
             let _ = tokenizer.next();
             continue;
         }
@@ -116,7 +133,9 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
             metar.visibility = Some(v);
 
             if matches!(metar.visibility, Some(Visibility::CAVOK)) {
+                // CAVOK implies no significant cloud and no significant weather
                 metar.clouds.clear();
+                metar.weather.clear();
             }
             continue;
         }
@@ -143,6 +162,30 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
 
         if let Some(v) = parse_pressure(&token) {
             metar.pressure = Some(v);
+            continue;
+        }
+
+        if let Some(ss) = parse_sea_state(&token) {
+            metar.sea_state = Some(ss);
+            continue;
+        }
+
+        // WS followed by R<runway> or ALL RWY — multi-token group
+        if token == "WS" {
+            if let Some(ws) = parse_metar_wind_shear_runway(&mut tokenizer) {
+                metar.wind_shear.push(ws);
+            }
+            // Whether or not we matched, the WS token is consumed; continue
+            continue;
+        }
+
+        if let Some(color) = parse_color_code(&token) {
+            if metar.color_code.is_none() {
+                metar.color_code = Some(color);
+            } else {
+                // A second bare color code token is the implicit BECMG forecast
+                metar.color_code_forecast = Some(color);
+            }
             continue;
         }
 
