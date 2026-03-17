@@ -16,7 +16,11 @@ pub fn parse_visibility(token: &str, metar: &Metar) -> Option<Visibility> {
 
     // Statute miles (single token, possibly with P/M prefix): 3SM, 3/4SM, P6SM, M1/4SM
     if let Some((prevailing, qualifier)) = parse_statute_miles_to_meters(token) {
-        return Some(Visibility::Single { prevailing, qualifier, ndv: false });
+        return Some(Visibility::Single {
+            prevailing,
+            qualifier,
+            ndv: false,
+        });
     }
 
     // Strip NDV suffix before metric parsing
@@ -29,29 +33,41 @@ pub fn parse_visibility(token: &str, metar: &Metar) -> Option<Visibility> {
     // Prevailing metric visibility: exactly 4 digits (0000–9999)
     if core.len() == 4 && core.chars().all(|c| c.is_ascii_digit()) {
         let prevailing: u16 = core.parse().ok()?;
-        return Some(Visibility::Single { prevailing, qualifier: None, ndv });
+        return Some(Visibility::Single {
+            prevailing,
+            qualifier: None,
+            ndv,
+        });
     }
 
     // Directional minimum (2000SW): 4+ chars, last 1-2 chars are a compass direction
     // NDV doesn't apply here; only metric single groups carry NDV
     if !ndv && token.len() >= 5 {
         let (dist_part, dir_part) = token.split_at(token.len() - 2);
-        if let (Ok(minimum), Some(direction)) =
-            (dist_part.parse::<u16>(), parse_visibility_direction(dir_part))
+        if let (Ok(minimum), Some(direction)) = (
+            dist_part.parse::<u16>(),
+            parse_visibility_direction(dir_part),
+        ) && let Some(Visibility::Single { prevailing, .. }) = metar.visibility
         {
-            if let Some(Visibility::Single { prevailing, .. }) = metar.visibility {
-                return Some(Visibility::WithMinimum { prevailing, minimum, direction });
-            }
+            return Some(Visibility::WithMinimum {
+                prevailing,
+                minimum,
+                direction,
+            });
         }
 
         // Try 1-char direction suffix (N, E, S, W)
         let (dist_part, dir_part) = token.split_at(token.len() - 1);
-        if let (Ok(minimum), Some(direction)) =
-            (dist_part.parse::<u16>(), parse_visibility_direction(dir_part))
+        if let (Ok(minimum), Some(direction)) = (
+            dist_part.parse::<u16>(),
+            parse_visibility_direction(dir_part),
+        ) && let Some(Visibility::Single { prevailing, .. }) = metar.visibility
         {
-            if let Some(Visibility::Single { prevailing, .. }) = metar.visibility {
-                return Some(Visibility::WithMinimum { prevailing, minimum, direction });
-            }
+            return Some(Visibility::WithMinimum {
+                prevailing,
+                minimum,
+                direction,
+            });
         }
     }
 

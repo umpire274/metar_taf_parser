@@ -18,4 +18,3 @@ pub enum MetarReportType {
     /// Special (non-routine) SPECI observation.
     Speci,
 }
-

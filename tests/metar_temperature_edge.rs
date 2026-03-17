@@ -1,4 +1,4 @@
-use metar_taf_parser::{describe_metar, parse_metar, Language};
+use metar_taf_parser::{Language, describe_metar, parse_metar};
 
 #[test]
 fn parse_positive_temperature() {

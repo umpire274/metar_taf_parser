@@ -17,4 +17,3 @@ pub enum MetarWindShearRunway {
     /// Wind shear reported for all runways (`WS ALL RWY`).
     AllRunways,
 }
-

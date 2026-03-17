@@ -45,11 +45,19 @@ pub fn parse_runway_state(token: &str) -> Option<RunwayState> {
     let chars: Vec<char> = data.chars().collect();
 
     let parse_digit = |c: char| {
-        if c == '/' { None } else { c.to_digit(10).map(|v| v as u8) }
+        if c == '/' {
+            None
+        } else {
+            c.to_digit(10).map(|v| v as u8)
+        }
     };
 
     let parse_two_str = |a: char, b: char| {
-        if a == '/' && b == '/' { None } else { Some(format!("{a}{b}")) }
+        if a == '/' && b == '/' {
+            None
+        } else {
+            Some(format!("{a}{b}"))
+        }
     };
 
     Some(RunwayState {

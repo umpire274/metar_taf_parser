@@ -6,7 +6,7 @@ use crate::metar::models::sea_state::{SeaState, WaveHeightKind};
 /// Accepts tokens of the form `W[TT]/[S|H][HH]` where:
 ///
 /// - `TT`  = two-digit water temperature, optionally prefixed with `M` for
-///           negative values (e.g. `M2` → −2 °C), or `//` for unavailable.
+///   negative values (e.g. `M2` → −2 °C), or `//` for unavailable.
 /// - `S`   = WMO state-of-sea code that follows (0–9).
 /// - `H`   = significant wave height in decimetres that follows.
 /// - `HH`  = one or two digit wave value, or `/` for unavailable.
@@ -49,7 +49,11 @@ pub fn parse_sea_state(token: &str) -> Option<SeaState> {
     let water_temperature = parse_temperature(temp_part)?;
     let (wave_kind, wave_value) = parse_wave(wave_part)?;
 
-    Some(SeaState { water_temperature, wave_kind, wave_value })
+    Some(SeaState {
+        water_temperature,
+        wave_kind,
+        wave_value,
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -100,4 +104,3 @@ fn parse_wave(part: &str) -> Option<(WaveHeightKind, Option<u8>)> {
     let value: u8 = value_str.parse().ok()?;
     Some((kind, Some(value)))
 }
-

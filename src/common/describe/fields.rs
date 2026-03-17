@@ -54,7 +54,11 @@ pub fn describe_wind<L: Locale>(wind: &Wind, locale: &L) -> String {
 pub fn describe_visibility<L: Locale>(vis: &Visibility, locale: &L) -> String {
     match vis {
         Visibility::CAVOK => "CAVOK (ceiling and visibility OK)".to_string(),
-        Visibility::Single { prevailing, qualifier, ndv } => {
+        Visibility::Single {
+            prevailing,
+            qualifier,
+            ndv,
+        } => {
             let base = match qualifier {
                 None => {
                     if *prevailing >= 9999 {
@@ -76,7 +80,11 @@ pub fn describe_visibility<L: Locale>(vis: &Visibility, locale: &L) -> String {
                 base
             }
         }
-        Visibility::WithMinimum { prevailing, minimum, direction } => {
+        Visibility::WithMinimum {
+            prevailing,
+            minimum,
+            direction,
+        } => {
             let dir = locale.visibility_direction(direction);
             format!(
                 "visibility {} m, minimum {} m to the {}",
@@ -231,7 +239,10 @@ pub fn describe_rvr(rvr: &RunwayVisualRange) -> String {
         Some(RvrTendency::NoChange) => " (no change)".to_string(),
     };
 
-    format!("RVR runway {}: {}{}", rvr.runway_designator, range, tendency)
+    format!(
+        "RVR runway {}: {}{}",
+        rvr.runway_designator, range, tendency
+    )
 }
 
 /// Describes a runway state group in natural language.
@@ -247,7 +258,10 @@ pub fn describe_runway_state(rs: &RunwayState) -> String {
         return "airfield closed due to snow/ice (SNOCLO)".to_string();
     }
 
-    let deposit = rs.deposit_type.map(deposit_type_label).unwrap_or("not reported");
+    let deposit = rs
+        .deposit_type
+        .map(deposit_type_label)
+        .unwrap_or("not reported");
     let coverage = rs.coverage.map(coverage_label).unwrap_or("not reported");
 
     let mut parts = vec![
@@ -328,10 +342,10 @@ fn braking_label(code: &str) -> String {
         "99" => "figures unreliable".to_string(),
         v => {
             // Values 28–75 are friction coefficients (/100)
-            if let Ok(n) = v.parse::<u8>() {
-                if n <= 75 {
-                    return format!("µ = {:.2}", f32::from(n) / 100.0);
-                }
+            if let Ok(n) = v.parse::<u8>()
+                && n <= 75
+            {
+                return format!("µ = {:.2}", f32::from(n) / 100.0);
             }
             v.to_string()
         }

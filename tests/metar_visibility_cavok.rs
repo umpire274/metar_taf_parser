@@ -74,13 +74,15 @@ fn describe_cavok_visibility() {
     let desc = describe_metar(&m, Language::En);
     let vis = desc.visibility.unwrap();
     assert!(vis.contains("CAVOK"), "{}", vis);
-    assert!(desc.clouds.is_empty(), "no cloud entries expected with CAVOK");
+    assert!(
+        desc.clouds.is_empty(),
+        "no cloud entries expected with CAVOK"
+    );
 }
 
 #[test]
 fn describe_cavok_full_example() {
-    let m =
-        parse_metar("METAR EHLE 280925Z 21009G19KT 060V130 CAVOK 02/M01 Q1001").unwrap();
+    let m = parse_metar("METAR EHLE 280925Z 21009G19KT 060V130 CAVOK 02/M01 Q1001").unwrap();
     let desc = describe_metar(&m, Language::En);
 
     assert_eq!(desc.station, "EHLE");

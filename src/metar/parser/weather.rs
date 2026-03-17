@@ -73,7 +73,7 @@ pub fn parse_weather(token: &str) -> Option<Weather> {
             "FU" => WeatherPhenomenon::Smoke,
             "GR" => WeatherPhenomenon::Hail,
             "GS" => WeatherPhenomenon::SmallHail,
-            "PL" | "PE" => WeatherPhenomenon::IcePellets,  // PE is legacy ICAO code
+            "PL" | "PE" => WeatherPhenomenon::IcePellets, // PE is legacy ICAO code
             "IC" => WeatherPhenomenon::IceCrystals,
             "SG" => WeatherPhenomenon::SnowGrains,
             "PO" => WeatherPhenomenon::SandWhirls,
@@ -99,19 +99,22 @@ pub fn parse_weather(token: &str) -> Option<Weather> {
     }
 
     // TS captured as descriptor but no phenomena follow → standalone thunderstorm
-    if phenomena.is_empty() {
-        if let Some(pos) = descriptors
+    if phenomena.is_empty()
+        && let Some(pos) = descriptors
             .iter()
             .position(|d| matches!(d, WeatherDescriptor::Thunderstorm))
-        {
-            descriptors.remove(pos);
-            phenomena.push(WeatherPhenomenon::Thunder);
-        }
+    {
+        descriptors.remove(pos);
+        phenomena.push(WeatherPhenomenon::Thunder);
     }
 
     if descriptors.is_empty() && phenomena.is_empty() {
         None
     } else {
-        Some(Weather { intensity, descriptors, phenomena })
+        Some(Weather {
+            intensity,
+            descriptors,
+            phenomena,
+        })
     }
 }

@@ -31,4 +31,3 @@ pub struct SeaState {
     /// `None` when reported as `/`.
     pub wave_value: Option<u8>,
 }
-

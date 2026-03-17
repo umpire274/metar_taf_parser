@@ -63,7 +63,10 @@ fn parse_freezing_fog() {
 fn parse_vicinity_showers() {
     let wx = parse_weather("VCSH").unwrap();
     assert!(wx.descriptors.contains(&WeatherDescriptor::Vicinity));
-    assert!(wx.phenomena.contains(&WeatherPhenomenon::Hail) || wx.descriptors.contains(&WeatherDescriptor::Showers));
+    assert!(
+        wx.phenomena.contains(&WeatherPhenomenon::Hail)
+            || wx.descriptors.contains(&WeatherDescriptor::Showers)
+    );
 }
 
 #[test]
@@ -102,78 +105,153 @@ fn parse_low_drifting_sand() {
 
 #[test]
 fn parse_haze() {
-    assert!(parse_weather("HZ").unwrap().phenomena.contains(&WeatherPhenomenon::Haze));
+    assert!(
+        parse_weather("HZ")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::Haze)
+    );
 }
 
 #[test]
 fn parse_smoke() {
-    assert!(parse_weather("FU").unwrap().phenomena.contains(&WeatherPhenomenon::Smoke));
+    assert!(
+        parse_weather("FU")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::Smoke)
+    );
 }
 
 #[test]
 fn parse_ice_crystals() {
-    assert!(parse_weather("IC").unwrap().phenomena.contains(&WeatherPhenomenon::IceCrystals));
+    assert!(
+        parse_weather("IC")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::IceCrystals)
+    );
 }
 
 #[test]
 fn parse_ice_pellets_pl() {
-    assert!(parse_weather("PL").unwrap().phenomena.contains(&WeatherPhenomenon::IcePellets));
+    assert!(
+        parse_weather("PL")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::IcePellets)
+    );
 }
 
 #[test]
 fn parse_ice_pellets_pe_legacy() {
     // PE is the legacy ICAO code, must map to IcePellets
-    assert!(parse_weather("PE").unwrap().phenomena.contains(&WeatherPhenomenon::IcePellets));
+    assert!(
+        parse_weather("PE")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::IcePellets)
+    );
 }
 
 #[test]
 fn parse_sand_whirls() {
-    assert!(parse_weather("PO").unwrap().phenomena.contains(&WeatherPhenomenon::SandWhirls));
+    assert!(
+        parse_weather("PO")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::SandWhirls)
+    );
 }
 
 #[test]
 fn parse_squalls() {
-    assert!(parse_weather("SQ").unwrap().phenomena.contains(&WeatherPhenomenon::Squalls));
+    assert!(
+        parse_weather("SQ")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::Squalls)
+    );
 }
 
 #[test]
 fn parse_funnel_cloud() {
-    assert!(parse_weather("FC").unwrap().phenomena.contains(&WeatherPhenomenon::FunnelCloud));
+    assert!(
+        parse_weather("FC")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::FunnelCloud)
+    );
 }
 
 #[test]
 fn parse_sand() {
-    assert!(parse_weather("SA").unwrap().phenomena.contains(&WeatherPhenomenon::Sand));
+    assert!(
+        parse_weather("SA")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::Sand)
+    );
 }
 
 #[test]
 fn parse_dust() {
-    assert!(parse_weather("DU").unwrap().phenomena.contains(&WeatherPhenomenon::Dust));
+    assert!(
+        parse_weather("DU")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::Dust)
+    );
 }
 
 #[test]
 fn parse_dust_storm() {
-    assert!(parse_weather("DS").unwrap().phenomena.contains(&WeatherPhenomenon::DustStorm));
+    assert!(
+        parse_weather("DS")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::DustStorm)
+    );
 }
 
 #[test]
 fn parse_sand_storm() {
-    assert!(parse_weather("SS").unwrap().phenomena.contains(&WeatherPhenomenon::SandStorm));
+    assert!(
+        parse_weather("SS")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::SandStorm)
+    );
 }
 
 #[test]
 fn parse_volcanic_ash() {
-    assert!(parse_weather("VA").unwrap().phenomena.contains(&WeatherPhenomenon::VolcanicAsh));
+    assert!(
+        parse_weather("VA")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::VolcanicAsh)
+    );
 }
 
 #[test]
 fn parse_unknown_precipitation() {
-    assert!(parse_weather("UP").unwrap().phenomena.contains(&WeatherPhenomenon::UnknownPrecipitation));
+    assert!(
+        parse_weather("UP")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::UnknownPrecipitation)
+    );
 }
 
 #[test]
 fn parse_spray() {
-    assert!(parse_weather("PY").unwrap().phenomena.contains(&WeatherPhenomenon::Spray));
+    assert!(
+        parse_weather("PY")
+            .unwrap()
+            .phenomena
+            .contains(&WeatherPhenomenon::Spray)
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -207,7 +285,10 @@ fn parse_vicinity_mist() {
 fn parse_unknown_phenomena_pair() {
     let wx = parse_weather("BRXX").unwrap();
     assert!(wx.phenomena.contains(&WeatherPhenomenon::Mist));
-    assert!(wx.phenomena.contains(&WeatherPhenomenon::Unknown("XX".to_string())));
+    assert!(
+        wx.phenomena
+            .contains(&WeatherPhenomenon::Unknown("XX".to_string()))
+    );
 }
 
 #[test]

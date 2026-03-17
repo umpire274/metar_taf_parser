@@ -1,5 +1,5 @@
 use metar_taf_parser::metar::models::trend::{MetarTrend, MetarTrendTimeKind};
-use metar_taf_parser::{describe_metar, parse_metar, Language};
+use metar_taf_parser::{Language, describe_metar, parse_metar};
 
 #[test]
 fn parse_nosig_trend() {
@@ -63,10 +63,8 @@ fn parse_tempo_trend_payload_keeps_unknown_tokens() {
 #[test]
 fn parse_becmg_fm_visibility_manual_example() {
     // "FM1200 6000 means that the visibility will be 6 km from 12:00 UTC"
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1200 6000",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1200 6000")
+        .unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert_eq!(detail.kind, MetarTrend::Becmg);
@@ -77,16 +75,19 @@ fn parse_becmg_fm_visibility_manual_example() {
 
     let vis = detail.visibility.unwrap();
     use metar_taf_parser::metar::models::visibility::Visibility;
-    assert!(matches!(vis, Visibility::Single { prevailing: 6000, .. }));
+    assert!(matches!(
+        vis,
+        Visibility::Single {
+            prevailing: 6000,
+            ..
+        }
+    ));
 }
 
 #[test]
 fn parse_tempo_cloud_manual_example() {
     // "TEMPO BKN007 means that there is a temporary cloud layer at 700 ft"
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO BKN007",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO BKN007").unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert_eq!(detail.kind, MetarTrend::Tempo);
@@ -119,10 +120,8 @@ fn nosig_flag_false_without_nosig() {
 
 #[test]
 fn parse_tempo_at_time() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO AT1330 3000",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO AT1330 3000")
+        .unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert_eq!(detail.times[0].kind, MetarTrendTimeKind::At);
@@ -144,23 +143,22 @@ fn describe_nosig_trend() {
 
 #[test]
 fn describe_becmg_with_time_and_visibility() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1200 6000",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1200 6000")
+        .unwrap();
     let desc = describe_metar(&m, Language::En);
     let trend = desc.trend.unwrap();
-    assert!(trend.contains("becoming") || trend.contains("BECMG"), "{}", trend);
+    assert!(
+        trend.contains("becoming") || trend.contains("BECMG"),
+        "{}",
+        trend
+    );
     assert!(trend.contains("12:00Z"), "{}", trend);
     assert!(trend.contains("6000"), "{}", trend);
 }
 
 #[test]
 fn describe_tempo_with_cloud() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO BKN007",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO BKN007").unwrap();
     let desc = describe_metar(&m, Language::En);
     let trend = desc.trend.unwrap();
     assert!(trend.contains("temporar"), "{}", trend);
@@ -173,10 +171,8 @@ fn describe_tempo_with_cloud() {
 
 #[test]
 fn prob30_not_a_metar_trend_keyword() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 PROB30 TEMPO 0200",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 PROB30 TEMPO 0200")
+        .unwrap();
     // PROB30 is never set as the MetarTrend value (it is a TAF-only construct)
     // TEMPO that follows is still a valid METAR trend keyword
     assert!(
@@ -188,10 +184,8 @@ fn prob30_not_a_metar_trend_keyword() {
 
 #[test]
 fn prob40_not_a_metar_trend_keyword() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 PROB40 TEMPO 0200",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 PROB40 TEMPO 0200")
+        .unwrap();
     // Same as PROB30: never a MetarTrend value in METAR context
     assert!(
         matches!(m.trend, Some(MetarTrend::Tempo)),
@@ -207,10 +201,8 @@ fn prob40_not_a_metar_trend_keyword() {
 #[test]
 fn parse_becmg_tl_only_time() {
     // BECMG with TL only (no FM): the change is complete by the TL time
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG TL1800 22015KT",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG TL1800 22015KT")
+        .unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert_eq!(detail.kind, MetarTrend::Becmg);
@@ -228,10 +220,7 @@ fn parse_becmg_tl_only_time() {
 #[test]
 fn parse_tempo_with_weather() {
     // TEMPO with a weather phenomenon (-RA)
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO -RA",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO -RA").unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert_eq!(detail.kind, MetarTrend::Tempo);
@@ -242,10 +231,8 @@ fn parse_tempo_with_weather() {
 #[test]
 fn parse_tempo_with_wind() {
     // TEMPO carrying a new wind group
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO 09010KT",
-    )
-    .unwrap();
+    let m =
+        parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO 09010KT").unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert_eq!(detail.kind, MetarTrend::Tempo);
@@ -262,10 +249,8 @@ fn parse_tempo_with_wind() {
 #[test]
 fn invalid_trend_time_not_parsed_as_time() {
     // FM2499 has minute 99 which is out of range: must not be parsed as a trend time
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM2499 6000",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM2499 6000")
+        .unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert!(
@@ -287,10 +272,9 @@ fn invalid_trend_time_not_parsed_as_time() {
 #[test]
 fn trend_stops_at_rmk() {
     // Tokens after RMK must not be consumed by the trend parser
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1300 6000 RMK AO2",
-    )
-    .unwrap();
+    let m =
+        parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1300 6000 RMK AO2")
+            .unwrap();
 
     let detail = m.trend_detail.unwrap();
     // RMK-related tokens must not appear in the trend's unparsed_groups
@@ -313,10 +297,8 @@ fn trend_stops_at_rmk() {
 
 #[test]
 fn trend_raw_tokens_populated() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1300 22015KT",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG FM1300 22015KT")
+        .unwrap();
 
     let detail = m.trend_detail.unwrap();
     assert!(
@@ -336,23 +318,23 @@ fn trend_raw_tokens_populated() {
 
 #[test]
 fn describe_becmg_with_wind() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG 22015KT",
-    )
-    .unwrap();
+    let m =
+        parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG 22015KT").unwrap();
     let desc = describe_metar(&m, Language::En);
     let trend = desc.trend.unwrap();
-    assert!(trend.contains("becoming") || trend.contains("BECMG"), "{}", trend);
+    assert!(
+        trend.contains("becoming") || trend.contains("BECMG"),
+        "{}",
+        trend
+    );
     assert!(trend.contains("220"), "{}", trend);
     assert!(trend.contains("15"), "{}", trend);
 }
 
 #[test]
 fn describe_becmg_with_tl_time() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG TL1800 22015KT",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 BECMG TL1800 22015KT")
+        .unwrap();
     let desc = describe_metar(&m, Language::En);
     let trend = desc.trend.unwrap();
     assert!(trend.contains("18:00Z"), "{}", trend);
@@ -360,14 +342,10 @@ fn describe_becmg_with_tl_time() {
 
 #[test]
 fn describe_tempo_with_weather() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO -RA",
-    )
-    .unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015 TEMPO -RA").unwrap();
     let desc = describe_metar(&m, Language::En);
     let trend = desc.trend.unwrap();
     assert!(trend.contains("temporar"), "{}", trend);
     // "-RA" should produce some mention of rain in the description
     assert!(trend.to_lowercase().contains("rain"), "{}", trend);
 }
-

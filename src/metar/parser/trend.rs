@@ -61,7 +61,11 @@ pub fn parse_trend_detail(kind: MetarTrend, tokenizer: &mut Tokenizer) -> MetarT
             && let Some(next) = tokenizer.peek()
             && let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next)
         {
-            detail.visibility = Some(Visibility::Single { prevailing, qualifier: None, ndv: false });
+            detail.visibility = Some(Visibility::Single {
+                prevailing,
+                qualifier: None,
+                ndv: false,
+            });
             let split = tokenizer.next().unwrap_or_default();
             detail.raw_tokens.push(split);
             continue;

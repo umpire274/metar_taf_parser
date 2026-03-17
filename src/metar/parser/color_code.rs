@@ -46,4 +46,3 @@ pub fn parse_color_code(token: &str) -> Option<MilitaryColor> {
 
     Some(MilitaryColor { code, black })
 }
-

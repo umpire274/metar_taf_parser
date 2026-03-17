@@ -1,6 +1,6 @@
 use metar_taf_parser::metar::models::pressure::Pressure;
 use metar_taf_parser::metar::parser::pressure::parse_pressure;
-use metar_taf_parser::{describe_metar, parse_metar, Language};
+use metar_taf_parser::{Language, describe_metar, parse_metar};
 
 #[test]
 fn parse_qnh_hpa_group() {
@@ -59,8 +59,14 @@ fn parse_manual_example_inhg() {
 
 #[test]
 fn parse_low_and_high_qnh() {
-    assert!(matches!(parse_pressure("Q0850").unwrap(), Pressure::QnhHpa(850)));
-    assert!(matches!(parse_pressure("Q1050").unwrap(), Pressure::QnhHpa(1050)));
+    assert!(matches!(
+        parse_pressure("Q0850").unwrap(),
+        Pressure::QnhHpa(850)
+    ));
+    assert!(matches!(
+        parse_pressure("Q1050").unwrap(),
+        Pressure::QnhHpa(1050)
+    ));
 }
 
 #[test]

@@ -82,11 +82,7 @@ fn describe_runway_state_coverage_11_25_percent() {
     let desc = describe_metar(&metar, Language::En);
 
     let rs = &desc.runway_state[0];
-    assert!(
-        rs.contains("11\u{2013}25%"),
-        "expected '11–25%' in: {}",
-        rs
-    );
+    assert!(rs.contains("11\u{2013}25%"), "expected '11–25%' in: {}", rs);
 }
 
 // ── Thickness codes ───────────────────────────────────────────────────────────
@@ -227,4 +223,3 @@ fn describe_runway_state_designator_with_suffix() {
         rs
     );
 }
-

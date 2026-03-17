@@ -46,4 +46,3 @@ pub struct MilitaryColor {
     /// `true` when the `BLACK` prefix is present, indicating a closed field.
     pub black: bool,
 }
-

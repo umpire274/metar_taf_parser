@@ -15,10 +15,8 @@ fn describe_rvr_basic() {
 
 #[test]
 fn describe_rvr_with_tendency_and_qualifier() {
-    let m = parse_metar(
-        "METAR LIRF 121250Z 18010KT 9999 R27/P1500V2000U FEW030 18/12 Q1015",
-    )
-    .unwrap();
+    let m =
+        parse_metar("METAR LIRF 121250Z 18010KT 9999 R27/P1500V2000U FEW030 18/12 Q1015").unwrap();
     let desc = describe_metar(&m, Language::En);
     let rvr = &desc.runway_visual_range[0];
     assert!(rvr.contains("more than 1500 m"), "{}", rvr);
@@ -28,12 +26,10 @@ fn describe_rvr_with_tendency_and_qualifier() {
 
 #[test]
 fn describe_rvr_decreasing() {
-    let m =
-        parse_metar("METAR LIRF 121250Z 18010KT 9999 R16/0500D FEW030 18/12 Q1015").unwrap();
+    let m = parse_metar("METAR LIRF 121250Z 18010KT 9999 R16/0500D FEW030 18/12 Q1015").unwrap();
     let desc = describe_metar(&m, Language::En);
     assert!(desc.runway_visual_range[0].contains("decreasing"));
 }
-
 
 #[test]
 fn parse_basic_rvr_group() {

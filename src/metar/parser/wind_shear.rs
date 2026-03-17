@@ -37,4 +37,3 @@ pub fn parse_metar_wind_shear_runway(tokenizer: &mut Tokenizer) -> Option<MetarW
 
     None
 }
-

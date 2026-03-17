@@ -1,4 +1,6 @@
-use metar_taf_parser::metar::models::visibility::{Visibility, VisibilityDirection, VisibilityQualifier};
+use metar_taf_parser::metar::models::visibility::{
+    Visibility, VisibilityDirection, VisibilityQualifier,
+};
 use metar_taf_parser::parse_metar;
 
 #[test]
@@ -39,7 +41,9 @@ fn metar_visibility_metric_no_fields() {
 fn metar_visibility_ndv() {
     let m = parse_metar("LIRF 121250Z 18010KT 5000NDV FEW030 18/12 Q1015").unwrap();
     match m.visibility.unwrap() {
-        Visibility::Single { prevailing, ndv, .. } => {
+        Visibility::Single {
+            prevailing, ndv, ..
+        } => {
             assert_eq!(prevailing, 5000);
             assert!(ndv);
         }

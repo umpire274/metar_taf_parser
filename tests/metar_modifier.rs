@@ -149,4 +149,3 @@ fn describe_report_type_default_is_metar() {
     let desc = describe_metar(&m, Language::En);
     assert_eq!(desc.report_type, "METAR");
 }
-

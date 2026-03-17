@@ -77,7 +77,11 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
             && let Some(next) = iter.peek()
             && let Some(prevailing) = parse_split_statute_miles_to_meters(token, next)
         {
-            let vis = Visibility::Single { prevailing, qualifier: None, ndv: false };
+            let vis = Visibility::Single {
+                prevailing,
+                qualifier: None,
+                ndv: false,
+            };
             visibility_context = Some(vis.clone());
             current.visibility = Some(vis);
             iter.next();

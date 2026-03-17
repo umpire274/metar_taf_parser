@@ -147,8 +147,7 @@ fn parse_runway_state_thickness_missing() {
 
 #[test]
 fn parse_multiple_runway_states() {
-    let metar =
-        "METAR UOOO 191400Z 00000MPS CAVOK M28/M31 Q1020 R19/450235 R01/010091 NOSIG";
+    let metar = "METAR UOOO 191400Z 00000MPS CAVOK M28/M31 Q1020 R19/450235 R01/010091 NOSIG";
     let parsed = parse_metar(metar).unwrap();
 
     assert_eq!(parsed.runway_state.len(), 2);
@@ -165,4 +164,3 @@ fn reject_designator_with_invalid_suffix() {
 
     assert!(parsed.runway_state.is_empty());
 }
-

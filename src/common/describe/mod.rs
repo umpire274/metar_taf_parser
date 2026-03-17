@@ -26,9 +26,9 @@ pub mod locale;
 
 use crate::common::describe::fields::{
     describe_cloud, describe_icing, describe_metar_wind_shear_runway, describe_military_color,
-    describe_pressure, describe_remarks, describe_runway_state, describe_rvr,
-    describe_sea_state, describe_trend_detail, describe_turbulence, describe_visibility,
-    describe_weather, describe_wind, describe_wind_shear,
+    describe_pressure, describe_remarks, describe_runway_state, describe_rvr, describe_sea_state,
+    describe_trend_detail, describe_turbulence, describe_visibility, describe_weather,
+    describe_wind, describe_wind_shear,
 };
 use crate::common::describe::locale::Locale;
 use crate::common::describe::locale::en::En;
@@ -448,11 +448,7 @@ fn describe_metar_with_locale<L: Locale>(metar: &Metar, locale: &L) -> MetarDesc
             .iter()
             .map(describe_metar_wind_shear_runway)
             .collect(),
-        runway_visual_range: metar
-            .runway_visual_range
-            .iter()
-            .map(describe_rvr)
-            .collect(),
+        runway_visual_range: metar.runway_visual_range.iter().map(describe_rvr).collect(),
         runway_state: metar
             .runway_state
             .iter()

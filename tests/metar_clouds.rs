@@ -1,5 +1,5 @@
 use metar_taf_parser::metar::models::cloud::{CloudAmount, CloudType};
-use metar_taf_parser::{describe_metar, parse_metar, Language};
+use metar_taf_parser::{Language, describe_metar, parse_metar};
 
 // ---------------------------------------------------------------------------
 // Standard layers
@@ -7,10 +7,7 @@ use metar_taf_parser::{describe_metar, parse_metar, Language};
 
 #[test]
 fn metar_multiple_cloud_layers() {
-    let m = parse_metar(
-        "LIRF 121250Z 18010KT 9999 FEW007 BKN014CB BKN017 18/12 Q1015",
-    )
-    .unwrap();
+    let m = parse_metar("LIRF 121250Z 18010KT 9999 FEW007 BKN014CB BKN017 18/12 Q1015").unwrap();
     // Manual example: FEW007 BKN014CB BKN017
     assert_eq!(m.clouds.len(), 3);
     assert_eq!(m.clouds[0].amount, CloudAmount::FEW);
@@ -157,5 +154,9 @@ fn describe_cloud_vv() {
 fn describe_cloud_ovc_unknown_height() {
     let m = parse_metar("LIRF 121250Z 18010KT 9999 OVC/// 18/12 Q1015").unwrap();
     let desc = describe_metar(&m, Language::En);
-    assert!(desc.clouds[0].contains("not available"), "{}", desc.clouds[0]);
+    assert!(
+        desc.clouds[0].contains("not available"),
+        "{}",
+        desc.clouds[0]
+    );
 }

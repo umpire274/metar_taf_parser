@@ -124,7 +124,11 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
             && let Some(next) = tokenizer.peek()
             && let Some(prevailing) = parse_split_statute_miles_to_meters(&token, next)
         {
-            metar.visibility = Some(Visibility::Single { prevailing, qualifier: None, ndv: false });
+            metar.visibility = Some(Visibility::Single {
+                prevailing,
+                qualifier: None,
+                ndv: false,
+            });
             let _ = tokenizer.next();
             continue;
         }

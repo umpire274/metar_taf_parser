@@ -7,24 +7,24 @@ use metar_taf_parser::{Language, describe_metar, parse_metar};
 
 #[test]
 fn parse_wind_shear_single_runway() {
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23",
-    )
-    .unwrap();
+    let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23").unwrap();
 
     assert_eq!(m.wind_shear.len(), 1);
-    assert_eq!(m.wind_shear[0], MetarWindShearRunway::Runway("23".to_string()));
+    assert_eq!(
+        m.wind_shear[0],
+        MetarWindShearRunway::Runway("23".to_string())
+    );
 }
 
 #[test]
 fn parse_wind_shear_runway_with_suffix() {
     // WS R06R — runway 06 Right
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R06R",
-    )
-    .unwrap();
+    let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R06R").unwrap();
 
-    assert_eq!(m.wind_shear[0], MetarWindShearRunway::Runway("06R".to_string()));
+    assert_eq!(
+        m.wind_shear[0],
+        MetarWindShearRunway::Runway("06R".to_string())
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -33,10 +33,7 @@ fn parse_wind_shear_runway_with_suffix() {
 
 #[test]
 fn parse_wind_shear_all_runways() {
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY",
-    )
-    .unwrap();
+    let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY").unwrap();
 
     assert_eq!(m.wind_shear.len(), 1);
     assert_eq!(m.wind_shear[0], MetarWindShearRunway::AllRunways);
@@ -48,14 +45,18 @@ fn parse_wind_shear_all_runways() {
 
 #[test]
 fn parse_multiple_wind_shear_groups() {
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23 WS R05",
-    )
-    .unwrap();
+    let m =
+        parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23 WS R05").unwrap();
 
     assert_eq!(m.wind_shear.len(), 2);
-    assert_eq!(m.wind_shear[0], MetarWindShearRunway::Runway("23".to_string()));
-    assert_eq!(m.wind_shear[1], MetarWindShearRunway::Runway("05".to_string()));
+    assert_eq!(
+        m.wind_shear[0],
+        MetarWindShearRunway::Runway("23".to_string())
+    );
+    assert_eq!(
+        m.wind_shear[1],
+        MetarWindShearRunway::Runway("05".to_string())
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -74,10 +75,7 @@ fn no_wind_shear_in_ordinary_metar() {
 
 #[test]
 fn describe_wind_shear_single_runway() {
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23",
-    )
-    .unwrap();
+    let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS R23").unwrap();
     let desc = describe_metar(&m, Language::En);
     assert_eq!(desc.wind_shear.len(), 1);
     assert!(desc.wind_shear[0].contains("23"), "{}", desc.wind_shear[0]);
@@ -90,10 +88,7 @@ fn describe_wind_shear_single_runway() {
 
 #[test]
 fn describe_wind_shear_all_runways() {
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY",
-    )
-    .unwrap();
+    let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY").unwrap();
     let desc = describe_metar(&m, Language::En);
     assert_eq!(desc.wind_shear.len(), 1);
     assert!(
@@ -105,11 +100,7 @@ fn describe_wind_shear_all_runways() {
 
 #[test]
 fn format_metar_includes_wind_shear_line() {
-    let m = parse_metar(
-        "METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY",
-    )
-    .unwrap();
+    let m = parse_metar("METAR EGLL 120930Z 25010KT 9999 FEW020 15/10 Q1013 WS ALL RWY").unwrap();
     let text = metar_taf_parser::format_metar(&m, Language::En);
     assert!(text.contains("Wind shear:"), "{}", text);
 }
-
