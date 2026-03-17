@@ -7,6 +7,7 @@
 //! Converts raw remark tokens into strongly-typed [`Remark`] variants.
 //! Tokens that do not match any known pattern are preserved in [`Remarks::unparsed`].
 
+use crate::metar::models::cloud::CloudAmount;
 use crate::metar::models::remark::{AutoStationKind, LightningType, Remark, Remarks};
 
 /// Parses a slice of remark tokens into a structured [`Remarks`] value.
@@ -51,6 +52,21 @@ pub fn parse_rmk(tokens: &[String]) -> Remarks {
             continue;
         }
 
+        // WIND <sensor_id> <wind_group>  (3 tokens)
+        if tokens[i] == "WIND"
+            && i + 2 < tokens.len()
+            && let Some((direction, speed, gust)) = parse_wind_token(&tokens[i + 2])
+        {
+            items.push(Remark::WindAtSensor {
+                sensor_id: tokens[i + 1].clone(),
+                direction,
+                speed,
+                gust,
+            });
+            i += 3;
+            continue;
+        }
+
         if let Some(r) = parse_single_token(&tokens[i]) {
             items.push(r);
             i += 1;
@@ -86,6 +102,9 @@ fn parse_single_token(token: &str) -> Option<Remark> {
         return Some(r);
     }
     if let Some(r) = parse_pressure_tendency(token) {
+        return Some(r);
+    }
+    if let Some(r) = parse_cloud_augmentation(token) {
         return Some(r);
     }
 
@@ -307,4 +326,77 @@ fn parse_lightning(token: &str) -> Remark {
     };
 
     Remark::Lightning { types, direction }
+}
+
+/// Parses an ASOS cloud augmentation token of the form `CCCddd///`.
+///
+/// This format appears in the RMK section of automated station METARs to indicate
+/// a cloud ceiling where the type (CB/TCU) cannot be determined by the sensor.
+/// Example: `OVC014///` → overcast at 1400 ft, type undeterminable.
+fn parse_cloud_augmentation(token: &str) -> Option<Remark> {
+    // Must be exactly 9 chars: 3 (amount) + 3 (altitude hundreds) + 3 ("///")
+    if token.len() != 9 || !token.ends_with("///") {
+        return None;
+    }
+
+    let amount = match &token[0..3] {
+        "FEW" => CloudAmount::FEW,
+        "SCT" => CloudAmount::SCT,
+        "BKN" => CloudAmount::BKN,
+        "OVC" => CloudAmount::OVC,
+        _ => return None,
+    };
+
+    let altitude_str = &token[3..6];
+    if !altitude_str.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let altitude_hundreds: u16 = altitude_str.parse().ok()?;
+
+    Some(Remark::CloudAugmentation {
+        amount,
+        base_ft: altitude_hundreds * 100,
+    })
+}
+
+/// Parses a wind group token (e.g. `VRB01G22KT`, `18010KT`, `24015G25MPS`) into
+/// its directional and speed components, for use within the RMK wind-at-sensor group.
+///
+/// Returns `(direction, speed, gust)` where `direction` is `None` for variable wind.
+fn parse_wind_token(token: &str) -> Option<(Option<u16>, u16, Option<u16>)> {
+    let core = token
+        .strip_suffix("KT")
+        .or_else(|| token.strip_suffix("MPS"))?;
+
+    // Variable wind: VRBssGggKT or VRBssKT
+    if let Some(speed_part) = core.strip_prefix("VRB") {
+        let (speed, gust) = parse_speed_gust(speed_part)?;
+        return Some((None, speed, gust));
+    }
+
+    // Fixed direction: dddssGggKT or dddssKT (at least 5 chars: 3 dir + 2 speed)
+    if core.len() < 5 || !core[..3].chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+
+    let direction: u16 = core[..3].parse().ok()?;
+    if direction > 360 {
+        return None;
+    }
+
+    let (speed, gust) = parse_speed_gust(&core[3..])?;
+    Some((Some(direction), speed, gust))
+}
+
+/// Splits `ssGgg` or `ss` into `(speed, Some(gust))` or `(speed, None)`.
+fn parse_speed_gust(s: &str) -> Option<(u16, Option<u16>)> {
+    if let Some((spd, gst)) = s.split_once('G') {
+        let speed: u16 = spd.parse().ok()?;
+        let gust: u16 = gst.parse().ok()?;
+        Some((speed, Some(gust)))
+    } else {
+        let speed: u16 = s.parse().ok()?;
+        Some((speed, None))
+    }
 }

@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.8] - 2026-03-18
+
+### Added
+
+- Aggiunto `Remark::CloudAugmentation { amount: CloudAmount, base_ft: u16 }`:
+  formato ASOS/AWOS `CCCddd///` (es. `OVC014///`) in cui il tipo di nube (CB/TCU)
+  non è determinabile dal sensore automatico. Riconosciuto come remark strutturato
+  anziché finire in `remarks.unparsed`.
+
+- Aggiunto `Remark::WindAtSensor { sensor_id, direction, speed, gust }`:
+  gruppo a tre token `WIND <id> <wind_group>` (es. `WIND SKEID VRB01G22KT`) presente
+  in alcuni METAR ICAO nordeuropei per indicare il vento rilevato da un sensore
+  secondario o anemometro di riferimento locale.
+
+- Aggiornato `describe_remark` in `common::describe::fields` con due nuovi arm:
+  - `CloudAugmentation` → `"overcast at 1400 ft (type undeterminable)"`.
+  - `WindAtSensor` → `"wind at sensor SKEID variable at 1 kt, gusting 22 kt"`.
+
+- Aggiunti 11 nuovi test in `tests/metar_remark_parser.rs` (da 22 a 33 totali):
+  - **CloudAugmentation:** OVC, BKN, FEW; indipendenza dal cloud body; rifiuto di
+    token senza `///`.
+  - **WindAtSensor:** VRB con raffica (esempio manuale `WIND SKEID VRB01G22KT`),
+    direzione fissa senza raffica, direzione fissa con raffica, token vento
+    malformato → `unparsed`.
+  - **Describe:** output `CloudAugmentation` e `WindAtSensor` tramite `describe_metar`.
+
+### Changed
+
+- Bumped crate version to `0.4.8`.
+
+---
+
 ## [0.4.7] - 2026-03-17
 
 ### Fixed
