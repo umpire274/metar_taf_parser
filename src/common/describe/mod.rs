@@ -135,16 +135,36 @@ pub struct TafDescription {
 impl fmt::Display for MetarDescription {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "METAR {}", self.station)?;
-        if let Some(ref v) = self.time        { writeln!(f, "  Time:        {}", v)?; }
-        if let Some(ref v) = self.modifier    { writeln!(f, "  Status:      {}", v)?; }
-        if let Some(ref v) = self.wind        { writeln!(f, "  Wind:        {}", v)?; }
-        if let Some(ref v) = self.visibility  { writeln!(f, "  Visibility:  {}", v)?; }
-        for w in &self.weather                { writeln!(f, "  Weather:     {}", w)?; }
-        for c in &self.clouds                 { writeln!(f, "  Clouds:      {}", c)?; }
-        if let Some(ref v) = self.temperature { writeln!(f, "  Temperature: {}", v)?; }
-        if let Some(ref v) = self.pressure    { writeln!(f, "  Pressure:    {}", v)?; }
-        if let Some(ref v) = self.trend       { writeln!(f, "  Trend:       {}", v)?; }
-        if let Some(ref v) = self.remarks     { writeln!(f, "  Remarks:     {}", v)?; }
+        if let Some(ref v) = self.time {
+            writeln!(f, "  Time:        {}", v)?;
+        }
+        if let Some(ref v) = self.modifier {
+            writeln!(f, "  Status:      {}", v)?;
+        }
+        if let Some(ref v) = self.wind {
+            writeln!(f, "  Wind:        {}", v)?;
+        }
+        if let Some(ref v) = self.visibility {
+            writeln!(f, "  Visibility:  {}", v)?;
+        }
+        for w in &self.weather {
+            writeln!(f, "  Weather:     {}", w)?;
+        }
+        for c in &self.clouds {
+            writeln!(f, "  Clouds:      {}", c)?;
+        }
+        if let Some(ref v) = self.temperature {
+            writeln!(f, "  Temperature: {}", v)?;
+        }
+        if let Some(ref v) = self.pressure {
+            writeln!(f, "  Pressure:    {}", v)?;
+        }
+        if let Some(ref v) = self.trend {
+            writeln!(f, "  Trend:       {}", v)?;
+        }
+        if let Some(ref v) = self.remarks {
+            writeln!(f, "  Remarks:     {}", v)?;
+        }
         Ok(())
     }
 }
@@ -155,16 +175,34 @@ impl fmt::Display for MetarDescription {
 impl fmt::Display for ForecastDescription {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "  [{}]", self.kind)?;
-        if let Some(ref p) = self.period      { write!(f, "  {}", p)?; }
-        if let Some(ref p) = self.probability { write!(f, "  ({})", p)?; }
+        if let Some(ref p) = self.period {
+            write!(f, "  {}", p)?;
+        }
+        if let Some(ref p) = self.probability {
+            write!(f, "  ({})", p)?;
+        }
         writeln!(f)?;
-        if let Some(ref v) = self.wind        { writeln!(f, "    Wind:        {}", v)?; }
-        if let Some(ref v) = self.visibility  { writeln!(f, "    Visibility:  {}", v)?; }
-        for w in &self.weather                { writeln!(f, "    Weather:     {}", w)?; }
-        for c in &self.clouds                 { writeln!(f, "    Clouds:      {}", c)?; }
-        if let Some(ref v) = self.max_temperature { writeln!(f, "    Max temp:    {}", v)?; }
-        if let Some(ref v) = self.min_temperature { writeln!(f, "    Min temp:    {}", v)?; }
-        if let Some(ref v) = self.wind_shear  { writeln!(f, "    Wind shear:  {}", v)?; }
+        if let Some(ref v) = self.wind {
+            writeln!(f, "    Wind:        {}", v)?;
+        }
+        if let Some(ref v) = self.visibility {
+            writeln!(f, "    Visibility:  {}", v)?;
+        }
+        for w in &self.weather {
+            writeln!(f, "    Weather:     {}", w)?;
+        }
+        for c in &self.clouds {
+            writeln!(f, "    Clouds:      {}", c)?;
+        }
+        if let Some(ref v) = self.max_temperature {
+            writeln!(f, "    Max temp:    {}", v)?;
+        }
+        if let Some(ref v) = self.min_temperature {
+            writeln!(f, "    Min temp:    {}", v)?;
+        }
+        if let Some(ref v) = self.wind_shear {
+            writeln!(f, "    Wind shear:  {}", v)?;
+        }
         Ok(())
     }
 }
@@ -185,10 +223,18 @@ impl fmt::Display for ForecastDescription {
 impl fmt::Display for TafDescription {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "TAF {}", self.station)?;
-        if let Some(ref v) = self.issued_at { writeln!(f, "  Issued:    {}", v)?; }
-        if let Some(ref v) = self.validity  { writeln!(f, "  Validity:  {}", v)?; }
-        if let Some(ref v) = self.modifier  { writeln!(f, "  Status:    {}", v)?; }
-        for forecast in &self.forecasts     { write!(f, "{}", forecast)?; }
+        if let Some(ref v) = self.issued_at {
+            writeln!(f, "  Issued:    {}", v)?;
+        }
+        if let Some(ref v) = self.validity {
+            writeln!(f, "  Validity:  {}", v)?;
+        }
+        if let Some(ref v) = self.modifier {
+            writeln!(f, "  Status:    {}", v)?;
+        }
+        for forecast in &self.forecasts {
+            write!(f, "{}", forecast)?;
+        }
         Ok(())
     }
 }

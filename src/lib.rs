@@ -10,8 +10,7 @@ pub mod metar;
 pub mod taf;
 
 pub use common::describe::{
-    ForecastDescription, Language, MetarDescription, TafDescription,
-    describe_metar, describe_taf,
+    ForecastDescription, Language, MetarDescription, TafDescription, describe_metar, describe_taf,
     format_metar, format_taf,
 };
 pub use metar::parser::metar::{parse_metar, parse_metar_strict};
