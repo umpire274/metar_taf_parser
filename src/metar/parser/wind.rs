@@ -1,7 +1,7 @@
 //! Module `wind`.
 //!
 //! Contains types and parsing logic implemented for this crate.
-use crate::metar::models::wind::{Wind, WindUnit};
+use crate::metar::models::wind::{Wind, WindUnit, WindVariation};
 
 /// Normalizes token/text input for `strip_unit` processing.
 fn strip_unit(token: &str) -> Option<(&str, WindUnit)> {
@@ -25,6 +25,7 @@ pub fn parse_wind(token: &str) -> Option<Wind> {
             speed: 0,
             gust: None,
             unit,
+            variation: None,
         });
     }
 
@@ -73,5 +74,43 @@ pub fn parse_wind(token: &str) -> Option<Wind> {
         speed,
         gust,
         unit,
+        variation: None,
     })
+}
+
+/// Parses a variable wind direction range token of the form `dddVddd`.
+///
+/// Returns `Some(WindVariation)` for tokens like `180V240`, otherwise `None`.
+///
+/// # Examples
+///
+/// ```
+/// use metar_taf_parser::metar::parser::wind::parse_wind_variation;
+///
+/// let v = parse_wind_variation("180V240").unwrap();
+/// assert_eq!(v.min, 180);
+/// assert_eq!(v.max, 240);
+///
+/// assert!(parse_wind_variation("18010KT").is_none());
+/// assert!(parse_wind_variation("VRB05KT").is_none());
+/// ```
+pub fn parse_wind_variation(token: &str) -> Option<WindVariation> {
+    // Exactly 7 chars: 3 digits + 'V' + 3 digits
+    if token.len() != 7 {
+        return None;
+    }
+    let (min_str, max_str) = token.split_once('V')?;
+    if min_str.len() != 3 || max_str.len() != 3 {
+        return None;
+    }
+    if !min_str.chars().all(|c| c.is_ascii_digit()) || !max_str.chars().all(|c| c.is_ascii_digit())
+    {
+        return None;
+    }
+    let min: u16 = min_str.parse().ok()?;
+    let max: u16 = max_str.parse().ok()?;
+    if min > 360 || max > 360 {
+        return None;
+    }
+    Some(WindVariation { min, max })
 }

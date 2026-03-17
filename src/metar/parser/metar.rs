@@ -16,7 +16,7 @@ use crate::metar::parser::time::parse_time;
 use crate::metar::parser::trend::{parse_trend, parse_trend_detail};
 use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, parse_visibility};
 use crate::metar::parser::weather::parse_weather;
-use crate::metar::parser::wind::parse_wind;
+use crate::metar::parser::wind::{parse_wind, parse_wind_variation};
 
 /// Parses input tokens into typed data for `parse_metar`.
 pub fn parse_metar(input: &str) -> Result<Metar, MetarError> {
@@ -92,6 +92,14 @@ fn parse_metar_with_mode(input: &str, strict: bool) -> Result<Metar, MetarError>
 
         if let Some(v) = parse_wind(&token) {
             metar.wind = Some(v);
+            continue;
+        }
+
+        // Variable wind direction range (e.g. 180V240), must follow the wind group
+        if let Some(variation) = parse_wind_variation(&token) {
+            if let Some(ref mut wind) = metar.wind {
+                wind.variation = Some(variation);
+            }
             continue;
         }
 

@@ -10,8 +10,8 @@ fn parse_runway_state_full_icao() {
 
     assert_eq!(rs.runway_designator, "19");
     assert_eq!(rs.deposit_type, Some(4)); // Dry snow
-    assert_eq!(rs.contamination_extent, Some(5)); // 26–50%
-    assert_eq!(rs.deposit_depth.as_deref(), Some("02")); // 2 mm
+    assert_eq!(rs.coverage, Some(5)); // 26–50%
+    assert_eq!(rs.thickness.as_deref(), Some("02")); // 2 mm
     assert_eq!(rs.braking_action.as_deref(), Some("35")); // friction / braking
 }
 
@@ -23,8 +23,8 @@ fn parse_runway_state_with_missing_fields() {
     let rs = &parsed.runway_state[0];
     assert_eq!(rs.runway_designator, "01");
     assert_eq!(rs.deposit_type, Some(3));
-    assert_eq!(rs.contamination_extent, Some(9));
-    assert_eq!(rs.deposit_depth.as_deref(), None);
+    assert_eq!(rs.coverage, Some(9));
+    assert_eq!(rs.thickness.as_deref(), None);
     assert_eq!(rs.braking_action.as_deref(), Some("37"));
 }
 
@@ -37,10 +37,10 @@ fn parse_runway_state_preserve_codes() {
 
     assert_eq!(rs.runway_designator, "19");
     assert_eq!(rs.deposit_type, Some(4));
-    assert_eq!(rs.contamination_extent, Some(5));
+    assert_eq!(rs.coverage, Some(5));
 
     // IMPORTANT: preserved as string
-    assert_eq!(rs.deposit_depth.as_deref(), Some("02"));
+    assert_eq!(rs.thickness.as_deref(), Some("02"));
     assert_eq!(rs.braking_action.as_deref(), Some("35"));
 }
 

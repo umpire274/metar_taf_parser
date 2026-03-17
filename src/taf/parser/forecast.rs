@@ -11,8 +11,10 @@ use crate::metar::parser::visibility::{parse_split_statute_miles_to_meters, pars
 use crate::metar::parser::weather::parse_weather;
 use crate::metar::parser::wind::parse_wind;
 use crate::taf::models::forecast::{TafForecast, TafForecastKind};
+use crate::taf::models::icing::{Icing, IcingIntensity};
 use crate::taf::models::temperature::TafTemperature;
 use crate::taf::models::time::TafPeriod;
+use crate::taf::models::turbulence::{Turbulence, TurbulenceIntensity};
 use crate::taf::models::wind_shear::TafWindShear;
 
 /// Entry point: parse tutti i forecast TAF
@@ -94,6 +96,18 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
             continue;
         }
 
+        // -------- Icing (6ABBBC) --------
+        if let Some(icing) = parse_icing(token) {
+            current.icing.push(icing);
+            continue;
+        }
+
+        // -------- Turbulence (5ABBBC) --------
+        if let Some(turb) = parse_turbulence(token) {
+            current.turbulence.push(turb);
+            continue;
+        }
+
         // -------- TAF temperatures (TX/TN) --------
         if let Some((is_max, temp)) = parse_taf_temperature(token) {
             if is_max {
@@ -139,6 +153,8 @@ fn new_base_forecast() -> TafForecast {
         max_temperature: None,
         min_temperature: None,
         wind_shear: None,
+        icing: Vec::new(),
+        turbulence: Vec::new(),
     }
 }
 
@@ -156,6 +172,8 @@ fn new_fm_forecast(from: (u8, u8, u8)) -> TafForecast {
         max_temperature: None,
         min_temperature: None,
         wind_shear: None,
+        icing: Vec::new(),
+        turbulence: Vec::new(),
     }
 }
 
@@ -177,6 +195,8 @@ fn new_period_forecast(
         max_temperature: None,
         min_temperature: None,
         wind_shear: None,
+        icing: Vec::new(),
+        turbulence: Vec::new(),
     }
 }
 
@@ -358,7 +378,51 @@ fn parse_signed_temp(token: &str) -> Option<i8> {
     Some(if negative { -parsed } else { parsed })
 }
 
-/// Helper function used by `fake_metar` parsing logic.
+/// Parses a TAF icing group of the form `6ABBBC` into an [`Icing`] value.
+fn parse_icing(token: &str) -> Option<Icing> {
+    if token.len() != 6 {
+        return None;
+    }
+    let bytes = token.as_bytes();
+    if bytes[0] != b'6' {
+        return None;
+    }
+    if !token[1..].chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    let intensity = IcingIntensity::from_code(bytes[1] - b'0');
+    let base_hundreds: u16 = token[2..5].parse().ok()?;
+    let thickness_thousands: u16 = (bytes[5] - b'0') as u16;
+    Some(Icing {
+        intensity,
+        base_ft: base_hundreds * 100,
+        thickness_ft: thickness_thousands * 1000,
+    })
+}
+
+/// Parses a TAF turbulence group of the form `5ABBBC` into a [`Turbulence`] value.
+fn parse_turbulence(token: &str) -> Option<Turbulence> {
+    if token.len() != 6 {
+        return None;
+    }
+    let bytes = token.as_bytes();
+    if bytes[0] != b'5' {
+        return None;
+    }
+    if !token[1..].chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    let intensity = TurbulenceIntensity::from_code(bytes[1] - b'0');
+    let base_hundreds: u16 = token[2..5].parse().ok()?;
+    let thickness_thousands: u16 = (bytes[5] - b'0') as u16;
+    Some(Turbulence {
+        intensity,
+        base_ft: base_hundreds * 100,
+        thickness_ft: thickness_thousands * 1000,
+    })
+}
+
+/// Builds a minimal [`Metar`] used as context for visibility parsing inside TAF forecasts.
 fn fake_metar(visibility: Option<Visibility>) -> crate::metar::models::Metar {
     use crate::metar::models::Metar;
 

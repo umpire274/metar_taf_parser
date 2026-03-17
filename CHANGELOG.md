@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.3] - 2026-03-17
+
+### Added
+
+- Added `WindVariation { min: u16, max: u16 }` struct to `metar::models::wind`.
+- Added `variation: Option<WindVariation>` field to `Wind`; set when a `dddVddd` token
+  follows the main wind group in a METAR (e.g. `180V240`).
+- Added `parse_wind_variation(token: &str) -> Option<WindVariation>` to `metar::parser::wind`.
+- The `describe_wind` helper now appends `", variable Xto Y°"` when `variation` is present.
+- Added `taf::models::icing` module with:
+  - `IcingIntensity` enum (None, Light, ModerateMixedOrRime, ModerateGlaze, Severe, Unknown).
+  - `Icing { intensity, base_ft, thickness_ft }` struct.
+- Added `taf::models::turbulence` module with:
+  - `TurbulenceIntensity` enum (None, Light, ModerateInCloud, ModerateClearAir,
+    SevereInCloud, SevereClearAir, Extreme, Unknown).
+  - `Turbulence { intensity, base_ft, thickness_ft }` struct.
+- TAF forecast parser now recognises `6ABBBC` (icing) and `5ABBBC` (turbulence) groups,
+  populating `TafForecast::icing` and `TafForecast::turbulence` (`Vec`) accordingly.
+- Added `describe_icing` and `describe_turbulence` helpers in `common::describe::fields`.
+- Added `icing: Vec<String>` and `turbulence: Vec<String>` to `ForecastDescription`;
+  printed by `Display` and `format_taf`.
+- Added 6 integration tests in `tests/metar_wind_variation.rs`.
+- Added 14 integration tests in `tests/taf_icing_turbulence.rs`.
+
+### Changed — **Breaking**
+
+- `RunwayState::contamination_extent` renamed to `RunwayState::coverage`.
+- `RunwayState::deposit_depth` renamed to `RunwayState::thickness`.
+  - Code accessing these fields must be updated accordingly.
+- `Wind` struct gains `variation: Option<WindVariation>` — struct literal construction
+  must add the new field (e.g. `variation: None`).
+- `TafForecast` gains `icing: Vec<Icing>` and `turbulence: Vec<Turbulence>` — struct
+  literal construction must include these fields.
+- Bumped crate version to `0.4.3`.
+- README and CHANGELOG updated.
+
+---
+
 ## [0.4.2] - 2026-03-17
 
 ### Added

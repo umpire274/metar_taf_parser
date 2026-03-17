@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.4.2`
+> ⚠️ **Status:** Active development – current version `0.4.3`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,7 +52,7 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.4.2"
+metar-taf-parser = "0.4.3"
 ```
 
 ### METAR example
@@ -261,6 +261,46 @@ Recognised remark variants: `PeakWind`, `WindShift`, `SeaLevelPressure`,
 `PressureRisingRapidly`, `PressureFallingRapidly`, `SensorStatus`.
 
 The `nosig` field on `Metar` is `true` whenever a `NOSIG` trend group is present.
+
+---
+
+### Wind direction variation (METAR)
+
+When a variable direction range follows the wind group, it is stored in `wind.variation`:
+
+```rust
+use metar_taf_parser::parse_metar;
+
+let m = parse_metar("LIRF 121250Z 18010KT 180V240 9999 FEW030 18/12 Q1015")?;
+let v = m.wind.unwrap().variation.unwrap();
+assert_eq!(v.min, 180);
+assert_eq!(v.max, 240);
+```
+
+### Icing and turbulence in TAF forecasts
+
+Icing (`6ABBBC`) and turbulence (`5ABBBC`) groups are parsed into typed vectors on each
+`TafForecast` block:
+
+```rust
+use metar_taf_parser::parse_taf;
+use metar_taf_parser::taf::models::icing::IcingIntensity;
+use metar_taf_parser::taf::models::turbulence::TurbulenceIntensity;
+
+let taf = parse_taf(
+    "TAF KORD 121100Z 1212/1318 18010KT 9999 SCT020 610304 520803"
+)?;
+
+let fc = &taf.forecasts[0];
+
+// Icing: 6 + intensity=1(Light) + base=030(3000 ft) + thickness=4(4000 ft)
+assert_eq!(fc.icing[0].intensity, IcingIntensity::Light);
+assert_eq!(fc.icing[0].base_ft, 3000);
+
+// Turbulence: 5 + intensity=2(ModerateInCloud) + base=080(8000 ft) + thickness=3(3000 ft)
+assert_eq!(fc.turbulence[0].intensity, TurbulenceIntensity::ModerateInCloud);
+assert_eq!(fc.turbulence[0].base_ft, 8000);
+```
 
 ---
 

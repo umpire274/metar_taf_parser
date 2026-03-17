@@ -8,12 +8,15 @@ use crate::metar::models::trend::MetarTrendDetail;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::models::weather::Weather;
 use crate::metar::models::wind::Wind;
+use crate::taf::models::icing::{Icing, IcingIntensity};
+use crate::taf::models::turbulence::{Turbulence, TurbulenceIntensity};
 use crate::taf::models::wind_shear::TafWindShear;
 
 /// Describes a wind group in natural language.
 ///
-/// Produces output such as `"wind from 180° at 10 kt"` or
-/// `"wind from variable direction at 5 kt, gusting 15 kt"`.
+/// Produces output such as `"wind from 180° at 10 kt"`,
+/// `"wind from variable direction at 5 kt, gusting 15 kt"`, or
+/// `"wind from 200° at 8 kt, variable 180 to 240°"`.
 pub fn describe_wind<L: Locale>(wind: &Wind, locale: &L) -> String {
     let dir = match wind.direction {
         None => "variable direction".to_string(),
@@ -21,12 +24,17 @@ pub fn describe_wind<L: Locale>(wind: &Wind, locale: &L) -> String {
     };
     let unit = locale.wind_unit(&wind.unit);
 
-    match wind.gust {
+    let base = match wind.gust {
         None => format!("wind from {} at {} {}", dir, wind.speed, unit),
         Some(g) => format!(
             "wind from {} at {} {}, gusting {} {}",
             dir, wind.speed, unit, g, unit
         ),
+    };
+
+    match &wind.variation {
+        None => base,
+        Some(v) => format!("{}, variable {} to {}°", base, v.min, v.max),
     }
 }
 
@@ -148,6 +156,44 @@ pub fn describe_wind_shear(ws: &TafWindShear) -> String {
         ws.height_hundreds_ft * 100,
         ws.direction,
         ws.speed_kt,
+    )
+}
+
+/// Describes a TAF icing layer in natural language.
+///
+/// Example output: `"light icing from 4000 ft, depth 3000 ft"`.
+pub fn describe_icing(icing: &Icing) -> String {
+    let intensity = match &icing.intensity {
+        IcingIntensity::None => "no icing",
+        IcingIntensity::Light => "light icing",
+        IcingIntensity::ModerateMixedOrRime => "moderate icing (mixed/rime)",
+        IcingIntensity::ModerateGlaze => "moderate icing (glaze)",
+        IcingIntensity::Severe => "severe icing",
+        IcingIntensity::Unknown(_) => "icing",
+    };
+    format!(
+        "{} from {} ft, depth {} ft",
+        intensity, icing.base_ft, icing.thickness_ft
+    )
+}
+
+/// Describes a TAF turbulence layer in natural language.
+///
+/// Example output: `"moderate turbulence (in-cloud) from 8000 ft, depth 2000 ft"`.
+pub fn describe_turbulence(turb: &Turbulence) -> String {
+    let intensity = match &turb.intensity {
+        TurbulenceIntensity::None => "no turbulence",
+        TurbulenceIntensity::Light => "light turbulence",
+        TurbulenceIntensity::ModerateInCloud => "moderate turbulence (in-cloud)",
+        TurbulenceIntensity::ModerateClearAir => "moderate turbulence (clear air)",
+        TurbulenceIntensity::SevereInCloud => "severe turbulence (in-cloud)",
+        TurbulenceIntensity::SevereClearAir => "severe turbulence (clear air)",
+        TurbulenceIntensity::Extreme => "extreme turbulence",
+        TurbulenceIntensity::Unknown(_) => "turbulence",
+    };
+    format!(
+        "{} from {} ft, depth {} ft",
+        intensity, turb.base_ft, turb.thickness_ft
     )
 }
 
