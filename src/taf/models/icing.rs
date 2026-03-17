@@ -53,4 +53,3 @@ pub struct Icing {
     /// Layer thickness in feet.
     pub thickness_ft: u16,
 }
-

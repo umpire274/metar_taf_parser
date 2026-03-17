@@ -28,8 +28,7 @@ fn wind_variation_with_vrb() {
 
 #[test]
 fn wind_variation_with_gust() {
-    let m =
-        parse_metar("LIRF 121250Z 20015G28KT 170V240 9999 FEW030 18/12 Q1015").unwrap();
+    let m = parse_metar("LIRF 121250Z 20015G28KT 170V240 9999 FEW030 18/12 Q1015").unwrap();
     let wind = m.wind.as_ref().unwrap();
     assert_eq!(wind.gust, Some(28));
     let v = wind.variation.as_ref().unwrap();
@@ -51,4 +50,3 @@ fn wind_variation_unit_struct() {
     assert_eq!(v.min, 100);
     assert_eq!(v.max, 200);
 }
-

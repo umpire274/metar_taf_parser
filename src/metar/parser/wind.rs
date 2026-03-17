@@ -103,8 +103,7 @@ pub fn parse_wind_variation(token: &str) -> Option<WindVariation> {
     if min_str.len() != 3 || max_str.len() != 3 {
         return None;
     }
-    if !min_str.chars().all(|c| c.is_ascii_digit())
-        || !max_str.chars().all(|c| c.is_ascii_digit())
+    if !min_str.chars().all(|c| c.is_ascii_digit()) || !max_str.chars().all(|c| c.is_ascii_digit())
     {
         return None;
     }

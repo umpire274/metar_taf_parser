@@ -26,8 +26,7 @@ pub mod locale;
 
 use crate::common::describe::fields::{
     describe_cloud, describe_icing, describe_pressure, describe_remarks, describe_trend_detail,
-    describe_turbulence, describe_visibility, describe_weather, describe_wind,
-    describe_wind_shear,
+    describe_turbulence, describe_visibility, describe_weather, describe_wind, describe_wind_shear,
 };
 use crate::common::describe::locale::Locale;
 use crate::common::describe::locale::en::En;
@@ -472,7 +471,11 @@ fn describe_forecast<L: Locale>(forecast: &TafForecast, locale: &L) -> ForecastD
         }),
         wind_shear: forecast.wind_shear.as_ref().map(describe_wind_shear),
         icing: forecast.icing.iter().map(describe_icing).collect(),
-        turbulence: forecast.turbulence.iter().map(describe_turbulence).collect(),
+        turbulence: forecast
+            .turbulence
+            .iter()
+            .map(describe_turbulence)
+            .collect(),
     }
 }
 

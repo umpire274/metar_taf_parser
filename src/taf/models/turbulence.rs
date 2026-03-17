@@ -59,4 +59,3 @@ pub struct Turbulence {
     /// Layer thickness in feet.
     pub thickness_ft: u16,
 }
-

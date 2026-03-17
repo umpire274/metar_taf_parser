@@ -159,7 +159,6 @@ pub fn describe_wind_shear(ws: &TafWindShear) -> String {
     )
 }
 
-
 /// Describes a TAF icing layer in natural language.
 ///
 /// Example output: `"light icing from 4000 ft, depth 3000 ft"`.
@@ -172,7 +171,10 @@ pub fn describe_icing(icing: &Icing) -> String {
         IcingIntensity::Severe => "severe icing",
         IcingIntensity::Unknown(_) => "icing",
     };
-    format!("{} from {} ft, depth {} ft", intensity, icing.base_ft, icing.thickness_ft)
+    format!(
+        "{} from {} ft, depth {} ft",
+        intensity, icing.base_ft, icing.thickness_ft
+    )
 }
 
 /// Describes a TAF turbulence layer in natural language.
@@ -189,7 +191,10 @@ pub fn describe_turbulence(turb: &Turbulence) -> String {
         TurbulenceIntensity::Extreme => "extreme turbulence",
         TurbulenceIntensity::Unknown(_) => "turbulence",
     };
-    format!("{} from {} ft, depth {} ft", intensity, turb.base_ft, turb.thickness_ft)
+    format!(
+        "{} from {} ft, depth {} ft",
+        intensity, turb.base_ft, turb.thickness_ft
+    )
 }
 
 /// Produces a human-readable summary of the RMK section.
