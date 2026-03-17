@@ -34,10 +34,13 @@ use thiserror::Error;
 ///     ParsedReport::Taf(t)   => println!("station: {}", t.station),
 /// }
 /// ```
+///
+/// The `Metar` variant is heap-allocated (`Box<Metar>`) to keep the enum size
+/// small: `Metar` is significantly larger than `Taf` on the stack.
 #[derive(Debug)]
 pub enum ParsedReport {
     /// A parsed METAR or SPECI observation.
-    Metar(Metar),
+    Metar(Box<Metar>),
     /// A parsed TAF forecast.
     Taf(Taf),
 }
@@ -105,7 +108,7 @@ pub fn parse(input: &str) -> Result<ParsedReport, ParseError> {
     if first == "TAF" {
         Ok(ParsedReport::Taf(parse_taf(input)?))
     } else {
-        Ok(ParsedReport::Metar(parse_metar(input)?))
+        Ok(ParsedReport::Metar(Box::new(parse_metar(input)?)))
     }
 }
 
@@ -134,9 +137,8 @@ pub fn parse(input: &str) -> Result<ParsedReport, ParseError> {
 pub fn parse_strict(input: &str) -> Result<ParsedReport, ParseError> {
     let first = input.split_whitespace().next().unwrap_or("");
     match first {
-        "METAR" | "SPECI" => Ok(ParsedReport::Metar(parse_metar_strict(input)?)),
+        "METAR" | "SPECI" => Ok(ParsedReport::Metar(Box::new(parse_metar_strict(input)?))),
         "TAF" => Ok(ParsedReport::Taf(parse_taf_strict(input)?)),
         _ => Err(ParseError::UnknownReportType),
     }
 }
-
