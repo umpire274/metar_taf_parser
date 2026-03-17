@@ -28,11 +28,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   weather phenomena (intensity, descriptor, phenomenon), temperature (positive and negative),
   pressure (QNH and inHg), modifiers (AUTO, COR, AMD), trends (NOSIG, TEMPO+time),
   remarks preservation, TAF blocks (Base, FM, BECMG, TEMPO, PROB), wind shear, and temperatures.
+- Implemented `std::fmt::Display` for `MetarDescription`, `ForecastDescription`, and `TafDescription`:
+  a single `println!("{}", desc)` prints the full human-readable report, skipping absent fields.
+- Added `format_metar(metar: &Metar, lang: Language) -> String` convenience function: parses,
+  describes, and formats in one call.
+- Added `format_taf(taf: &Taf, lang: Language) -> String` convenience function: same for TAF.
+- Re-exported `format_metar` and `format_taf` from `lib.rs`.
+- Added 17 integration tests in `tests/format_describe.rs` covering `format_metar`, `format_taf`,
+  `Display` output correctness, absent-field omission, and multi-group rendering.
 
 ### Changed
 
 - Bumped crate version to `0.4.0`.
-- README updated with `describe_metar` and `describe_taf` usage examples and dependency snippet.
+- README updated with `describe_metar`, `describe_taf`, `format_metar`, and `format_taf` usage
+  examples and dependency snippet.
 
 ---
 
