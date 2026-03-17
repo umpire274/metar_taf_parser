@@ -24,8 +24,7 @@ fn parse_speci_prefix_returns_metar_variant_with_speci_type() {
 
 #[test]
 fn parse_taf_prefix_returns_taf_variant() {
-    let report =
-        parse("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020").unwrap();
+    let report = parse("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020").unwrap();
     assert!(matches!(report, ParsedReport::Taf(_)));
 }
 
@@ -59,8 +58,7 @@ fn parse_taf_station_is_correct() {
 #[test]
 fn parse_tolerates_unknown_groups_in_metar() {
     // Tolerant mode: unknown tokens end up in unparsed_groups, no error.
-    let report =
-        parse("METAR LIRF 121250Z 18010KT 9999 FEW030 UNKNOWN_TOKEN 18/12 Q1015").unwrap();
+    let report = parse("METAR LIRF 121250Z 18010KT 9999 FEW030 UNKNOWN_TOKEN 18/12 Q1015").unwrap();
     if let ParsedReport::Metar(m) = report {
         assert!(m.unparsed_groups.contains(&"UNKNOWN_TOKEN".to_string()));
     } else {
@@ -74,29 +72,25 @@ fn parse_tolerates_unknown_groups_in_metar() {
 
 #[test]
 fn parse_strict_metar_prefix_ok() {
-    let report =
-        parse_strict("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
+    let report = parse_strict("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
     assert!(matches!(report, ParsedReport::Metar(_)));
 }
 
 #[test]
 fn parse_strict_speci_prefix_ok() {
-    let report =
-        parse_strict("SPECI LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
+    let report = parse_strict("SPECI LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap();
     assert!(matches!(report, ParsedReport::Metar(_)));
 }
 
 #[test]
 fn parse_strict_taf_prefix_ok() {
-    let report =
-        parse_strict("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020").unwrap();
+    let report = parse_strict("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020").unwrap();
     assert!(matches!(report, ParsedReport::Taf(_)));
 }
 
 #[test]
 fn parse_strict_no_prefix_returns_unknown_report_type() {
-    let err =
-        parse_strict("LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap_err();
+    let err = parse_strict("LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015").unwrap_err();
     assert!(
         matches!(err, ParseError::UnknownReportType),
         "expected UnknownReportType, got: {}",
@@ -106,10 +100,8 @@ fn parse_strict_no_prefix_returns_unknown_report_type() {
 
 #[test]
 fn parse_strict_rejects_unknown_metar_group() {
-    let err = parse_strict(
-        "METAR LIRF 121250Z 18010KT 9999 FEW030 UNKNOWN_TOKEN 18/12 Q1015",
-    )
-    .unwrap_err();
+    let err = parse_strict("METAR LIRF 121250Z 18010KT 9999 FEW030 UNKNOWN_TOKEN 18/12 Q1015")
+        .unwrap_err();
     assert!(
         matches!(err, ParseError::Metar(_)),
         "expected Metar error, got: {}",
@@ -120,12 +112,10 @@ fn parse_strict_rejects_unknown_metar_group() {
 #[test]
 fn parse_strict_rejects_unknown_taf_group() {
     let err =
-        parse_strict("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 UNKNOWN_TOKEN")
-            .unwrap_err();
+        parse_strict("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020 UNKNOWN_TOKEN").unwrap_err();
     assert!(
         matches!(err, ParseError::Taf(_)),
         "expected Taf error, got: {}",
         err
     );
 }
-
