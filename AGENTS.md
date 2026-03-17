@@ -127,6 +127,13 @@ Pattern preferiti:
 * propagazione degli errori con `?`
 * aggiunta di contesto agli errori quando utile
 
+I principali tipi di errore sono:
+
+- `MetarError` (`src/metar/errors.rs`)
+- `TafError` (`src/taf/errors.rs`)
+
+Questi tipi sono usati come error type nei parser pubblici e sono serializzabili/testabili.
+
 ---
 
 ## Stile del codice
@@ -157,6 +164,17 @@ Evitare:
 * funzioni monolitiche
 * effetti collaterali nascosti
 
+### Pattern tipico di parser
+
+Tutte le funzioni pubbliche di parsing seguono la firma:
+
+```rust
+fn parse_metar(input: &str) -> Result<Metar, MetarError>
+fn parse_taf(input: &str) -> Result<Taf, TafError>
+```
+
+I modelli di dominio sono fortemente tipizzati (`Metar`, `Taf`, ecc.) e serializzabili con `serde`.
+
 ---
 
 ## Organizzazione del progetto
@@ -168,18 +186,33 @@ Quando viene aggiunto nuovo codice:
 * estrarre la logica riutilizzabile in moduli dedicati
 * mantenere separate, per quanto possibile:
 
-    * CLI
     * logica di dominio
     * parsing
     * formattazione
     * persistenza
     * utility
 
-Se una modifica supera la dimensione di una patch semplice, preferire:
+> **Nota:** Questo progetto espone solo una libreria (`lib.rs`), non una CLI. La separazione CLI non si applica attualmente.
 
-* introduzione di un nuovo modulo
-* refactoring in funzioni più piccole
-* confini più chiari tra file e responsabilità
+La struttura dei moduli segue il pattern:
+
+```
+src/
+  airports/
+    db.rs, model.rs, mod.rs
+  common/
+    report_modifier.rs, tokenizer.rs, ...
+  metar/
+    models/
+      metar.rs, wind.rs, ...
+    parser/
+      metar.rs, wind.rs, ...
+  taf/
+    models/
+    parser/
+```
+
+Ogni gruppo parser/metar/taf ha sottodirectory `models` e `parser` per separare i modelli di dominio dalla logica di parsing.
 
 ---
 
@@ -195,6 +228,19 @@ Sono particolarmente desiderabili:
 * integration test quando il comportamento coinvolge più componenti
 
 Se una modifica non include test, il motivo va esplicitato.
+
+### Pipeline di build e test
+
+La pipeline di build e QA raccomandata è tramite gli script condivisi in `dev_tools/`:
+
+- Windows: `dev_tools/build_check.ps1`
+- Linux/macOS: `dev_tools/build_check.sh`
+
+Questi script eseguono build, lint, format e test in modo standardizzato. Lanciare sempre la pipeline prima di push.
+
+Per eseguire solo i test:
+
+- `cargo test`
 
 ---
 
@@ -214,6 +260,13 @@ Quando possibile:
 * preferire la standard library
 * evitare crate pesanti per esigenze semplici
 * ridurre il rischio di lock-in architetturale
+
+Le uniche dipendenze esterne attualmente ammesse sono:
+
+- `thiserror` (errori tipizzati)
+- `serde` (serializzazione)
+
+L'aggiunta di nuove dipendenze è fortemente scoraggiata salvo reale necessità e va sempre motivata.
 
 ---
 
@@ -237,6 +290,69 @@ Quando viene proposto un refactoring, questo deve puntare a:
 * preservare il comportamento esistente, salvo richiesta diversa
 
 Evitare refactoring puramente estetici se non producono un vantaggio concreto.
+
+---
+
+## Policy di porting e regex
+
+Tutti i parser di gruppo (METAR/TAF) devono mantenere la parità di comportamento con i regex Python di riferimento, come descritto in `docs/PORTING_REGEX_POLICY.md`.
+
+La baseline di porting è completa dalla versione `v0.3.0`. Ogni modifica ai parser deve preservare la compatibilità con i test di parità e la semantica dei gruppi.
+
+### Regex Python → parsing manuale Rust
+
+Il progetto Python di riferimento ([umpire274/python-metar-taf-parser](https://github.com/umpire274/python-metar-taf-parser)) implementa ogni gruppo parser tramite classi `Command` con **regex compilate** (`re.compile()`), ad esempio:
+
+```python
+class WindCommand:
+    regex = r'^(VRB|\d{3})(\d{2})G?(\d{2,3})?(KT|MPS|KM\/H)?'
+```
+
+Il porting Rust ha **deliberatamente sostituito le regex con parsing manuale** idiomatico:
+- `strip_prefix` / `strip_suffix` per riconoscere suffissi e prefissi
+- slicing diretto (`&token[0..3]`)
+- `chars().all(|c| c.is_ascii_digit())` per validazione carattere per carattere
+- `split_once` per separare parti del token
+- `parse::<u16>()` per conversione numerica
+
+**Non è usato nessun crate regex nel progetto Rust.** La semantica di accettazione/rifiuto dei token è preservata rispetto al Python; solo l'implementazione è diversa. Questo è intenzionale e idiomatico Rust.
+
+---
+
+## Gap di parità rispetto al Python
+
+Il progetto Python include funzionalità **non ancora portate** nel porting Rust v0.3.0. Un agente che lavora su questo repository deve essere consapevole di queste aree prima di proporre estensioni:
+
+### 1. Conversione in linguaggio naturale (i18n)
+
+Il Python espone un sistema i18n completo basato su `gettext` con file `messages.po/messages.mo` per **10 lingue**:
+`de`, `en`, `es`, `fr`, `it`, `pl`, `ru-RU`, `tr`, `zh-CN`
+
+Il sistema traduce ogni valore dei modelli in stringhe human-readable tramite chiavi come:
+- `Phenomenon.RA` → `"rain"`
+- `CloudQuantity.BKN` → `"broken"`
+- `Flag.AUTO` → `"automated METAR"`
+- `Remark.PeakWind` → `"peak wind of {1} knots from {0} degrees at {2}:{3}"`
+
+Nel Rust v0.3.0 **non esiste nessun modulo di conversione in linguaggio naturale né alcun supporto i18n.**
+
+### 2. Remark parser
+
+Il Python include un `RemarkParser` dedicato con decine di pattern localizzati (gruppi `Remark.*` nel `.pot`) che converte i gruppi RMK in stringhe descrittive leggibili. Il Rust gestisce i RMK come stringa grezza (`rmk: Option<String>`).
+
+### 3. Architettura Command/Supplier Python
+
+Il Python usa un pattern architetturale `Command/Supplier` con classi dedicate per ogni gruppo (`WindCommand`, `CloudCommand`, ecc.) e un `CommandSupplier` per il dispatch. Il Rust usa invece funzioni pure di parsing, senza questo strato di indirection.
+
+### 4. Modelli Python più ricchi
+
+Il Python modella alcuni concetti non ancora presenti nel Rust, tra cui:
+- `Icing` e `Turbulence` (con intensità e altezze) nei TAF trend
+- `RunwayInfo` con `deposit_type`, `coverage`, `thickness`, `braking_capacity`
+- variazione direzionale del vento (`min_variation`, `max_variation` sul `Wind`)
+- `nosig` come campo booleano su `Metar`
+
+Queste funzionalità sono candidate a porting incrementale futuro.
 
 ---
 
