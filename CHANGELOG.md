@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.7] - 2026-03-17
+
+### Fixed
+
+- **TAF parser — Gruppo 0 (codice TAF):** `TAF AMD NIL` e `TAF COR NIL` non venivano
+  riconosciuti come report NIL. Il token `NIL` era erroneamente trattato come stazione,
+  producendo un `Taf` con `station = "NIL"` invece di `modifier = Nil`. Il parser ora
+  verifica se il token successivo a `AMD` o `COR` è `NIL` e restituisce il report NIL
+  correttamente, allineandosi al comportamento già presente nel parser METAR per `COR NIL`.
+
+### Added
+
+- Esteso `tests/taf_modifier.rs` con 7 nuovi test che coprono l'intero Gruppo 0:
+  - `parse_taf_without_prefix_normal` — TAF senza token `TAF` iniziale.
+  - `parse_taf_amd_nil` — regressione per il bug `TAF AMD NIL`.
+  - `parse_taf_cor_nil` — regressione per il bug `TAF COR NIL`.
+  - `describe_taf_modifier_amd` — `modifier` → `"amended forecast"`.
+  - `describe_taf_modifier_cor` — `modifier` → `"corrected report"`.
+  - `describe_taf_modifier_nil` — `modifier` → `"no data available"`.
+  - `describe_taf_modifier_normal_is_absent` — `modifier` è `None` per report normali.
+
+- Aggiunto `tests/taf_change_groups.rs` con 23 test per i gruppi evolutivi del TAF:
+  - **FM (From):** blocco autonomo, campi corretti, minuti non zero, multipli, periodo
+    invalido ignorato.
+  - **BECMG (Becoming):** esempio dal manuale (`BECMG 2521/2523 22013KT`), periodo ≤ 4 ore,
+    elementi non modificati assenti, attraversamento mezzanotte, multipli.
+  - **TEMPO (Temporary):** esempio dal manuale (`TEMPO 2600/2603 TSRA`), periodo corretto,
+    attraversamento mezzanotte, multipli, TEMPO dopo FM.
+  - **Combinazioni:** tutti i gruppi evolutivi nello stesso TAF, indipendenza dei contenuti.
+  - **Describe:** label FM/BECMG/TEMPO, periodo BECMG, periodo TEMPO.
+
+- Esteso `tests/taf_prob.rs` da 4 a 14 test per i gruppi probabilità (`PROB30`/`PROB40`):
+  - Esempio dal manuale: `PROB40 2510/2513` con verifica di periodo, kind e probabilità.
+  - Validazione: `PROB50` non deve creare un blocco PROB (solo 30 e 40 sono ammessi).
+  - `PROB30` e `PROB40` riconosciuti con il corretto valore `probability`.
+  - Attraversamento mezzanotte con `PROB30`.
+  - Combinazione PROB con FM e TEMPO nello stesso TAF.
+  - Elementi non modificati assenti nel blocco PROB.
+  - Describe: label "Probability", campo `probability` con percentuale, campo `period`.
+
+- Esteso `tests/taf_temperature_groups.rs` da 3 a 16 test per i gruppi temperatura
+  (`TX`/`TN`):
+  - Esempi dal manuale: `TX22/1718Z` (max 22 °C alle 18:00Z del 17°) e `TNM01/1801Z`
+    (min −1 °C alle 01:00Z del 18°).
+  - Combinazione TX + TN nello stesso TAF.
+  - Solo TX senza TN e solo TN senza TX.
+  - Temperatura zero (`TX00`/`TN00`).
+  - TX/TN con giorno che attraversa la mezzanotte.
+  - TX all'interno di un blocco FM.
+  - Token malformati: mancanza del suffisso `Z`, parte oraria non numerica.
+  - Describe: `max_temperature` contiene valore/giorno/ora; `min_temperature` contiene
+    valore negativo; formato con `"maximum"` e `"°C"`.
+
+### Changed
+
+- Bumped crate version to `0.4.7`.
+- README and CHANGELOG updated.
+
+---
+
 ## [0.4.6] - 2026-03-17
 
 ### Added

@@ -90,6 +90,12 @@ pub fn parse_forecasts(tokens: &[String]) -> (Vec<TafForecast>, Vec<String>) {
 
         if let Some(vis) = parse_visibility(token, &fake_metar(visibility_context.clone())) {
             visibility_context = Some(vis.clone());
+            // CAVOK replaces visibility, weather and cloud groups — clear any
+            // groups already parsed in this forecast block.
+            if matches!(vis, Visibility::CAVOK) {
+                current.clouds.clear();
+                current.weather.clear();
+            }
             current.visibility = Some(vis);
             continue;
         }
