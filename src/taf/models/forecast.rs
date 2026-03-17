@@ -5,8 +5,10 @@ use crate::metar::models::cloud::CloudLayer;
 use crate::metar::models::visibility::Visibility;
 use crate::metar::models::weather::Weather;
 use crate::metar::models::wind::Wind;
+use crate::taf::models::icing::Icing;
 use crate::taf::models::temperature::TafTemperature;
 use crate::taf::models::time::TafPeriod;
+use crate::taf::models::turbulence::Turbulence;
 use crate::taf::models::wind_shear::TafWindShear;
 use serde::Serialize;
 
@@ -40,4 +42,8 @@ pub struct TafForecast {
     pub max_temperature: Option<TafTemperature>,
     pub min_temperature: Option<TafTemperature>,
     pub wind_shear: Option<TafWindShear>,
+    /// Icing layers reported in this forecast block.
+    pub icing: Vec<Icing>,
+    /// Turbulence layers reported in this forecast block.
+    pub turbulence: Vec<Turbulence>,
 }

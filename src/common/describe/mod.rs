@@ -25,8 +25,9 @@ mod fields;
 pub mod locale;
 
 use crate::common::describe::fields::{
-    describe_cloud, describe_pressure, describe_remarks, describe_trend_detail,
-    describe_visibility, describe_weather, describe_wind, describe_wind_shear,
+    describe_cloud, describe_icing, describe_pressure, describe_remarks, describe_trend_detail,
+    describe_turbulence, describe_visibility, describe_weather, describe_wind,
+    describe_wind_shear,
 };
 use crate::common::describe::locale::Locale;
 use crate::common::describe::locale::en::En;
@@ -99,6 +100,10 @@ pub struct ForecastDescription {
     pub min_temperature: Option<String>,
     /// Wind shear, e.g. `"wind shear at 2000 ft: 250° at 40 kt"`.
     pub wind_shear: Option<String>,
+    /// Icing layers, one entry per parsed icing group.
+    pub icing: Vec<String>,
+    /// Turbulence layers, one entry per parsed turbulence group.
+    pub turbulence: Vec<String>,
 }
 
 /// Natural language description of a parsed [`Taf`] report.
@@ -202,6 +207,12 @@ impl fmt::Display for ForecastDescription {
         }
         if let Some(ref v) = self.wind_shear {
             writeln!(f, "    Wind shear:  {}", v)?;
+        }
+        for i in &self.icing {
+            writeln!(f, "    Icing:       {}", i)?;
+        }
+        for t in &self.turbulence {
+            writeln!(f, "    Turbulence:  {}", t)?;
         }
         Ok(())
     }
@@ -460,6 +471,8 @@ fn describe_forecast<L: Locale>(forecast: &TafForecast, locale: &L) -> ForecastD
             )
         }),
         wind_shear: forecast.wind_shear.as_ref().map(describe_wind_shear),
+        icing: forecast.icing.iter().map(describe_icing).collect(),
+        turbulence: forecast.turbulence.iter().map(describe_turbulence).collect(),
     }
 }
 

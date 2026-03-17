@@ -43,17 +43,9 @@ pub fn parse_runway_state(token: &str) -> Option<RunwayState> {
 
     Some(RunwayState {
         runway_designator,
-
-        // Group 2
         deposit_type: parse_digit(chars[0]),
-
-        // Group 3
-        contamination_extent: parse_digit(chars[1]),
-
-        // Group 4 (string, ICAO code)
-        deposit_depth: parse_two_str(chars[2], chars[3]),
-
-        // Group 5 (string, ICAO code)
+        coverage: parse_digit(chars[1]),
+        thickness: parse_two_str(chars[2], chars[3]),
         braking_action: parse_two_str(chars[4], chars[5]),
     })
 }

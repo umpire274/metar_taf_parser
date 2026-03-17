@@ -10,6 +10,18 @@ pub enum WindUnit {
     MPS,
 }
 
+/// Variable wind direction range reported alongside the main wind group.
+///
+/// Appears in METAR as `dddVddd`, e.g. `180V240` means the wind is veering
+/// between 180° and 240°.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct WindVariation {
+    /// Minimum variable direction in degrees (0–360).
+    pub min: u16,
+    /// Maximum variable direction in degrees (0–360).
+    pub max: u16,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 /// Stores parsed wind-related values for Wind.
 pub struct Wind {
@@ -24,4 +36,7 @@ pub struct Wind {
 
     /// Unit of measure (KT or MPS)
     pub unit: WindUnit,
+
+    /// Variable wind direction range, when reported (e.g. `180V240`).
+    pub variation: Option<WindVariation>,
 }
