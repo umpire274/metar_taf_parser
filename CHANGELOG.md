@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.6] - 2026-03-17
+
+### Added
+
+- Added `common::parse` module providing a unified entry-point for METAR and TAF parsing.
+- Added `ParsedReport` enum:
+  - `ParsedReport::Metar(Metar)` — wraps a successfully decoded METAR or SPECI.
+  - `ParsedReport::Taf(Taf)` — wraps a successfully decoded TAF.
+- Added `ParseError` enum (derives `thiserror::Error`):
+  - `ParseError::Metar(MetarError)` — inner METAR parser failure.
+  - `ParseError::Taf(TafError)` — inner TAF parser failure.
+  - `ParseError::UnknownReportType` — leading token is neither `METAR`, `SPECI`, nor `TAF`
+    (only returned by `parse_strict`).
+- Added `parse(input: &str) -> Result<ParsedReport, ParseError>` — tolerant dispatcher:
+  - leading token `TAF` → delegates to `parse_taf`.
+  - any other prefix (including `METAR`, `SPECI`, or none) → delegates to `parse_metar`.
+- Added `parse_strict(input: &str) -> Result<ParsedReport, ParseError>` — strict dispatcher:
+  - requires an explicit `METAR`, `SPECI`, or `TAF` leading token; returns
+    `ParseError::UnknownReportType` otherwise.
+  - delegates to `parse_metar_strict` / `parse_taf_strict` respectively.
+- Re-exported `parse`, `parse_strict`, `ParsedReport`, and `ParseError` from `lib.rs`.
+- Added 13 integration tests in `tests/parse_unified.rs` covering tolerant and strict
+  dispatch for all three prefixes, the no-prefix fallback, station extraction from both
+  variants, tolerant unknown-group collection, and strict rejection of unknown groups.
+
+### Changed
+
+- Bumped crate version to `0.4.6`.
+- README and CHANGELOG updated.
+
+---
+
 ## [0.4.5] - 2026-03-17
 
 ### Added
