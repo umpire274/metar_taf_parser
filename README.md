@@ -1,6 +1,6 @@
 # metar_taf_parser
 
-> ⚠️ **Status:** Active development – current version `0.4.5`
+> ⚠️ **Status:** Active development – current version `0.4.6`
 
 A modern, strongly-typed **METAR and TAF parser library** written in Rust.
 
@@ -52,10 +52,41 @@ Add the core crate to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-metar-taf-parser = "0.4.5"
+metar-taf-parser = "0.4.6"
 ```
 
-### METAR example
+### Unified entry-point
+
+When the report type is not known in advance, use `parse` to let the library
+select the correct decoder automatically:
+
+```rust
+use metar_taf_parser::{parse, ParsedReport};
+
+let report = parse("METAR LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015")?;
+// or
+let report = parse("TAF LIRF 121100Z 1212/1318 18010KT 9999 SCT020")?;
+
+match report {
+    ParsedReport::Metar(m) => println!("METAR station: {}", m.station),
+    ParsedReport::Taf(t)   => println!("TAF station:   {}", t.station),
+}
+```
+
+`parse_strict` behaves the same but requires an explicit `METAR`, `SPECI`, or
+`TAF` prefix and rejects unrecognised groups:
+
+```rust
+use metar_taf_parser::{parse_strict, ParseError};
+
+// no prefix → error
+assert!(matches!(
+    parse_strict("LIRF 121250Z 18010KT 9999 FEW030 18/12 Q1015"),
+    Err(ParseError::UnknownReportType)
+));
+```
+
+
 
 ```rust
 use metar_taf_parser::parse_metar;
